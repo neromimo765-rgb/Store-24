@@ -42,6 +42,12 @@
         .hero-banner h2 { font-size: 15px; color: var(--accent-gold); margin-bottom: 4px; }
         .hero-banner p { font-size: 11px; color: var(--text-muted); }
 
+        /* تصميم الكتالوجات / الأقسام الجانبية التفاعلية */
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; scrollbar-width: none; }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+        .category-chip { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .category-chip.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
+
         .search-box { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 10px 15px; border-radius: 12px; font-size: 12px; outline: none; margin-bottom: 12px; }
         .search-box:focus { border-color: var(--accent-gold); }
 
@@ -130,7 +136,6 @@
 </head>
 <body>
 
-    <!-- موسيقى Lo-Fi هادئة ومستقرة تماماً -->
     <audio id="bgMusic" loop preload="auto">
         <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
     </audio>
@@ -160,12 +165,20 @@
             <p>تسوق أحدث المنتجات والعروض الحصرية بكل سهولة وأمان.</p>
         </div>
 
+        <!-- شريط الكتالوجات والأقسام التفاعلية (تظهر دائماً) -->
+        <div class="categories-scroll" id="categoriesContainer">
+            <div class="category-chip active" onclick="filterByCategory('الكل', this)">🏷️ كل المنتجات</div>
+            <div class="category-chip" onclick="filterByCategory('أدوات منزلية', this)">🚿 أدوات منزلية</div>
+            <div class="category-chip" onclick="filterByCategory('إلكترونيات', this)">⚡ إلكترونيات</div>
+            <div class="category-chip" onclick="filterByCategory('عروض خاصة', this)">🔥 عروض خاصة</div>
+        </div>
+
         <div class="catalog-section">
             <input type="text" id="searchInput" class="search-box" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
         </div>
 
         <div class="section-title">
-            <span>📦 كتالوج المنتجات الاحترافي</span>
+            <span id="currentCategoryTitle">📦 كتالوج المنتجات الاحترافي</span>
             <span id="productsCount" style="font-size: 11px; color: var(--accent-gold);">0 منتج</span>
         </div>
 
@@ -219,9 +232,9 @@
     <script>
         let cart = [];
         let isPlaying = false;
+        let selectedCategory = 'الكل';
 
         window.addEventListener('DOMContentLoaded', () => {
-            // تهيئة الموسيقى
             let music = document.getElementById('bgMusic');
             let btn = document.getElementById('musicToggleBtn');
             music.volume = 0.25;
@@ -251,7 +264,6 @@
                 });
             }
 
-            // تحميل المنتجات مع فحص للتأكد من عدم فراغ الكتالوج
             checkAndInitProducts();
             loadCustomerProducts();
         });
@@ -259,13 +271,14 @@
         function checkAndInitProducts() {
             let data = localStorage.getItem('store_products');
             if (!data) {
-                // إذا لم يكن هناك منتجات مخزنة نهائياً، نضع منتج افتراضي عشان الكتالوج يشتغل ويظهر دائمًا
+                // المنتج الافتراضي بدون أي خصم نهائياً ومُصنف تحت "أدوات منزلية"
                 let defaultProducts = [
                     {
                         id: 1,
                         name: "دوش تربو يعمل بالضغط يعمل بالمروحة يزيد المياه",
                         price: 650,
-                        discount: "10%",
+                        discount: "", 
+                        category: "أدوات منزلية",
                         desc: "دوش تربو عالي الجودة يعمل بالضغط والمروحة لزيادة تدفق المياه بكفاءة.",
                         images: [{ type: 'image', src: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=500&auto=format&fit=crop&q=60' }]
                     }
@@ -289,6 +302,17 @@
                     btn.innerHTML = '⏸️';
                 }).catch(e => {});
             }
+        }
+
+        function filterByCategory(category, element) {
+            selectedCategory = category;
+            
+            // تغيير شكل الزرار النشط
+            document.querySelectorAll('.category-chip').forEach(chip => chip.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('currentCategoryTitle').innerText = category === 'الكل' ? '📦 كتالوج المنتجات الاحترافي' : `📂 قسم: ${category}`;
+            loadCustomerProducts();
         }
 
         function toggleQuickSearch(show) {
@@ -336,22 +360,28 @@
             let data = localStorage.getItem('store_products');
             let products = data ? JSON.parse(data) : [];
 
-            document.getElementById('productsCount').innerText = `${products.length} منتج`;
+            // تصفية المنتجات حسب القسم المختار
+            let filteredProducts = products;
+            if (selectedCategory !== 'الكل') {
+                filteredProducts = products.filter(p => p.category === selectedCategory);
+            }
+
+            document.getElementById('productsCount').innerText = `${filteredProducts.length} منتج`;
             const grid = document.getElementById('customerProductsGrid');
             
-            if (products.length === 0) {
+            if (filteredProducts.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
-                        <h3>المتجر جاهز وفي انتظار المنتجات! 🚀</h3>
-                        <p>تصفح الموقع واستمتع بالعروض.</p>
+                        <h3>لا توجد منتجات في هذا القسم حالياً! 📂</h3>
+                        <p>اختر قسماً آخر أو أضف منتجات جديدة لهذا القسم.</p>
                     </div>
                 `;
                 return;
             }
 
-            let singleClass = products.length === 1 ? 'style="max-width: 170px;"' : '';
+            let singleClass = filteredProducts.length === 1 ? 'style="max-width: 170px;"' : '';
 
-            grid.innerHTML = products.map(p => {
+            grid.innerHTML = filteredProducts.map(p => {
                 let mediaHtml = `<div style="background:#111; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">بدون صورة</div>`;
                 if (p.images && p.images.length > 0) {
                     let first = p.images[0];
@@ -362,7 +392,7 @@
                     }
                 }
 
-                // **الإصلاح الجذري للخصم:** شارة الخصم تظهر فقط إذا كان الحقل مكتوب فيه قيمة وغير فارغ أو ليس مسافة
+                // إخفاء شارة الخصم تماماً إذا كانت فارغة أو صفر
                 let discountBadge = '';
                 if (p.discount && p.discount.trim() !== "" && p.discount !== "0" && p.discount.toLowerCase() !== "null") {
                     discountBadge = `<div class="discount-tag">خصم ${p.discount}</div>`;
@@ -517,7 +547,11 @@
             let data = localStorage.getItem('store_products');
             if (!data) return;
             let products = JSON.parse(data);
+            
             let filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
+            if (selectedCategory !== 'الكل') {
+                filtered = filtered.filter(p => p.category === selectedCategory);
+            }
             
             const grid = document.getElementById('customerProductsGrid');
             if (filtered.length === 0) {

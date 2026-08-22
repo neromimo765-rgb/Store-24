@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store-24 | المتجر الاحترافي المتكامل</title>
+    <style>
+        :root {
+            --bg-primary: #0F0F1A;
+            --bg-card: #1E1E32;
+            --accent-gold: #F59E0B;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0B0;
+            --whatsapp-green: #25D366;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding-bottom: 100px; }
+
+        header { background: var(--bg-card); padding: 14px 20px; text-align: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        header h1 { font-size: 18px; color: var(--accent-gold); font-weight: 900; }
+
+        .hero { padding: 30px 20px; text-align: center; background: linear-gradient(180deg, rgba(30,30,50,0.8) 0%, var(--bg-primary) 100%); }
+        .hero span { background: rgba(245, 158, 11, 0.1); color: var(--accent-gold); padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid rgba(245, 158, 11, 0.2); display: inline-block; margin-bottom: 10px; }
+        .hero h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+        .hero p { font-size: 12px; color: var(--text-muted); }
+
+        /* شريط التصنيفات والأقسام */
+        .categories { display: flex; gap: 8px; padding: 0 15px 15px 15px; overflow-x: auto; scrollbar-width: none; }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .cat-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
+
+        .container { padding: 0 15px; max-width: 600px; margin: 0 auto; }
+        
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .card-img { height: 110px; background: rgba(245, 158, 11, 0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 8px; position: relative; }
+        .badge { position: absolute; top: 6px; right: 6px; background: var(--accent-gold); color: #000; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; }
+        
+        .card h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.3; height: 26px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        
+        .specs { font-size: 9px; color: var(--accent-gold); background: rgba(245,158,11,0.05); padding: 4px 6px; border-radius: 6px; margin-bottom: 8px; }
+        
+        .price-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 8px; }
+        .price { color: var(--accent-gold); font-weight: 800; font-size: 12px; }
+        
+        .btn { background: var(--accent-gold); border: none; padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; color: #000; }
+        
+        /* شريط السلة السفلي */
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(30, 30, 50, 0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .cart-info { font-size: 12px; font-weight: 700; }
+        .cart-info span { color: var(--accent-gold); }
+        .whatsapp-btn { background: var(--whatsapp-green); color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 10px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Store-24 | المتجر المتطور ⚡</h1>
+    </header>
+
+    <div class="hero">
+        <span>✨ جودة عالية وأسعار تنافسية</span>
+        <h2>اطلب احتياجاتك بكل سهولة ويسر</h2>
+        <p>تصفح الأقسام أدناه واختر ما يناسبك بضغطة زر.</p>
+    </div>
+
+    <!-- شريط الأقسام والتصنيفات -->
+    <div class="categories">
+        <button class="cat-btn active" onclick="filterCategory('all', this)">الكل</button>
+        <button class="cat-btn" onclick="filterCategory('audio', this)">سماعات وأصوات</button>
+        <button class="cat-btn" onclick="filterCategory('smart', this)">ساعات ذكية</button>
+        <button class="cat-btn" onclick="filterCategory('tools', this)">إكسسوارات سيارات</button>
+    </div>
+
+    <div class="container">
+        <div class="grid" id="productGrid">
+            {/* المنتجات تظهر هنا تلقائياً */}
+        </div>
+    </div>
+
+    <!-- سلة الشراء -->
+    <div class="cart-bar">
+        <div class="cart-info">الإجمالي: <span id="cartTotal">0</span> ج.م (<span id="cartCount">0</span>)</div>
+        <a href="javascript:void(0);" class="whatsapp-btn" onclick="checkoutWhatsApp()">إتمام الطلب 📱</a>
+    </div>
+
+    <script>
+        // قاعدة البيانات الموسعة مع التصنيفات والتفاصيل الدقيقة
+        const products = [
+            { id: 1, name: 'سماعات لاسلكية برو', category: 'audio', desc: 'صوت نقي عالي الأداء مع عزل ضوضاء.', specs: '🔹 بطارية 40 ساعة - بلوتوث 5.3', price: 850, emoji: '🎧', discount: '29%' },
+            { id: 2, name: 'ساعة ذكية رياضية', category: 'smart', desc: 'تتبع نبضات القلب ومقاومة للمياه.', specs: '🔹 شاشة AMOLED - مقاومة للماء IP68', price: 1450, emoji: '⌚', discount: '23%' },
+            { id: 3, name: 'كاميرا مراقبة ذكية', category: 'smart', desc: 'رؤية ليلية وتنبيهات حركة فورية.', specs: '🔹 تغطية 360 درجة - دقة HD', price: 999, emoji: '📷', discount: '23%' },
+            { id: 4, name: 'حامل هاتف للسيارة', category: 'tools', desc: 'شحن سريع وتثبيت أوتوماتيكي ذكي.', specs: '🔹 شحن لاسلكي سريع 15 واط', price: 450, emoji: '🚗', discount: '25%' }
+        ];
+
+        let cart = {};
+
+        function renderProducts(filter = 'all') {
+            const grid = document.getElementById('productGrid');
+            const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+            
+            grid.innerHTML = filtered.map(p => `
+                <div class="card">
+                    <div>
+                        <div class="card-img">${p.emoji} <span class="badge">خصم ${p.discount}</span></div>
+                        <h3>${p.name}</h3>
+                        <p>${p.desc}</p>
+                        <div class="specs">${p.specs}</div>
+                    </div>
+                    <div class="price-row">
+                        <span class="price">${p.price} ج.م</span>
+                        <button class="btn" onclick="updateCart(${p.id}, 1)">+ إضافة</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(category, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProducts(category);
+        }
+
+        function updateCart(productId, change) {
+            if (!cart[productId]) cart[productId] = 0;
+            cart[productId] += change;
+            if (cart[productId] <= 0) delete cart[productId];
+            updateUI();
+        }
+
+        function updateUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+            
+            for (let id in cart) {
+                let prod = products.find(p => p.id == id);
+                totalCount += cart[id];
+                totalPrice += prod.price * cart[id];
+            }
+
+            document.getElementById('cartCount').innerText = totalCount;
+            document.getElementById('cartTotal').innerText = totalPrice;
+        }
+
+    function checkoutWhatsApp() {
+            let totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+            if (totalCount === 0) {
+                alert('الرجاء اختيار منتج واحد على الأقل لإتمام الطلب.');
+                return;
+            }
+
+            let message = "مرحباً، أود طلب المنتجات التالية:\n";
+            let totalPrice = 0;
+
+            for (let id in cart) {
+                let prod = products.find(p => p.id == id);
+                message += `▪️ ${prod.name} (العدد: ${cart[id]}) - ${prod.price * cart[id]} ج.م\n`;
+                totalPrice += prod.price * cart[id];
+            }
+
+            message += `\n💰 الإجمالي الكلي: ${totalPrice} ج.م`;
+            let url = `https://wa.me/201000000000?text=` + encodeURIComponent(message);
+            window.open(url, '_blank');
+        }
+
+        // التشغيل الأولي
+        renderProducts();
+    </script>
+</body>
+</html>

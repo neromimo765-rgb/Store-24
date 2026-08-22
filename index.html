@@ -47,8 +47,9 @@
 
         .section-title { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; }
+        /* ضبط الشبكة لضمان ظهور المنتجات بجانب بعضها بشكل متناسق وثابت */
+        .products-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; width: 100%; }
         .product-card:active { transform: scale(0.98); }
         
         .product-media-box { width: 100%; height: 140px; background: #000; position: relative; overflow: hidden; cursor: pointer; }
@@ -66,7 +67,7 @@
 
         .buy-btn { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
         
-        .empty-state { text-align: center; padding: 30px 15px; grid-column: span 2; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 16px; }
+        .empty-state { text-align: center; padding: 30px 15px; grid-column: span 2; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 16px; width: 100%; }
         .empty-state h3 { color: var(--accent-gold); font-size: 14px; margin-bottom: 6px; }
         .empty-state p { color: var(--text-muted); font-size: 11px; margin-bottom: 12px; }
 
@@ -91,7 +92,6 @@
             transition: transform 0.2s;
         }
         .floating-assistant-btn:active { transform: scale(0.9); }
-        /* تصميم "الديل" أو مؤشر الدردشة للزر الدائري */
         .floating-assistant-btn::after {
             content: '';
             position: absolute;
@@ -112,12 +112,14 @@
         .quick-result-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); cursor: pointer; }
         .quick-result-item:hover { border-color: var(--accent-gold); }
 
-        /* نافذة تفاصيل المنتج وصورة مكبرة */
+        /* نافذة تفاصيل المنتج وصورة مكبرة ومنضبطة */
         #productModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 11, 16, 0.9); backdrop-filter: blur(5px); z-index: 3000; overflow-y: auto; }
         .modal-box { position: relative; background: var(--bg-card); margin: 30px auto; width: 90%; max-width: 420px; border-radius: 16px; border: 1px solid var(--border-color); padding: 15px; }
         .close-modal { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        .modal-media { width: 100%; height: 260px; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 12px; }
-        .modal-media img, .modal-media video { width: 100%; height: 100%; object-fit: contain; }
+        
+        .modal-media { width: 100%; height: 260px; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .modal-media img, .modal-media video { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
         .modal-title { font-size: 15px; color: #fff; font-weight: bold; margin-bottom: 6px; cursor: pointer; }
         .modal-title:hover { color: var(--accent-gold); }
         .modal-price { font-size: 16px; color: var(--accent-gold); font-weight: 900; margin-bottom: 10px; }
@@ -147,9 +149,9 @@
 </head>
 <body>
 
-    <!-- موسيقى خلفية هادئة تعمل تلقائياً -->
+    <!-- موسيقى هادئة وناعمة جداً (Lo-Fi / Ambient) -->
     <audio id="bgMusic" loop preload="auto">
-        <source src="https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg" type="audio/ogg">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf7f6.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
     </audio>
 
     <div class="top-ticker">
@@ -204,7 +206,7 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل المنتج وصورة مكبرة -->
+    <!-- نافذة تفاصيل المنتج -->
     <div id="productModal">
         <div class="modal-box" id="modalBoxContent"></div>
     </div>
@@ -241,7 +243,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             let music = document.getElementById('bgMusic');
             let btn = document.getElementById('musicToggleBtn');
-            music.volume = 0.4;
+            music.volume = 0.3;
             
             let playPromise = music.play();
             if (playPromise !== undefined) {
@@ -356,6 +358,7 @@
                     }
                 }
 
+                // شارة الخصم تظهر حصرياً إذا كتبتها من لوحة التحكم وليست فارغة
                 let discountBadge = (p.discount && p.discount.trim() !== "") ? `<div class="discount-tag">خصم ${p.discount}</div>` : '';
 
                 return `
@@ -392,19 +395,23 @@
             if (p.images && p.images.length > 0) {
                 let first = p.images[0];
                 if (first.type === 'video') {
-                    mediaHtml = `<video src="${first.src}" controls autoplay loop playsinline style="width:100%; height:100%; object-fit:contain;"></video>`;
+                    mediaHtml = `<video src="${first.src}" controls autoplay loop playsinline style="max-width:100%; max-height:100%; object-fit:contain;"></video>`;
                 } else {
-                    mediaHtml = `<img src="${first.src}" alt="${p.name}" style="width:100%; height:100%; object-fit:contain;">`;
+                    mediaHtml = `<img src="${first.src}" alt="${p.name}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
                 }
             }
 
+            let discountBadge = (p.discount && p.discount.trim() !== "") ? `<div class="discount-tag">خصم ${p.discount}</div>` : '';
             let reviewsKey = `product_reviews_${p.id}`;
             let reviews = JSON.parse(localStorage.getItem(reviewsKey) || '[]');
             let reviewsHtml = reviews.map(r => `<div class="review-item">💬 ${r}</div>`).join('') || '<div style="font-size:10px; color:var(--text-muted);">كن أول من يكتب رأيه في هذا المنتج!</div>';
 
             document.getElementById('modalBoxContent').innerHTML = `
                 <button class="close-modal" onclick="closeProductModal()">&times;</button>
-                <div class="modal-media">${mediaHtml}</div>
+                <div class="modal-media">
+                    ${discountBadge}
+                    ${mediaHtml}
+                </div>
                 <h3 class="modal-title" onclick="openProductDetails(${p.id})">${p.name}</h3>
                 <div class="modal-price">${p.price} ج.م</div>
                 <div class="modal-desc"><strong>التفاصيل:</strong><br>${p.desc || 'لا توجد تفاصيل مضافة لهذا المنتج.'}</div>

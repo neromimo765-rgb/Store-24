@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | الإدارة</title>
+    <style>
+        :root {
+            --bg-primary: #0F0F1A;
+            --bg-card: #1E1E32;
+            --accent-gold: #F59E0B;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0B0;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --danger: #EF4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 20px; }
+
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        /* شاشة تسجيل الدخول */
+        #loginScreen { background: var(--bg-card); border: 1px solid var(--accent-gold); border-radius: 14px; padding: 25px; text-align: center; margin-top: 50px; }
+        #loginScreen h2 { color: var(--accent-gold); margin-bottom: 15px; font-size: 18px; }
+        
+        /* لوحة التحكم الرئيسية */
+        #adminPanel { display: none; }
+        
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+        .card h2 { color: var(--accent-gold); font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        
+        .input-field { width: 100%; background: #0F0F1A; border: 1px solid var(--border-color); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; outline: none; }
+        .btn { background: var(--accent-gold); color: #000; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; }
+        
+        .product-row { display: flex; justify-content: space-between; align-items: center; background: #0F0F1A; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; border: 1px solid var(--border-color); }
+        .del-btn { background: var(--danger); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; }
+        
+        .back-link { display: block; text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 12px; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- شاشة الباسورد -->
+        <div id="loginScreen">
+            <h2>🔐 دخول لوحة التحكم الخاصة بالمتجر</h2>
+            <input type="password" id="adminPass" class="input-field" placeholder="أدخل كلمة المرور (افتراضي: 1234)">
+            <button class="btn" onclick="login()">دخول للأدمن 🚀</button>
+            <a href="index.html" class="back-link">← العودة لموقع المتجر الرئيسي</a>
+        </div>
+
+        <!-- اللوحة الفعلية لإضافة وحذف المنتجات -->
+        <div id="adminPanel">
+            <div class="card">
+                <h2>➕ إضافة منتج جديد للمتجر</h2>
+                <input type="text" id="pName" class="input-field" placeholder="اسم المنتج (مثال: ساعة ذكية)">
+                <input type="number" id="pPrice" class="input-field" placeholder="السعر (بالجنيه)">
+                <input type="text" id="pDiscount" class="input-field" placeholder="نسبة الخصم (مثال: 20%)">
+                <input type="text" id="pImage" class="input-field" placeholder="رابط الصورة أو الفيديو المباشر">
+                <input type="text" id="pDesc" class="input-field" placeholder="وصف قصير للمنتج">
+                <button class="btn" onclick="addProduct()">نشر المنتج في المتجر فوراً ⚡</button>
+            </div>
+
+            <div class="card">
+                <h2>📦 المنتجات الحالية في المتجر (<span id="pCount">0</span>)</h2>
+                <div id="productsList"></div>
+            </div>
+
+            <a href="index.html" class="back-link">🌐 عرض المتجر الرئيسي للعملاء</a>
+        </div>
+    </div>
+
+    <script>
+        // كلمة المرور الخاصة بك (يمكنك تغييرها هنا لو أردت)
+        const MY_PASSWORD = "1234";
+
+        function login() {
+            let enteredPass = document.getElementById('adminPass').value;
+            if (enteredPass === MY_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadProductsAdmin();
+            } else {
+                alert('كلمة المرور غير صحيحة!');
+            }
+        }
+
+        function loadProductsAdmin() {
+            let products = JSON.parse(localStorage.getItem('store_products')) || [];
+            const list = document.getElementById('productsList');
+            document.getElementById('pCount').innerText = products.length;
+
+            if (products.length === 0) {
+                list.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px;">لا توجد منتجات حالياً.</p>`;
+                return;
+            }
+
+            list.innerHTML = products.map(p => `
+                <div class="product-row">
+                    <div>
+                        <b>${p.name}</b><br>
+                        <span style="color: var(--accent-gold);">${p.price} ج.م</span>
+                    </div>
+                    <button class="del-btn" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function addProduct() {
+            const name = document.getElementById('pName').value;
+            const price = parseFloat(document.getElementById('pPrice').value);
+            const discount = document.getElementById('pDiscount').value;
+            const image = document.getElementById('pImage').value;
+            const desc = document.getElementById('pDesc').value;
+
+            if (!name || !price) {
+                alert('الرجاء إدخال اسم المنتج والسعر على الأقل!');
+                return;
+            }
+
+            let products = JSON.parse(localStorage.getItem('store_products')) || [];
+            
+            let newProd = {
+                id: Date.now(),
+                name,
+                price,
+                discount: discount || '10%',
+                image: image || '',
+                desc: desc || 'منتج عالي الجودة',
+                reviews: []
+            };
+
+            products.push(newProd);
+            localStorage.setItem('store_products', JSON.stringify(products));
+            
+            // تفريغ الحقول
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pDiscount').value = '';
+            document.getElementById('pImage').value = '';
+            document.getElementById('pDesc').value = '';
+
+            loadProductsAdmin();
+            alert('تم إضافة المنتج بنجاح ونشره في المتجر! 🎉');
+        }
+
+    function deleteProduct(id) {
+        if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) {
+            let products = JSON.parse(localStorage.getItem('store_products')) || [];
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('store_products', JSON.stringify(products));
+            loadProductsAdmin();
+        }
+    }
+</script>
+</body>
+</html>

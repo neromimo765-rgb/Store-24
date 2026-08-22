@@ -3,419 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الاحترافية | Mobile Dashboard</title>
+    <title>Store-24 | لوحة تحكم المالك</title>
     <style>
         :root {
-            --bg-primary: #09090E;
-            --bg-card: #13131F;
+            --bg-primary: #0B0B10;
+            --bg-card: #151522;
             --accent-gold: #F59E0B;
-            --accent-glow: rgba(245, 158, 11, 0.15);
             --text-main: #FFFFFF;
-            --text-muted: #8E8EA0;
+            --text-muted: #9CA3AF;
             --border-color: rgba(255, 255, 255, 0.08);
             --danger: #EF4444;
             --success: #10B981;
-            --whatsapp: #25D366;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-primary); color: var(--text-main); padding: 12px; padding-bottom: 90px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 15px; padding-bottom: 50px; }
 
         .container { max-width: 480px; margin: 0 auto; }
-        
-        /* شاشة تسجيل الدخول */
-        #loginScreen { background: var(--bg-card); border: 1px solid var(--accent-gold); border-radius: 20px; padding: 30px 20px; text-align: center; margin-top: 60px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-        #loginScreen h2 { color: var(--accent-gold); margin-bottom: 8px; font-size: 20px; }
-        #loginScreen p { color: var(--text-muted); font-size: 12px; margin-bottom: 20px; }
-        
-        #adminPanel { display: none; }
 
-        /* الهيدر العلوي */
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 5px 0; border-bottom: 1px solid var(--border-color); }
-        .app-header h1 { font-size: 16px; color: var(--accent-gold); display: flex; align-items: center; gap: 6px; }
-        .logout-btn { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .header h2 { color: var(--accent-gold); font-size: 16px; }
+        .back-store-btn { background: var(--bg-card); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; text-decoration: none; }
 
-        /* إحصائيات تفاعلية قابلة للتعديل */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .stat-card:active { border-color: var(--accent-gold); background: var(--accent-glow); }
-        .stat-card .number { font-size: 15px; font-weight: 800; color: var(--accent-gold); margin-bottom: 3px; }
-        .stat-card .label { font-size: 10px; color: var(--text-muted); }
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; margin-bottom: 15px; }
+        .card h3 { font-size: 13px; color: var(--accent-gold); margin-bottom: 10px; }
 
-        /* الكروت والمنتجات */
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; margin-bottom: 15px; }
-        .card h3 { color: var(--accent-gold); font-size: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* قائمة المنتجات المصغرة */
-        .product-row { background: var(--bg-primary); padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); }
-        .product-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .product-info { display: flex; align-items: center; gap: 10px; }
-        .product-thumb { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; background: #1a1a1a; border: 1px solid var(--border-color); }
-        .product-details h4 { font-size: 12px; color: #fff; margin-bottom: 2px; }
-        .product-details span { font-size: 11px; color: var(--accent-gold); font-weight: bold; }
-        
-        /* أزرار المشاركة السريعة لمواقع التواصل */
-        .social-share-bar { display: flex; gap: 6px; border-top: 1px solid var(--border-color); padding-top: 8px; }
-        .share-btn { flex: 1; padding: 6px 4px; border-radius: 8px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; color: #fff; }
-        .btn-whatsapp { background: var(--whatsapp); }
-        .btn-copy { background: rgba(255,255,255,0.1); color: var(--text-main); }
-        .del-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+        .form-control { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; padding: 9px; border-radius: 8px; font-size: 11px; outline: none; }
+        .form-control:focus { border-color: var(--accent-gold); }
 
-        /* نافذة إضافة منتج (Modal) */
-        #addProductModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 9, 14, 0.85); backdrop-filter: blur(8px); z-index: 1000; overflow-y: auto; padding: 15px; }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--accent-gold); border-radius: 20px; max-width: 450px; margin: 30px auto; padding: 20px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .close-modal { position: absolute; left: 15px; top: 15px; background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; }
+        .btn-primary { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 11px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; margin-top: 8px; }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; padding: 4px 8px; border-radius: 6px; font-size: 9px; cursor: pointer; font-weight: bold; }
 
-        .form-group { margin-bottom: 12px; }
-        .form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
-        .input-field { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; padding: 11px; border-radius: 10px; font-size: 12px; outline: none; transition: 0.2s; }
-        .input-field:focus { border-color: var(--accent-gold); box-shadow: 0 0 8px var(--accent-glow); }
-
-        /* رفع الوسائط ومعالجة عرض الفيديو والصور بدقة */
-        .file-upload-box { border: 2px dashed var(--accent-gold); padding: 15px; border-radius: 12px; text-align: center; background: var(--accent-glow); cursor: pointer; }
-        .file-upload-box input { display: none; }
-        .file-upload-box label { cursor: pointer; font-size: 12px; color: var(--accent-gold); display: block; font-weight: bold; }
-        
-        .preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .preview-item { position: relative; width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-gold); background: #000; }
-        .preview-item img, .preview-item video { width: 100%; height: 100%; object-fit: cover; }
-        .remove-img-btn { position: absolute; top: 2px; left: 2px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
-
-        .btn { background: var(--accent-gold); color: #000; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
-        .btn-secondary { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); margin-top: 10px; }
-
-        .fab-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent-gold); color: #000; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 800; font-size: 13px; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); cursor: pointer; display: flex; align-items: center; gap: 8px; z-index: 99; }
-        .back-link { display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-size: 11px; text-decoration: none; }
+        .products-list { display: flex; flex-direction: column; gap: 8px; }
+        .admin-product-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .admin-product-info h4 { font-size: 11px; color: #fff; margin-bottom: 2px; }
+        .admin-product-info span { font-size: 9px; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- شاشة تسجيل الدخول -->
-        <div id="loginScreen">
-            <h2>🔐 لوحة تحكم المتجر</h2>
-            <p>أدخل كلمة المرور لإدارة منتجاتك (1234)</p>
-            <input type="password" id="adminPass" class="input-field" placeholder="كلمة المرور" style="text-align: center; margin-bottom: 15px;">
-            <button class="btn" onclick="login()">دخول للأدمن ⚡</button>
-            <a href="index.html" class="back-link">← العودة للمتجر الرئيسي</a>
+        <div class="header">
+            <h2>⚙️ لوحة تحكم المالك</h2>
+            <a href="index.html" class="back-store-btn">عرض المتجر 🛒</a>
         </div>
 
-        <!-- لوحة التحكم الفعلية -->
-        <div id="adminPanel">
-            <div class="app-header">
-                <h1>⚡ لوحة التحكم</h1>
-                <button class="logout-btn" onclick="logout()">خروج 🚪</button>
+        <!-- نموذج إضافة منتج جديد -->
+        <div class="card">
+            <h3>➕ إضافة منتج جديد وتحديد القسم</h3>
+            <div class="form-group">
+                <label>اسم المنتج:</label>
+                <input type="text" id="pName" class="form-control" placeholder="مثال: مطحنة ومساحة">
             </div>
-
-            <!-- إحصائيات تفاعلية بالكامل للتحكم الحقيقي -->
-            <div class="stats-grid">
-                <div class="stat-card" onclick="editStat('products')">
-                    <div class="number" id="statTotal">0</div>
-                    <div class="label">المنتجات 📦</div>
-                </div>
-                <div class="stat-card" onclick="editStat('orders')">
-                    <div class="number" id="statOrders">12</div>
-                    <div class="label">الطلبات 🛒 (تعديل)</div>
-                </div>
-                <div class="stat-card" onclick="editStat('rating')">
-                    <div class="number" id="statRating">4.9★</div>
-                    <div class="label">التقييم ⭐ (تعديل)</div>
-                </div>
+            <div class="form-group">
+                <label>السعر (بالجنيه):</label>
+                <input type="number" id="pPrice" class="form-control" placeholder="مثال: 650">
             </div>
-
-            <!-- قائمة المنتجات مع التسويق الفوري -->
-            <div class="card">
-                <h3>📦 المنتجات وتسويقها</h3>
-                <div id="productsList"></div>
-                <button class="btn btn-secondary" onclick="resetDefaultProducts()">🔄 استعادة المنتجات التجريبية</button>
+            <div class="form-group">
+                <label>اختر القسم (الكتالوج):</label>
+                <select id="pCategory" class="form-control">
+                    <option value="أدوات منزلية">🚿 أدوات منزلية</option>
+                    <option value="إلكترونيات">⚡ إلكترونيات</option>
+                    <option value="عروض خاصة">🔥 عروض خاصة</option>
+                </select>
             </div>
-
-            <a href="index.html" class="back-link" target="_blank">🌐 تصفح المتجر الرئيسي للعملاء</a>
+            <div class="form-group">
+                <label>رابط الصورة أو الفيديو المباشر:</label>
+                <input type="text" id="pImage" class="form-control" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="form-group">
+                <label>وصف المنتج:</label>
+                <textarea id="pDesc" class="form-control" rows="2" placeholder="تفاصيل المنتج ومميزاته..."></textarea>
+            </div>
+            <button class="btn-primary" onclick="addNewProduct()">نشر المنتج الآن في الكتالوج 🚀</button>
         </div>
-    </div>
 
-    <!-- نافذة إضافة منتج -->
-    <div id="addProductModal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="toggleModal(false)">&times;</button>
-            <h3 style="color: var(--accent-gold); margin-bottom: 15px; font-size: 15px;">➕ إضافة منتج جديد</h3>
-            
-            <div class="form-group">
-                <label class="form-label">اسم المنتج</label>
-                <input type="text" id="pName" class="input-field" placeholder="مثال: ساعة ذكية أصلية">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">السعر (بالجنيه)</label>
-                <input type="number" id="pPrice" class="input-field" placeholder="0.00">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">نسبة الخصم (اختياري)</label>
-                <input type="text" id="pDiscount" class="input-field" placeholder="مثال: 20%">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">الصور أو الفيديو (معالجة ذكية للفيديو والصور)</label>
-                <div class="file-upload-box">
-                    <input type="file" id="mediaInput" accept="image/*,video/*" multiple onchange="handleMediaFiles(this)">
-                    <label for="mediaInput">📁 اختر الصور أو الفيديوهات من التليفون</label>
-                </div>
-                <div id="previewArea" class="preview-container"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">وصف سريع للمنتج</label>
-                <input type="text" id="pDesc" class="input-field" placeholder="تفاصيل المنتج...">
-            </div>
-
-            <button class="btn" onclick="addProduct()">نشر المنتج الآن والتزامن مع المتجر 🚀</button>
+        <!-- قائمة المنتجات الحالية -->
+        <div class="card">
+            <h3>📦 إدارة المنتجات (<span id="totalAdminCount">0</span>)</h3>
+            <div class="products-list" id="adminProductsList"></div>
         </div>
     </div>
-
-    <!-- الزر العائم -->
-    <button id="fabBtn" class="fab-btn" style="display: none;" onclick="toggleModal(true)">
-        ➕ إضافة منتج جديد
-    </button>
 
     <script>
-        const MY_PASSWORD = "1234";
-        let uploadedMediaArray = [];
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAdminProducts();
+        });
 
-        function login() {
-            let enteredPass = document.getElementById('adminPass').value;
-            if (enteredPass === MY_PASSWORD) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('fabBtn').style.display = 'flex';
-                loadAdminData();
-            } else {
-                alert('كلمة المرور غير صحيحة!');
-            }
-        }
-
-        function logout() {
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('fabBtn').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'block';
-            document.getElementById('adminPass').value = '';
-        }
-
-        function toggleModal(show) {
-            document.getElementById('addProductModal').style.display = show ? 'block' : 'none';
-        }
-
-        // معالجة خاصة تفرق بدقة بين الصور والفيديوهات عشان الفيديو يظهر ويشتغل صح في المعاينة
-        function handleMediaFiles(input) {
-            const files = input.files;
-            if (uploadedMediaArray.length + files.length > 10) {
-                alert('عذراً، أقصى حد مسموح به هو 10 ملفات للمنتج الواحد!');
-                return;
-            }
-
-            for (let i = 0; i < files.length; i++) {
-                let file = files[i];
-                let reader = new FileReader();
-
-                reader.onload = function(e) {
-                    uploadedMediaArray.push({
-                        type: file.type.startsWith('video') ? 'video' : 'image',
-                        src: e.target.result
-                    });
-                    renderPreviews();
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function renderPreviews() {
-            const previewArea = document.getElementById('previewArea');
-            previewArea.innerHTML = '';
-            
-            uploadedMediaArray.forEach((media, index) => {
-                let div = document.createElement('div');
-                div.className = 'preview-item';
-                
-                if (media.type === 'video') {
-                    div.innerHTML = `<video src="${media.src}" muted autoplay loop playsinline></video><button class="remove-img-btn" onclick="removeMedia(${index})">×</button>`;
-                } else {
-                    div.innerHTML = `<img src="${media.src}" alt="preview"><button class="remove-img-btn" onclick="removeMedia(${index})">×</button>`;
-                }
-                previewArea.appendChild(div);
-            });
-        }
-
-        function removeMedia(index) {
-            uploadedMediaArray.splice(index, 1);
-            renderPreviews();
-        }
-
-        // التحكم الحقيقي في الإحصائيات (الطلبات والتقييمات) وحفظها لتظهر فوراً للعملاء
-        function getStoreStats() {
-            let stats = localStorage.getItem('store_stats');
-            if (!stats) {
-                let defaultStats = { orders: 12, rating: "4.9★" };
-                localStorage.setItem('store_stats', JSON.stringify(defaultStats));
-                return defaultStats;
-            }
-            return JSON.parse(stats);
-        }
-
-        function editStat(type) {
-            let stats = getStoreStats();
-            if (type === 'orders') {
-                let newVal = prompt("أدخل عدد الطلبات الحقيقي الجديد:", stats.orders);
-                if (newVal !== null && newVal.trim() !== "") {
-                    stats.orders = newVal;
-                    localStorage.setItem('store_stats', JSON.stringify(stats));
-                    loadAdminData();
-                    alert('✅ تم تحديث عدد الطلبات وحفظه للعملاء بنجاح!');
-                }
-            } else if (type === 'rating') {
-                let newVal = prompt("أدخل التقييم الجديد (مثال: 4.9★):", stats.rating);
-                if (newVal !== null && newVal.trim() !== "") {
-                    stats.rating = newVal;
-                    localStorage.setItem('store_stats', JSON.stringify(stats));
-                    loadAdminData();
-                    alert('✅ تم تحديث التقييم وحفظه للعملاء بنجاح!');
-                }
-            }
-        }
-
-        function getProducts() {
+        function loadAdminProducts() {
             let data = localStorage.getItem('store_products');
-            if (!data) {
-                let defaults = [
-                    { id: 1, name: 'سماعات لاسلكية برو', desc: 'صوت نقي عالي الأداء وعزل ضوضاء ممتاز.', price: 850, discount: '29%', images: [], reviews: [] },
-                    { id: 2, name: 'ساعة ذكية رياضية', desc: 'تتبع نبضات القلب بدقة وشاشة HD كاملة باللمس.', price: 1450, discount: '23%', images: [], reviews: [] }
-                ];
-                localStorage.setItem('store_products', JSON.stringify(defaults));
-                return defaults;
-            }
-            return JSON.parse(data);
-        }
-
-        // التزامن الفوري مع قاعدة البيانات المحلية (localStorage) وتحديث واجهة الأدمن
-        function loadAdminData() {
-            let products = getProducts();
-            let stats = getStoreStats();
+            let products = data ? JSON.parse(data) : [];
             
-            document.getElementById('statTotal').innerText = products.length;
-            document.getElementById('statOrders').innerText = stats.orders;
-            document.getElementById('statRating').innerText = stats.rating;
+            document.getElementById('totalAdminCount').innerText = products.length;
+            let container = document.getElementById('adminProductsList');
 
-            const list = document.getElementById('productsList');
             if (products.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px; padding: 10px;">لا توجد منتجات حالياً.</p>`;
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px;">لا توجد منتجات مضافة حالياً.</p>`;
                 return;
             }
 
-            let storeBaseUrl = window.location.href.replace('admin.html', 'index.html');
-
-            list.innerHTML = products.map(p => {
-                let firstMedia = 'https://via.placeholder.com/40';
-                if (p.images && p.images.length > 0) {
-                    firstMedia = p.images[0].src; // لو صورة أو فيديو أول عنصر
-                }
-                
-                let productLink = `${storeBaseUrl}#product-${p.id}`;
-                let shareText = encodeURIComponent(`🔥 اطلب الآن: ${p.name} بسعر ${p.price} ج.م فقط!\nتصفح المتجر واطلب هنا: ${productLink}`);
-
-                return `
-                    <div class="product-row">
-                        <div class="product-top">
-                            <div class="product-info">
-                                ${p.images && p.images.length > 0 && p.images[0].type === 'video' ? 
-                                  `<video src="${p.images[0].src}" class="product-thumb" muted></video>` : 
-                                  `<img src="${firstMedia}" class="product-thumb" alt="product">`
-                                }
-                                <div class="product-details">
-                                    <h4>${p.name}</h4>
-                                    <span>${p.price} ج.م</span>
-                                </div>
-                            </div>
-                            <button class="del-btn" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
-                        </div>
-                        <!-- شريط التسويق ومشاركة الروابط -->
-                        <div class="social-share-bar">
-                            <button class="share-btn btn-copy" onclick="copyProductLink('${productLink}')">🔗 نسخ الرابط</button>
-                            <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" style="text-decoration:none; flex:1; display:flex;">
-                                <button class="share-btn btn-whatsapp" style="width:100%;">💬 واتساب</button>
-                            </a>
-                        </div>
+            container.innerHTML = products.map(p => `
+                <div class="admin-product-item">
+                    <div class="admin-product-info">
+                        <h4>${p.name}</h4>
+                        <span>${p.price} ج.م | القسم: ${p.category || 'عام'}</span>
                     </div>
-                `;
-            }).join('');
+                    <button class="btn-danger" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
+                </div>
+            `).join('');
         }
 
-        function copyProductLink(link) {
-            navigator.clipboard.writeText(link).then(() => {
-                alert('✅ تم نسخ رابط المنتج بنجاح! انسخه وانشره في فيسبوك، تيك توك، أو جروبات الواتساب.');
-            }).catch(err => {
-                prompt("انسخ الرابط يدوياً:", link);
-            });
-        }
+        function addNewProduct() {
+            let name = document.getElementById('pName').value.trim();
+            let price = parseFloat(document.getElementById('pPrice').value);
+            let category = document.getElementById('pCategory').value;
+            let imageUrl = document.getElementById('pImage').value.trim();
+            let desc = document.getElementById('pDesc').value.trim();
 
-        function addProduct() {
-            const name = document.getElementById('pName').value;
-            const price = parseFloat(document.getElementById('pPrice').value);
-            const discount = document.getElementById('pDiscount').value;
-            const desc = document.getElementById('pDesc').value;
-
-            if (!name || !price) {
-                alert('الرجاء إدخال اسم المنتج والسعر على الأقل!');
+            if (!name || isNaN(price)) {
+                alert('الرجاء إدخال اسم المنتج والسعر بشكل صحيح.');
                 return;
             }
 
-            let products = getProducts();
-            
-            let newProd = {
+            let images = [];
+            if (imageUrl) {
+                let isVideo = imageUrl.endsWith('.mp4') || imageUrl.includes('video');
+                images.push({ type: isVideo ? 'video' : 'image', src: imageUrl });
+            }
+
+            let data = localStorage.getItem('store_products');
+            let products = data ? JSON.parse(data) : [];
+
+            let newProduct = {
                 id: Date.now(),
-                name,
-                price,
-                discount: discount || '10%',
-                images: [...uploadedMediaArray],
-                desc: desc || 'منتج عالي الجودة',
-                reviews: []
+                name: name,
+                price: price,
+                category: category,
+                desc: desc,
+                images: images
             };
 
-            products.push(newProd);
-            // التزامن الفوري مع localStorage ليظهر للعملاء في index.html حالاً
-            localStorage.setItem('store_products', JSON.stringify(products));
+            products.unshift(newProduct);
             
-            // تحديث عداد المنتجات تلقائياً في الإحصائيات
-            let stats = getStoreStats();
-            localStorage.setItem('store_stats', JSON.stringify(stats));
+            try {
+                localStorage.setItem('store_products', JSON.stringify(products));
+                
+                document.getElementById('pName').value = '';
+                document.getElementById('pPrice').value = '';
+                document.getElementById('pImage').value = '';
+                document.getElementById('pDesc').value = '';
 
-            document.getElementById('pName').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('pDiscount').value = '';
-            document.getElementById('pDesc').value = '';
-            document.getElementById('mediaInput').value = '';
-            uploadedMediaArray = [];
-            document.getElementById('previewArea').innerHTML = '';
-            
-            toggleModal(false);
-            loadAdminData();
-            alert('تم نشر المنتج بنجاح وتزامن مع المتجر الرئيسي فوراً! جاهز للمشاركة 🚀');
+                loadAdminProducts();
+                alert('✅ تم نشر المنتج وتحديد القسم بنجاح!');
+            } catch (e) {
+                alert('⚠️ حدث خطأ في الذاكرة.');
+            }
         }
 
         function deleteProduct(id) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                let products = getProducts();
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('store_products', JSON.stringify(products));
-                loadAdminData();
-            }
-        }
+            if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
 
-        function resetDefaultProducts() {
-            if (confirm('هل تريد استعادة المنتجات الافتراضية؟')) {
-                localStorage.removeItem('store_products');
-                localStorage.removeItem('store_stats');
-                loadAdminData();
-                alert('تمت الاستعادة بنجاح!');
-            }
+            let data = localStorage.getItem('store_products');
+            if (!data) return;
+            let products = JSON.parse(data);
+
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('store_products', JSON.stringify(products));
+
+            loadAdminProducts();
         }
     </script>
 </body>

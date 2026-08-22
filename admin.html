@@ -52,7 +52,7 @@
 
         <!-- نموذج إضافة منتج جديد -->
         <div class="card">
-            <h3>➕ إضافة منتج جديد وتحديد القسم</h3>
+            <h3>➕ إضافة منتج جديد (روابط مباشرة للوسائط)</h3>
             <div class="form-group">
                 <label>اسم المنتج:</label>
                 <input type="text" id="pName" class="form-control" placeholder="مثال: مطحنة ومساحة">
@@ -70,8 +70,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>رابط الصورة أو الفيديو المباشر:</label>
-                <input type="text" id="pImage" class="form-control" placeholder="https://example.com/image.jpg">
+                <label>رابط الصورة أو الفيديو المباشر (.jpg أو .mp4):</label>
+                <input type="text" id="pImage" class="form-control" placeholder="https://example.com/media.jpg">
             </div>
             <div class="form-group">
                 <label>وصف المنتج:</label>
@@ -119,7 +119,7 @@
             let name = document.getElementById('pName').value.trim();
             let price = parseFloat(document.getElementById('pPrice').value);
             let category = document.getElementById('pCategory').value;
-            let imageUrl = document.getElementById('pImage').value.trim();
+            let mediaUrl = document.getElementById('pImage').value.trim();
             let desc = document.getElementById('pDesc').value.trim();
 
             if (!name || isNaN(price)) {
@@ -128,9 +128,10 @@
             }
 
             let images = [];
-            if (imageUrl) {
-                let isVideo = imageUrl.endsWith('.mp4') || imageUrl.includes('video');
-                images.push({ type: isVideo ? 'video' : 'image', src: imageUrl });
+            if (mediaUrl) {
+                // التحقق الذكي هل الرابط فيديو أم صورة لتشغيله بسلاسة
+                let isVideo = mediaUrl.endsWith('.mp4') || mediaUrl.includes('video') || mediaUrl.includes('.webm');
+                images.push({ type: isVideo ? 'video' : 'image', src: mediaUrl });
             }
 
             let data = localStorage.getItem('store_products');
@@ -156,7 +157,7 @@
                 document.getElementById('pDesc').value = '';
 
                 loadAdminProducts();
-                alert('✅ تم نشر المنتج وتحديد القسم بنجاح!');
+                alert('✅ تم نشر المنتج والوسائط وتحديد القسم بنجاح وبدون أي ضغط على الذاكرة!');
             } catch (e) {
                 alert('⚠️ حدث خطأ في الذاكرة.');
             }

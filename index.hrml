@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store-24 | المتجر الاحترافي</title>
+    <style>
+        :root {
+            --bg-primary: #0B0B10;
+            --bg-card: #151522;
+            --accent-gold: #F59E0B;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --danger: #EF4444;
+            --success: #10B981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding-bottom: 110px; }
+
+        .top-ticker { background: linear-gradient(90deg, #F59E0B, #D97706); color: #000; font-size: 11px; font-weight: 800; text-align: center; padding: 6px; white-space: nowrap; overflow: hidden; }
+        .container { max-width: 480px; margin: 0 auto; padding: 12px; }
+
+        .store-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
+        .store-logo { font-size: 18px; font-weight: 900; color: var(--accent-gold); display: flex; align-items: center; gap: 6px; }
+        
+        .header-actions { display: flex; gap: 6px; align-items: center; }
+        .music-btn { background: var(--bg-card); border: 1px solid var(--accent-gold); color: var(--accent-gold); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .music-btn.playing { background: var(--accent-gold); color: #000; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        .cart-icon-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--accent-gold); padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; position: relative; }
+        .cart-badge { background: var(--danger); color: #fff; font-size: 9px; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -4px; right: -4px; font-weight: bold; }
+
+        .hero-banner { background: linear-gradient(135deg, #151522, #1F1F33); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; text-align: center; margin-bottom: 15px; }
+        .hero-banner h2 { font-size: 15px; color: var(--accent-gold); margin-bottom: 4px; }
+        .hero-banner p { font-size: 11px; color: var(--text-muted); }
+
+        .search-box { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 10px 15px; border-radius: 12px; font-size: 12px; outline: none; margin-bottom: 12px; }
+        .search-box:focus { border-color: var(--accent-gold); }
+
+        .section-title { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* ضبط الشبكة لضمان ظهور المنتجات بجانب بعضها بشكل متناسق وثابت */
+        .products-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; width: 100%; }
+        .product-card:active { transform: scale(0.98); }
+        
+        .product-media-box { width: 100%; height: 140px; background: #000; position: relative; overflow: hidden; cursor: pointer; }
+        .product-media-box img, .product-media-box video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .discount-tag { position: absolute; top: 8px; right: 8px; background: var(--danger); color: #fff; font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 6px; z-index: 5; }
+
+        .product-info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+        .product-title:hover { color: var(--accent-gold); }
+        .product-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .product-price { font-size: 13px; font-weight: 900; color: var(--accent-gold); }
+
+        .buy-btn { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 8px; border-radius: 8px; font-weight: 800; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        
+        .empty-state { text-align: center; padding: 30px 15px; grid-column: span 2; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 16px; width: 100%; }
+        .empty-state h3 { color: var(--accent-gold); font-size: 14px; margin-bottom: 6px; }
+        .empty-state p { color: var(--text-muted); font-size: 11px; margin-bottom: 12px; }
+
+        /* الزر العائم الدائري بـ "ديل" للبحث السريع عن الموديلات */
+        .floating-assistant-btn {
+            position: fixed;
+            bottom: 75px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gold);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            cursor: pointer;
+            z-index: 998;
+            border: 2px solid #fff;
+            transition: transform 0.2s;
+        }
+        .floating-assistant-btn:active { transform: scale(0.9); }
+        .floating-assistant-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            right: 8px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid var(--accent-gold);
+            transform: rotate(-25deg);
+        }
+
+        /* نافذة البحث السريع للموديلات */
+        #quickSearchModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 11, 16, 0.85); backdrop-filter: blur(5px); z-index: 2500; }
+        .quick-search-content { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--bg-card); border-top: 1px solid var(--accent-gold); border-radius: 20px 20px 0 0; padding: 20px; max-height: 80vh; overflow-y: auto; }
+        .quick-search-results { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto; }
+        .quick-result-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); cursor: pointer; }
+        .quick-result-item:hover { border-color: var(--accent-gold); }
+
+        /* نافذة تفاصيل المنتج وصورة مكبرة ومنضبطة */
+        #productModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 11, 16, 0.9); backdrop-filter: blur(5px); z-index: 3000; overflow-y: auto; }
+        .modal-box { position: relative; background: var(--bg-card); margin: 30px auto; width: 90%; max-width: 420px; border-radius: 16px; border: 1px solid var(--border-color); padding: 15px; }
+        .close-modal { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.1); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        
+        .modal-media { width: 100%; height: 260px; border-radius: 12px; overflow: hidden; background: #000; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .modal-media img, .modal-media video { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
+        .modal-title { font-size: 15px; color: #fff; font-weight: bold; margin-bottom: 6px; cursor: pointer; }
+        .modal-title:hover { color: var(--accent-gold); }
+        .modal-price { font-size: 16px; color: var(--accent-gold); font-weight: 900; margin-bottom: 10px; }
+        .modal-desc { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+
+        /* قسم آراء العملاء */
+        .reviews-section { margin-top: 10px; }
+        .reviews-section h4 { font-size: 12px; color: var(--accent-gold); margin-bottom: 8px; }
+        .review-input-box { display: flex; gap: 6px; margin-bottom: 8px; }
+        .review-input { flex-grow: 1; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; padding: 8px; border-radius: 8px; font-size: 11px; outline: none; }
+        .review-send-btn { background: var(--accent-gold); color: #000; border: none; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; }
+        .reviews-list { max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .review-item { background: var(--bg-primary); padding: 6px 10px; border-radius: 8px; font-size: 10px; color: var(--text-muted); border: 1px solid var(--border-color); }
+
+        #cartModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 11, 16, 0.85); backdrop-filter: blur(5px); z-index: 2000; }
+        .cart-content { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--bg-card); border-top: 1px solid var(--accent-gold); border-radius: 20px 20px 0 0; padding: 20px; max-height: 80vh; overflow-y: auto; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+        .remove-cart-item { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; }
+        .checkout-submit-btn { width: 100%; background: var(--success); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; text-align: center; margin-top: 10px; }
+
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(21, 21, 34, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); padding: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 999; }
+        .cart-info { font-size: 12px; color: var(--text-muted); cursor: pointer; }
+        .cart-info span { color: var(--accent-gold); font-weight: bold; }
+        .checkout-btn { background: var(--success); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 800; font-size: 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- موسيقى هادئة وناعمة جداً (Lo-Fi / Ambient) -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf7f6.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="top-ticker">
+        🔥 شحن سريع لجميع المحافظات المصرية | اطلب الآن واكتشف أحدث العروض 🚀
+    </div>
+
+    <!-- الزر العائم الدائري ذو "الديل" للبحث السريع عن الموديلات -->
+    <div class="floating-assistant-btn" onclick="toggleQuickSearch(true)" title="البحث السريع عن الموديلات">
+        🔍
+    </div>
+
+    <div class="container">
+        <header class="store-header">
+            <div class="store-logo">🛍️ Store-24</div>
+            <div class="header-actions">
+                <button id="musicToggleBtn" class="music-btn" onclick="toggleMusic()" title="تشغيل / إيقاف الموسيقى">🎵</button>
+                <button class="cart-icon-btn" onclick="toggleCartModal(true)">
+                    🛒 السلة
+                    <span class="cart-badge" id="cartBadgeCount">0</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="hero-banner">
+            <h2>مرحباً بك في متجرك المفضل</h2>
+            <p>تسوق أحدث المنتجات والعروض الحصرية بكل سهولة وأمان.</p>
+        </div>
+
+        <div class="catalog-section">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 ابحث عن منتج..." oninput="filterProducts()">
+        </div>
+
+        <div class="section-title">
+            <span>📦 كتالوج المنتجات الاحترافي</span>
+            <span id="productsCount" style="font-size: 11px; color: var(--accent-gold);">0 منتج</span>
+        </div>
+
+        <div id="customerProductsGrid" class="products-grid"></div>
+    </div>
+
+    <!-- نافذة البحث السريع عن الموديلات -->
+    <div id="quickSearchModal">
+        <div class="quick-search-content">
+            <div class="cart-header">
+                <h3 style="color: var(--accent-gold);">⚡ بحث سريع عن الموديلات</h3>
+                <button onclick="toggleQuickSearch(false)" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">&times;</button>
+            </div>
+            <input type="text" id="quickSearchInput" class="search-box" placeholder="اكتب اسم أو موديل المنتج للبحث الفوري..." oninput="performQuickSearch()">
+            <div class="quick-search-results" id="quickSearchResultsContainer">
+                <p style="color: var(--text-muted); text-align: center; font-size: 11px; padding: 15px;">اكتب اسم الموديل للبحث عنه مباشرة...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تفاصيل المنتج -->
+    <div id="productModal">
+        <div class="modal-box" id="modalBoxContent"></div>
+    </div>
+
+    <!-- نافذة السلة -->
+    <div id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3 style="color: var(--accent-gold);">🛒 سلة المشتريات</h3>
+                <button onclick="toggleCartModal(false)" style="background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">&times;</button>
+            </div>
+            <div id="cartItemsContainer">
+                <p style="color: var(--text-muted); text-align: center; font-size: 12px; padding: 20px;">السلة فارغة حالياً.</p>
+            </div>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px;">
+                    <span>الإجمالي:</span>
+                    <span id="modalCartTotal" style="color: var(--accent-gold);">0 ج.م</span>
+                </div>
+                <button class="checkout-submit-btn" onclick="openCheckout()">إتمام الطلب عبر واتساب 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-bar">
+        <div class="cart-info" onclick="toggleCartModal(true)">الإجمالي: <span id="cartTotal">0 ج.م</span> (<span id="cartCount">0</span>) 👆</div>
+        <button class="checkout-btn" onclick="openCheckout()">إتمام الطلب 🛒</button>
+    </div>
+
+    <script>
+        let cart = [];
+        let isPlaying = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let music = document.getElementById('bgMusic');
+            let btn = document.getElementById('musicToggleBtn');
+            music.volume = 0.3;
+            
+            let playPromise = music.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    btn.classList.add('playing');
+                    btn.innerHTML = '⏸️';
+                }).catch(error => {
+                    isPlaying = false;
+                    btn.classList.remove('playing');
+                    btn.innerHTML = '🎵';
+                    
+                    const enableAudioOnInteract = () => {
+                        music.play().then(() => {
+                            isPlaying = true;
+                            btn.classList.add('playing');
+                            btn.innerHTML = '⏸️';
+                            window.removeEventListener('click', enableAudioOnInteract);
+                            window.removeEventListener('touchstart', enableAudioOnInteract);
+                        }).catch(e => {});
+                    };
+                    window.addEventListener('click', enableAudioOnInteract);
+                    window.addEventListener('touchstart', enableAudioOnInteract);
+                });
+            }
+            loadCustomerProducts();
+        });
+
+        function toggleMusic() {
+            let music = document.getElementById('bgMusic');
+            let btn = document.getElementById('musicToggleBtn');
+            if (isPlaying) {
+                music.pause();
+                isPlaying = false;
+                btn.classList.remove('playing');
+                btn.innerHTML = '🎵';
+            } else {
+                music.play().then(() => {
+                    isPlaying = true;
+                    btn.classList.add('playing');
+                    btn.innerHTML = '⏸️';
+                }).catch(e => {});
+            }
+        }
+
+        function toggleQuickSearch(show) {
+            document.getElementById('quickSearchModal').style.display = show ? 'block' : 'none';
+            if (show) {
+                setTimeout(() => document.getElementById('quickSearchInput').focus(), 100);
+            }
+        }
+
+        function performQuickSearch() {
+            let query = document.getElementById('quickSearchInput').value.toLowerCase().trim();
+            let data = localStorage.getItem('store_products');
+            let container = document.getElementById('quickSearchResultsContainer');
+            
+            if (!data) {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px;">لا توجد منتجات مسجلة.</p>`;
+                return;
+            }
+            let products = JSON.parse(data);
+
+            if (!query) {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px;">اكتب اسم الموديل للبحث عنه مباشرة...</p>`;
+                return;
+            }
+
+            let filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p style="color: var(--danger); text-align: center; font-size: 11px;">عذراً، لم يتم العثور على موديل مطابقة.</p>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(p => `
+                <div class="quick-result-item" onclick="toggleQuickSearch(false); openProductDetails(${p.id})">
+                    <div>
+                        <h4 style="font-size:12px; color:#fff; margin-bottom:2px;">${p.name}</h4>
+                        <span style="font-size:10px; color:var(--text-muted);">${p.desc ? p.desc.substring(0, 30) + '...' : ''}</span>
+                    </div>
+                    <span style="font-size:12px; color:var(--accent-gold); font-weight:bold;">${p.price} ج.م</span>
+                </div>
+            `).join('');
+        }
+
+        function loadCustomerProducts() {
+            let data = localStorage.getItem('store_products');
+            let products = data ? JSON.parse(data) : [];
+
+            document.getElementById('productsCount').innerText = `${products.length} منتج`;
+            const grid = document.getElementById('customerProductsGrid');
+            
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>المتجر جاهز وفي انتظار المنتجات! 🚀</h3>
+                        <p>تصفح الموقع واستمتع بالعروض.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => {
+                let mediaHtml = `<div style="background:#111; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">بدون صورة</div>`;
+                if (p.images && p.images.length > 0) {
+                    let first = p.images[0];
+                    if (first.type === 'video') {
+                        mediaHtml = `<video src="${first.src}" muted autoplay loop playsinline></video>`;
+                    } else {
+                        mediaHtml = `<img src="${first.src}" alt="${p.name}">`;
+                    }
+                }
+
+                // شارة الخصم تظهر حصرياً إذا كتبتها من لوحة التحكم وليست فارغة
+                let discountBadge = (p.discount && p.discount.trim() !== "") ? `<div class="discount-tag">خصم ${p.discount}</div>` : '';
+
+                return `
+                    <div class="product-card">
+                        <div class="product-media-box" onclick="openProductDetails(${p.id})">
+                            ${discountBadge}
+                            ${mediaHtml}
+                        </div>
+                        <div class="product-info">
+                            <div>
+                                <h3 class="product-title" onclick="openProductDetails(${p.id})">${p.name}</h3>
+                                <p class="product-desc">${p.desc || 'منتج عالي الجودة'}</p>
+                            </div>
+                            <div>
+                                <div class="price-row">
+                                    <span class="product-price">${p.price} ج.م</span>
+                                </div>
+                                <button class="buy-btn" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "")}', ${p.price})">أضف للسلة 🛒</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openProductDetails(id) {
+            let data = localStorage.getItem('store_products');
+            if (!data) return;
+            let products = JSON.parse(data);
+            let p = products.find(item => item.id === id);
+            if (!p) return;
+
+            let mediaHtml = `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#555;">لا توجد صورة</div>`;
+            if (p.images && p.images.length > 0) {
+                let first = p.images[0];
+                if (first.type === 'video') {
+                    mediaHtml = `<video src="${first.src}" controls autoplay loop playsinline style="max-width:100%; max-height:100%; object-fit:contain;"></video>`;
+                } else {
+                    mediaHtml = `<img src="${first.src}" alt="${p.name}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+                }
+            }
+
+            let discountBadge = (p.discount && p.discount.trim() !== "") ? `<div class="discount-tag">خصم ${p.discount}</div>` : '';
+            let reviewsKey = `product_reviews_${p.id}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey) || '[]');
+            let reviewsHtml = reviews.map(r => `<div class="review-item">💬 ${r}</div>`).join('') || '<div style="font-size:10px; color:var(--text-muted);">كن أول من يكتب رأيه في هذا المنتج!</div>';
+
+            document.getElementById('modalBoxContent').innerHTML = `
+                <button class="close-modal" onclick="closeProductModal()">&times;</button>
+                <div class="modal-media">
+                    ${discountBadge}
+                    ${mediaHtml}
+                </div>
+                <h3 class="modal-title" onclick="openProductDetails(${p.id})">${p.name}</h3>
+                <div class="modal-price">${p.price} ج.م</div>
+                <div class="modal-desc"><strong>التفاصيل:</strong><br>${p.desc || 'لا توجد تفاصيل مضافة لهذا المنتج.'}</div>
+                
+                <div style="margin-bottom: 10px;">
+                    <button class="buy-btn" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "")}', ${p.price}); closeProductModal();">أضف للسلة 🛒</button>
+                </div>
+
+                <div class="reviews-section">
+                    <h4>آراء العملاء وتقييماتهم ⭐</h4>
+                    <div class="review-input-box">
+                        <input type="text" id="reviewInput_${p.id}" class="review-input" placeholder="اكتب رأيك أو تعليقك هنا...">
+                        <button class="review-send-btn" onclick="addReview(${p.id})">إرسال</button>
+                    </div>
+                    <div class="reviews-list" id="reviewsList_${p.id}">
+                        ${reviewsHtml}
+                    </div>
+                </div>
+            `;
+            document.getElementById('productModal').style.display = 'block';
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        function addReview(id) {
+            let input = document.getElementById(`reviewInput_${id}`);
+            let text = input.value.trim();
+            if (!text) { alert('الرجاء كتابة تعليق أولاً.'); return; }
+
+            let reviewsKey = `product_reviews_${id}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey) || '[]');
+            reviews.unshift(text);
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+
+            let listContainer = document.getElementById(`reviewsList_${id}`);
+            listContainer.innerHTML = reviews.map(r => `<div class="review-item">💬 ${r}</div>`).join('');
+            input.value = '';
+        }
+
+        function addToCart(id, name, price) {
+            cart.push({ id, name, price });
+            updateCartUI();
+            alert(`✅ تم إضافة "${name}" إلى السلة بنجاح!`);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartBadgeCount').innerText = cart.length;
+            document.getElementById('cartCount').innerText = cart.length;
+            
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cartTotal').innerText = `${total} ج.م`;
+            document.getElementById('modalCartTotal').innerText = `${total} ج.م`;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 12px; padding: 20px;">السلة فارغة حالياً.</p>`;
+                return;
+            }
+
+            container.innerHTML = cart.map((item, index) => `
+                <div class="cart-item-row">
+                    <div>
+                        <h4 style="font-size:12px; color:#fff; margin-bottom:2px;">${item.name}</h4>
+                        <span style="font-size:11px; color:var(--accent-gold); font-weight:bold;">${item.price} ج.م</span>
+                    </div>
+                    <button class="remove-cart-item" onclick="removeFromCart(${index})">حذف 🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleCartModal(show) {
+            document.getElementById('cartModal').style.display = show ? 'block' : 'none';
+        }
+
+        function openCheckout() {
+            if (cart.length === 0) { alert('سلة المشتريات فارغة!'); return; }
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let itemsSummary = cart.map(i => i.name).join('، ');
+            let message = encodeURIComponent(`مرحباً، أرغب في إتمام طلب المنتجات التالية:\n- ${itemsSummary}\nالإجمالي: ${total} ج.م`);
+            window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${message}`, '_blank');
+        }
+
+        function filterProducts() {
+            let query = document.getElementById('searchInput').value.toLowerCase();
+            let data = localStorage.getItem('store_products');
+            if (!data) return;
+            let products = JSON.parse(data);
+            let filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
+            
+            const grid = document.getElementById('customerProductsGrid');
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><p>لا توجد نتائج مطابقة لبحثك.</p></div>`;
+                return;
+            }
+            
+            grid.innerHTML = filtered.map(p => {
+                let mediaHtml = `<div style="background:#111; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#555; font-size:10px;">بدون صورة</div>`;
+                if (p.images && p.images.length > 0) {
+                    let first = p.images[0];
+                    if (first.type === 'video') {
+                        mediaHtml = `<video src="${first.src}" muted autoplay loop playsinline></video>`;
+                    } else {
+                        mediaHtml = `<img src="${first.src}">`;
+                    }
+                }
+
+                let discountBadge = (p.discount && p.discount.trim() !== "") ? `<div class="discount-tag">خصم ${p.discount}</div>` : '';
+
+                return `
+                    <div class="product-card">
+                        <div class="product-media-box" onclick="openProductDetails(${p.id})">
+                            ${discountBadge}
+                            ${mediaHtml}
+                        </div>
+                        <div class="product-info">
+                            <div>
+                                <h3 class="product-title" onclick="openProductDetails(${p.id})">${p.name}</h3>
+                                <p class="product-desc">${p.desc || ''}</p>
+                            </div>
+                            <div>
+                                <div class="price-row"><span class="product-price">${p.price} ج.م</span></div>
+                                <button class="buy-btn" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "")}', ${p.price})">أضف للسلة 🛒</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

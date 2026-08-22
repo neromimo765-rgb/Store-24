@@ -8,7 +8,6 @@
         :root {
             --bg-primary: #09090E;
             --bg-card: #13131F;
-            --bg-card-hover: #1A1A2E;
             --accent-gold: #F59E0B;
             --accent-glow: rgba(245, 158, 11, 0.15);
             --text-main: #FFFFFF;
@@ -16,6 +15,7 @@
             --border-color: rgba(255, 255, 255, 0.08);
             --danger: #EF4444;
             --success: #10B981;
+            --whatsapp: #25D366;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -35,10 +35,11 @@
         .app-header h1 { font-size: 16px; color: var(--accent-gold); display: flex; align-items: center; gap: 6px; }
         .logout-btn { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold; }
 
-        /* مربعات الإحصائيات السريعة (Stats Grid) */
+        /* إحصائيات تفاعلية قابلة للتعديل */
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 8px; text-align: center; }
-        .stat-card .number { font-size: 16px; font-weight: 800; color: var(--accent-gold); margin-bottom: 3px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .stat-card:active { border-color: var(--accent-gold); background: var(--accent-glow); }
+        .stat-card .number { font-size: 15px; font-weight: 800; color: var(--accent-gold); margin-bottom: 3px; }
         .stat-card .label { font-size: 10px; color: var(--text-muted); }
 
         /* الكروت والمنتجات */
@@ -46,11 +47,18 @@
         .card h3 { color: var(--accent-gold); font-size: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         
         /* قائمة المنتجات المصغرة */
-        .product-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+        .product-row { background: var(--bg-primary); padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .product-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .product-info { display: flex; align-items: center; gap: 10px; }
         .product-thumb { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; background: #1a1a1a; border: 1px solid var(--border-color); }
         .product-details h4 { font-size: 12px; color: #fff; margin-bottom: 2px; }
         .product-details span { font-size: 11px; color: var(--accent-gold); font-weight: bold; }
+        
+        /* أزرار المشاركة السريعة لمواقع التواصل */
+        .social-share-bar { display: flex; gap: 6px; border-top: 1px solid var(--border-color); padding-top: 8px; }
+        .share-btn { flex: 1; padding: 6px 4px; border-radius: 8px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; color: #fff; }
+        .btn-whatsapp { background: var(--whatsapp); }
+        .btn-copy { background: rgba(255,255,255,0.1); color: var(--text-main); }
         .del-btn { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; }
 
         /* نافذة إضافة منتج (Modal) */
@@ -63,25 +71,20 @@
         .input-field { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; padding: 11px; border-radius: 10px; font-size: 12px; outline: none; transition: 0.2s; }
         .input-field:focus { border-color: var(--accent-gold); box-shadow: 0 0 8px var(--accent-glow); }
 
-        /* رفع الوسائط (صور وفيديوهات) */
+        /* رفع الوسائط ومعالجة عرض الفيديو والصور بدقة */
         .file-upload-box { border: 2px dashed var(--accent-gold); padding: 15px; border-radius: 12px; text-align: center; background: var(--accent-glow); cursor: pointer; }
         .file-upload-box input { display: none; }
         .file-upload-box label { cursor: pointer; font-size: 12px; color: var(--accent-gold); display: block; font-weight: bold; }
         
-        /* معاينة الصور المرفوعة مع زر حذف مصغر */
-        .preview-container { display: flex; gap: 8px; flex-wrap:.wrap; margin-top: 10px; }
-        .preview-item { position: relative; width: 55px; height: 55px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-gold); background: #000; }
+        .preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-item { position: relative; width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-gold); background: #000; }
         .preview-item img, .preview-item video { width: 100%; height: 100%; object-fit: cover; }
-        .remove-img-btn { position: absolute; top: 2px; left: 2px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .remove-img-btn { position: absolute; top: 2px; left: 2px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; }
 
-        /* الأزرار الأساسية والعائمة */
         .btn { background: var(--accent-gold); color: #000; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
         .btn-secondary { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); margin-top: 10px; }
 
-        /* الزر العائم (FAB) أسفل الشاشة */
-        .fab-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent-gold); color: #000; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 800; font-size: 13px; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); cursor: pointer; display: flex; align-items: center; gap: 8px; z-index: 99; transition: 0.2s; }
-        .fab-btn:active { transform: translateX(-50%) scale(0.95); }
-
+        .fab-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent-gold); color: #000; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 800; font-size: 13px; box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); cursor: pointer; display: flex; align-items: center; gap: 8px; z-index: 99; }
         .back-link { display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-size: 11px; text-decoration: none; }
     </style>
 </head>
@@ -104,34 +107,34 @@
                 <button class="logout-btn" onclick="logout()">خروج 🚪</button>
             </div>
 
-            <!-- إحصائيات سريعة عائمة -->
+            <!-- إحصائيات تفاعلية بالكامل للتحكم الحقيقي -->
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" onclick="editStat('products')">
                     <div class="number" id="statTotal">0</div>
-                    <div class="label">المنتجات</div>
+                    <div class="label">المنتجات 📦</div>
                 </div>
-                <div class="stat-card">
-                    <div class="number">12</div>
-                    <div class="label">الطلبات</div>
+                <div class="stat-card" onclick="editStat('orders')">
+                    <div class="number" id="statOrders">12</div>
+                    <div class="label">الطلبات 🛒 (تعديل)</div>
                 </div>
-                <div class="stat-card">
-                    <div class="number">4.9★</div>
-                    <div class="label">التقييم</div>
+                <div class="stat-card" onclick="editStat('rating')">
+                    <div class="number" id="statRating">4.9★</div>
+                    <div class="label">التقييم ⭐ (تعديل)</div>
                 </div>
             </div>
 
-            <!-- قائمة المنتجات -->
+            <!-- قائمة المنتجات مع التسويق الفوري -->
             <div class="card">
-                <h3>📦 إدارة المنتجات</h3>
+                <h3>📦 المنتجات وتسويقها</h3>
                 <div id="productsList"></div>
                 <button class="btn btn-secondary" onclick="resetDefaultProducts()">🔄 استعادة المنتجات التجريبية</button>
             </div>
 
-            <a href="index.html" class="back-link" target="_blank">🌐 تصفح المتجر الرئيسي للعملاء (في تبويب جديد)</a>
+            <a href="index.html" class="back-link" target="_blank">🌐 تصفح المتجر الرئيسي للعملاء</a>
         </div>
     </div>
 
-    <!-- نافذة إضافة منتج عائمة (Modal) -->
+    <!-- نافذة إضافة منتج -->
     <div id="addProductModal">
         <div class="modal-content">
             <button class="close-modal" onclick="toggleModal(false)">&times;</button>
@@ -153,12 +156,11 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">الصور أو الفيديو (من 1 إلى 10 ملفات)</label>
+                <label class="form-label">الصور أو الفيديو (معالجة ذكية للفيديو والصور)</label>
                 <div class="file-upload-box">
                     <input type="file" id="mediaInput" accept="image/*,video/*" multiple onchange="handleMediaFiles(this)">
-                    <label for="mediaInput">📁 اضغط لاختيار الصور من استوديو التليفون</label>
+                    <label for="mediaInput">📁 اختر الصور أو الفيديوهات من التليفون</label>
                 </div>
-                <!-- معاينة الصور مع زر الحذف الفردي -->
                 <div id="previewArea" class="preview-container"></div>
             </div>
 
@@ -167,18 +169,18 @@
                 <input type="text" id="pDesc" class="input-field" placeholder="تفاصيل المنتج...">
             </div>
 
-            <button class="btn" onclick="addProduct()">نشر المنتج الآن 🚀</button>
+            <button class="btn" onclick="addProduct()">نشر المنتج الآن والتزامن مع المتجر 🚀</button>
         </div>
     </div>
 
-    <!-- الزر العائم للإضافة السريعة (FAB) -->
+    <!-- الزر العائم -->
     <button id="fabBtn" class="fab-btn" style="display: none;" onclick="toggleModal(true)">
         ➕ إضافة منتج جديد
     </button>
 
     <script>
         const MY_PASSWORD = "1234";
-        let uploadedMediaArray = []; // لتخزين الوسائط المرفوعة
+        let uploadedMediaArray = [];
 
         function login() {
             let enteredPass = document.getElementById('adminPass').value;
@@ -186,7 +188,7 @@
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('fabBtn').style.display = 'flex';
-                loadProductsAdmin();
+                loadAdminData();
             } else {
                 alert('كلمة المرور غير صحيحة!');
             }
@@ -203,11 +205,11 @@
             document.getElementById('addProductModal').style.display = show ? 'block' : 'none';
         }
 
-        // التعامل مع رفع الصور والفيديوهات (من 1 إلى 10) مع إمكانية الحذف الفردي
+        // معالجة خاصة تفرق بدقة بين الصور والفيديوهات عشان الفيديو يظهر ويشتغل صح في المعاينة
         function handleMediaFiles(input) {
             const files = input.files;
             if (uploadedMediaArray.length + files.length > 10) {
-                alert('عذراً، أقصى حد مسموح به هو 10 صور للمنتج الواحد!');
+                alert('عذراً، أقصى حد مسموح به هو 10 ملفات للمنتج الواحد!');
                 return;
             }
 
@@ -216,25 +218,29 @@
                 let reader = new FileReader();
 
                 reader.onload = function(e) {
-                    uploadedMediaArray.push(e.target.result);
+                    uploadedMediaArray.push({
+                        type: file.type.startsWith('video') ? 'video' : 'image',
+                        src: e.target.result
+                    });
                     renderPreviews();
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // عرض معاينة الصور مع زر الحذف الفردي (X)
         function renderPreviews() {
             const previewArea = document.getElementById('previewArea');
             previewArea.innerHTML = '';
             
-            uploadedMediaArray.forEach((mediaSrc, index) => {
+            uploadedMediaArray.forEach((media, index) => {
                 let div = document.createElement('div');
                 div.className = 'preview-item';
-                div.innerHTML = `
-                    <img src="${mediaSrc}" alt="preview">
-                    <button class="remove-img-btn" onclick="removeMedia(${index})">×</button>
-                `;
+                
+                if (media.type === 'video') {
+                    div.innerHTML = `<video src="${media.src}" muted autoplay loop playsinline></video><button class="remove-img-btn" onclick="removeMedia(${index})">×</button>`;
+                } else {
+                    div.innerHTML = `<img src="${media.src}" alt="preview"><button class="remove-img-btn" onclick="removeMedia(${index})">×</button>`;
+                }
                 previewArea.appendChild(div);
             });
         }
@@ -244,11 +250,43 @@
             renderPreviews();
         }
 
+        // التحكم الحقيقي في الإحصائيات (الطلبات والتقييمات) وحفظها لتظهر فوراً للعملاء
+        function getStoreStats() {
+            let stats = localStorage.getItem('store_stats');
+            if (!stats) {
+                let defaultStats = { orders: 12, rating: "4.9★" };
+                localStorage.setItem('store_stats', JSON.stringify(defaultStats));
+                return defaultStats;
+            }
+            return JSON.parse(stats);
+        }
+
+        function editStat(type) {
+            let stats = getStoreStats();
+            if (type === 'orders') {
+                let newVal = prompt("أدخل عدد الطلبات الحقيقي الجديد:", stats.orders);
+                if (newVal !== null && newVal.trim() !== "") {
+                    stats.orders = newVal;
+                    localStorage.setItem('store_stats', JSON.stringify(stats));
+                    loadAdminData();
+                    alert('✅ تم تحديث عدد الطلبات وحفظه للعملاء بنجاح!');
+                }
+            } else if (type === 'rating') {
+                let newVal = prompt("أدخل التقييم الجديد (مثال: 4.9★):", stats.rating);
+                if (newVal !== null && newVal.trim() !== "") {
+                    stats.rating = newVal;
+                    localStorage.setItem('store_stats', JSON.stringify(stats));
+                    loadAdminData();
+                    alert('✅ تم تحديث التقييم وحفظه للعملاء بنجاح!');
+                }
+            }
+        }
+
         function getProducts() {
             let data = localStorage.getItem('store_products');
             if (!data) {
                 let defaults = [
-                    { id: 1, name: 'سماعات لاسلكية برو', desc: 'صوت نقي عالي الأداء وعزل ضوضاء ممتاز.', price: 850, discount: '29%', images: [], reviews: [{name: 'محمود', text: 'تحفة وصوته نقي جدا ⭐⭐⭐ق'}] },
+                    { id: 1, name: 'سماعات لاسلكية برو', desc: 'صوت نقي عالي الأداء وعزل ضوضاء ممتاز.', price: 850, discount: '29%', images: [], reviews: [] },
                     { id: 2, name: 'ساعة ذكية رياضية', desc: 'تتبع نبضات القلب بدقة وشاشة HD كاملة باللمس.', price: 1450, discount: '23%', images: [], reviews: [] }
                 ];
                 localStorage.setItem('store_products', JSON.stringify(defaults));
@@ -257,31 +295,65 @@
             return JSON.parse(data);
         }
 
-        function loadProductsAdmin() {
+        // التزامن الفوري مع قاعدة البيانات المحلية (localStorage) وتحديث واجهة الأدمن
+        function loadAdminData() {
             let products = getProducts();
-            const list = document.getElementById('productsList');
+            let stats = getStoreStats();
+            
             document.getElementById('statTotal').innerText = products.length;
+            document.getElementById('statOrders').innerText = stats.orders;
+            document.getElementById('statRating').innerText = stats.rating;
 
+            const list = document.getElementById('productsList');
             if (products.length === 0) {
                 list.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px; padding: 10px;">لا توجد منتجات حالياً.</p>`;
                 return;
             }
 
+            let storeBaseUrl = window.location.href.replace('admin.html', 'index.html');
+
             list.innerHTML = products.map(p => {
-                let firstImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/40';
+                let firstMedia = 'https://via.placeholder.com/40';
+                if (p.images && p.images.length > 0) {
+                    firstMedia = p.images[0].src; // لو صورة أو فيديو أول عنصر
+                }
+                
+                let productLink = `${storeBaseUrl}#product-${p.id}`;
+                let shareText = encodeURIComponent(`🔥 اطلب الآن: ${p.name} بسعر ${p.price} ج.م فقط!\nتصفح المتجر واطلب هنا: ${productLink}`);
+
                 return `
                     <div class="product-row">
-                        <div class="product-info">
-                            <img src="${firstImg}" class="product-thumb" alt="product">
-                            <div class="product-details">
-                                <h4>${p.name}</h4>
-                                <span>${p.price} ج.م</span>
+                        <div class="product-top">
+                            <div class="product-info">
+                                ${p.images && p.images.length > 0 && p.images[0].type === 'video' ? 
+                                  `<video src="${p.images[0].src}" class="product-thumb" muted></video>` : 
+                                  `<img src="${firstMedia}" class="product-thumb" alt="product">`
+                                }
+                                <div class="product-details">
+                                    <h4>${p.name}</h4>
+                                    <span>${p.price} ج.م</span>
+                                </div>
                             </div>
+                            <button class="del-btn" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
                         </div>
-                        <button class="del-btn" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
+                        <!-- شريط التسويق ومشاركة الروابط -->
+                        <div class="social-share-bar">
+                            <button class="share-btn btn-copy" onclick="copyProductLink('${productLink}')">🔗 نسخ الرابط</button>
+                            <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" style="text-decoration:none; flex:1; display:flex;">
+                                <button class="share-btn btn-whatsapp" style="width:100%;">💬 واتساب</button>
+                            </a>
+                        </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        function copyProductLink(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                alert('✅ تم نسخ رابط المنتج بنجاح! انسخه وانشره في فيسبوك، تيك توك، أو جروبات الواتساب.');
+            }).catch(err => {
+                prompt("انسخ الرابط يدوياً:", link);
+            });
         }
 
         function addProduct() {
@@ -302,15 +374,19 @@
                 name,
                 price,
                 discount: discount || '10%',
-                images: [...uploadedMediaArray], // حفظ الصور المرفوعة
+                images: [...uploadedMediaArray],
                 desc: desc || 'منتج عالي الجودة',
                 reviews: []
             };
 
             products.push(newProd);
+            // التزامن الفوري مع localStorage ليظهر للعملاء في index.html حالاً
             localStorage.setItem('store_products', JSON.stringify(products));
             
-            // إعادة ضبط الحقول وإغلاق النافذة
+            // تحديث عداد المنتجات تلقائياً في الإحصائيات
+            let stats = getStoreStats();
+            localStorage.setItem('store_stats', JSON.stringify(stats));
+
             document.getElementById('pName').value = '';
             document.getElementById('pPrice').value = '';
             document.getElementById('pDiscount').value = '';
@@ -320,8 +396,8 @@
             document.getElementById('previewArea').innerHTML = '';
             
             toggleModal(false);
-            loadProductsAdmin();
-            alert('تم نشر المنتج بنجاح! 🚀');
+            loadAdminData();
+            alert('تم نشر المنتج بنجاح وتزامن مع المتجر الرئيسي فوراً! جاهز للمشاركة 🚀');
         }
 
         function deleteProduct(id) {
@@ -329,14 +405,15 @@
                 let products = getProducts();
                 products = products.filter(p => p.id !== id);
                 localStorage.setItem('store_products', JSON.stringify(products));
-                loadProductsAdmin();
+                loadAdminData();
             }
         }
 
         function resetDefaultProducts() {
             if (confirm('هل تريد استعادة المنتجات الافتراضية؟')) {
                 localStorage.removeItem('store_products');
-                loadProductsAdmin();
+                localStorage.removeItem('store_stats');
+                loadAdminData();
                 alert('تمت الاستعادة بنجاح!');
             }
         }

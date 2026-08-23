@@ -106,7 +106,6 @@
                     <input type="text" id="lpTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية بتصميم عصري">
                 </div>
 
-                <!-- خانة وصف المنتج لصفحة الهبوط -->
                 <div>
                     <label style="font-size: 11px; color: var(--accent-gold); display: block; margin-bottom: 4px;">📝 وصف المنتج (اختياري):</label>
                     <textarea id="lpDesc" class="form-control" rows="3" placeholder="اكتب مميزات المنتج، فوائده، ولماذا يجب على العميل شراؤه..."></textarea>
@@ -349,7 +348,6 @@
             const imageFile = document.getElementById('lpImageFile').files[0];
             const videoFile = document.getElementById('lpVideoFile').files[0];
 
-            // تم جعل التحقق يقتصر على العنوان فقط، بحيث السعر اختياري تماماً
             if (!title) {
                 alert('الرجاء إدخال عنوان العرض أو اسم المنتج على الأقل.');
                 return;
@@ -372,7 +370,7 @@
                 const landingData = {
                     title,
                     desc: desc || '', 
-                    price: price || '', // قبول القيمة حتى لو كانت فارغة
+                    price: price || '', 
                     currency,
                     oldPrice: oldPrice || '',
                     timer: timer || '02:45:00',
@@ -384,13 +382,13 @@
                 await set(ref(db, 'landings/' + landingId), landingData);
                 hideLoading();
 
+                // توليد الرابط ليوجه تماماً إلى ملف landing.html المستقل
                 const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
                 const generatedUrl = baseUrl + `landing.html?id=${landingId}`;
 
                 document.getElementById('finalLandingLink').value = generatedUrl;
                 document.getElementById('generatedLinkResult').style.display = 'block';
                 
-                // تفريغ الحقول بعد النجاح
                 document.getElementById('lpTitle').value = '';
                 document.getElementById('lpDesc').value = '';
                 document.getElementById('lpPrice').value = '';
@@ -422,6 +420,7 @@
                 
                 container.innerHTML = Object.keys(data).map(id => {
                     const l = data[id];
+                    // الرابط الموجه لصفحة landing.html المستقلة
                     const link = baseUrl + `landing.html?id=${id}`;
                     const curSym = getCurrencySymbol(l.currency);
                     const priceDisplay = l.price ? `${l.price} ${curSym}` : 'بدون سعر (حسب الطلب)';

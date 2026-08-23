@@ -3,150 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store-24 | المتجر الرئيسي</title>
+    <title>لوحة تحكم المتجر الأساسي</title>
     <style>
         :root {
-            --bg-primary: #0B0B10;
-            --bg-card: #151522;
+            --bg-primary: #0f0f13;
+            --bg-card: #181824;
             --accent-gold: #F59E0B;
+            --accent-red: #EF4444;
             --text-main: #FFFFFF;
             --text-muted: #9CA3AF;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --danger: #EF4444;
+            --border-color: rgba(255, 255, 255, 0.1);
             --success: #10B981;
-            --wa-color: #25D366;
-            --fb-color: #1877F2;
-            --tk-color: #FE2C55;
+            --info: #3B82F6;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-primary); color: var(--text-main); padding: 12px; padding-bottom: 70px; }
-
-        .container { max-width: 480px; margin: 0 auto; }
-
-        .store-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        .store-header h1 { color: var(--accent-gold); font-size: 18px; display: flex; align-items: center; gap: 6px; }
-        
-        .header-tools { display: flex; align-items: center; gap: 10px; }
-        .cart-icon-btn { background: var(--bg-card); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        
-        .audio-wrapper { display: flex; align-items: center; gap: 6px; }
-        .music-btn { background: var(--accent-gold); border: none; color: #000; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .audio-hint { font-size: 9px; color: var(--accent-gold); font-weight: bold; line-height: 1.1; }
-
-        .welcome-banner { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(21, 21, 34, 0.8)); border: 1px solid var(--accent-gold); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: 11px; color: var(--accent-gold); text-align: center; font-weight: bold; }
-
-        .categories-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; scrollbar-width: none; }
-        .categories-bar::-webkit-scrollbar { display: none; }
-        .cat-btn { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); padding: 5px 10px; border-radius: 20px; font-size: 11px; white-space: nowrap; cursor: pointer; }
-        .cat-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); font-weight: bold; }
-
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        
-        .discount-badge { position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #EF4444, #DC2626); color: #fff; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; z-index: 5; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); display: flex; align-items: center; gap: 3px; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .stock-status-badge { position: absolute; top: 8px; left: 8px; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; z-index: 5; }
-        .status-in { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .status-out { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-
-        .product-media-box { width: 100%; height: 110px; background: #000; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-media-box img, .product-media-box video { width: 100%; height: 100%; object-fit: cover; }
-
-        .product-body { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .product-title { font-size: 11px; color: #fff; margin-bottom: 4px; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
-        .product-price { font-size: 11px; color: var(--accent-gold); font-weight: 800; margin-bottom: 4px; }
-        
-        .social-proof-tag { font-size: 9px; color: var(--text-muted); margin-bottom: 6px; background: var(--bg-primary); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; }
-
-        .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; margin-bottom: 6px; }
-        .add-to-cart-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
-
-        .card-social-bar { display: flex; gap: 4px; border-top: 1px solid var(--border-color); padding-top: 5px; }
-        .card-soc-btn { flex: 1; border: none; padding: 3px; border-radius: 4px; font-size: 8px; font-weight: bold; cursor: pointer; color: #fff; text-decoration: none; text-align: center; }
-        .cs-wa { background: var(--wa-color); color: #000; }
-        .cs-fb { background: var(--fb-color); }
-        .cs-tk { background: var(--tk-color); }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--accent-gold); width: 100%; max-width: 420px; max-height: 90vh; border-radius: 14px; overflow-y: auto; padding: 14px; position: relative; }
-        .close-modal { position: absolute; top: 10px; left: 10px; background: var(--danger); color: #fff; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        
-        .modal-media { width: 100%; height: 200px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; position: relative; cursor: zoom-in; }
-        .modal-media img, .modal-media video { width: 100%; height: 100%; object-fit: contain; }
-
-        .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 4000; padding: 15px; }
-        .fullscreen-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
-        .close-fullscreen { position: absolute; top: 15px; left: 15px; background: var(--danger); color: #fff; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 4010; }
-        
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 8px; border-radius: 8px; margin-bottom: 6px; border: 1px solid var(--border-color); font-size: 11px; }
-        .cart-item-controls { display: flex; align-items: center; gap: 6px; }
-        .qty-btn { background: var(--border-color); color: #fff; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .remove-item-btn { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
-        
-        .checkout-whatsapp-btn { background: var(--wa-color); color: #000; width: 100%; border: none; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-
-        .comments-section { margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 10px; }
-        .comment-box { background: var(--bg-primary); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 10px; border: 1px solid var(--border-color); }
-        .comment-input, .comment-name { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; padding: 7px; border-radius: 6px; font-size: 10px; margin-bottom: 6px; outline: none; }
-        .rating-select { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--accent-gold); padding: 7px; border-radius: 6px; font-size: 10px; margin-bottom: 6px; outline: none; font-weight: bold; }
-        .submit-comment-btn { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 8px; border-radius: 6px; font-weight: 800; font-size: 11px; cursor: pointer; }
-
-        .empty-msg { grid-column: span 2; text-align: center; color: var(--text-muted); font-size: 11px; padding: 25px; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding-bottom: 50px; }
+        .container { max-width: 480px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; padding: 16px; }
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;
+        }
+        header h1 { font-size: 15px; color: var(--accent-gold); font-weight: 800; }
+        .nav-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;
+        }
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 16px; margin-bottom: 20px;
+        }
+        .card h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+        .form-control {
+            width: 100%; background: #0f0f13; border: 1px solid var(--border-color);
+            color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; outline: none;
+        }
+        .form-control:focus { border-color: var(--accent-gold); }
+        .btn {
+            width: 100%; background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: #000; border: none; padding: 12px; border-radius: 8px;
+            font-weight: 900; font-size: 13px; cursor: pointer; margin-top: 5px;
+        }
+        .btn-cancel { background: var(--text-muted); color: #000; display: none; }
+        .item-card {
+            background: #0f0f13; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; margin-bottom: 12px;
+        }
+        .item-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #fff; }
+        .item-info { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .img-preview-box { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 8px; }
+        .img-preview-box img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
+        .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px; }
+        .action-btn { padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; }
+        .btn-edit { background: var(--info); }
+        .btn-delete { background: var(--accent-red); }
+        .social-share { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .share-btn { padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; }
+        .btn-whatsapp { background: #25D366; }
+        .btn-facebook { background: #1877F2; }
+        .btn-telegram { background: #229ED9; }
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 11, 16, 0.85); display: none;
+            justify-content: center; align-items: center; z-index: 2000;
+            flex-direction: column; color: var(--accent-gold); font-size: 13px; font-weight: bold;
+        }
+        .spinner {
+            width: 35px; height: 35px; border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-gold); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <audio id="storeAudio" loop preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3" type="audio/mp3">
-    </audio>
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <span>جاري معالجة ونشر المنتجات...</span>
+    </div>
 
     <div class="container">
-        <div class="store-header">
-            <h1>🛒 Store-24</h1>
-            <div class="header-tools">
-                <button class="cart-icon-btn" onclick="openCartModal()">
-                    🛒 السلة <span id="cartCountBadge" style="background:var(--accent-gold); color:#000; padding:1px 5px; border-radius:6px; font-size:10px;">0</span>
-                </button>
-                <div class="audio-wrapper">
-                    <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()">▶</button>
-                    <span class="audio-hint">تشغيل / إيقاف<br>الصوت</span>
-                </div>
+        <header>
+            <h1>🛒 لوحة المتجر الأساسي</h1>
+            <a href="landing-admin.html" class="nav-btn">صفحات الهبوط 🚀</a>
+        </header>
+
+        <div class="card">
+            <h2 id="formTitle">➕ إضافة منتج جديد</h2>
+            <input type="hidden" id="editingId" value="">
+
+            <div class="form-group">
+                <label>اسم المنتج:</label>
+                <input type="text" id="prodTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية">
+            </div>
+            <div class="form-group">
+                <label>السعر (بالجنيه):</label>
+                <input type="number" id="prodPrice" class="form-control" placeholder="مثال: 750">
+            </div>
+            <div class="form-group">
+                <label>القسم:</label>
+                <select id="prodCategory" class="form-control">
+                    <option value="أدوات منزلية">🚀 أدوات منزلية</option>
+                    <option value="إلكترونيات">📱 إلكترونيات</option>
+                    <option value="إكسسوارات">⌚ إكسسوارات</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>صور المنتج (من الهاتف - حتى 10 صور):</label>
+                <input type="file" id="prodImages" class="form-control" accept="image/*" multiple>
+            </div>
+            <div class="form-group">
+                <label>فيديو المنتج (اختياري):</label>
+                <input type="file" id="prodVideo" class="form-control" accept="video/*">
+            </div>
+            <div class="form-group">
+                <label>وصف المنتج:</label>
+                <textarea id="prodDesc" class="form-control" rows="3" placeholder="تفاصيل ومميزات المنتج..."></textarea>
+            </div>
+            <button onclick="saveProduct()" id="submitBtn" class="btn">نشر المنتج الآن 🚀</button>
+            <button onclick="resetForm()" id="cancelBtn" class="btn btn-cancel">إلغاء التعديل</button>
+        </div>
+
+        <div class="card">
+            <h2>📦 المنتجات المضافة للمتجر</h2>
+            <div id="productsList">
+                <p style="text-align: center; color: var(--text-muted); font-size: 11px;">جاري تحميل المنتجات...</p>
             </div>
         </div>
-
-        <div class="welcome-banner" id="welcomeMessage">أهلاً بك في متجرك المفضل! 🌟</div>
-
-        <div class="categories-bar" id="categoriesBar">
-            <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
-            <button class="cat-btn" onclick="filterCategory('أدوات منزلية', this)">🚿 أدوات منزلية</button>
-            <button class="cat-btn" onclick="filterCategory('إلكترونيات', this)">⚡ إلكترونيات</button>
-            <button class="cat-btn" onclick="filterCategory('ملابس', this)">👕 ملابس</button>
-            <button class="cat-btn" onclick="filterCategory('مستلزمات حيوانات أليفة', this)">🐾 حيوانات</button>
-            <button class="cat-btn" onclick="filterCategory('الصحة والجمال', this)">💄 جمال</button>
-            <button class="cat-btn" onclick="filterCategory('أجهزة كمبيوتر', this)">💻 كمبيوتر</button>
-            <button class="cat-btn" onclick="filterCategory('عروض خاصة', this)">🔥 عروض</button>
-        </div>
-
-        <div class="products-grid" id="storeProductsGrid"></div>
-    </div>
-
-    <!-- نافذة عرض تفاصيل المنتج -->
-    <div class="modal-overlay" id="generalModal" onclick="closeModalOnOutside(event)">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeGeneralModal()">×</button>
-            <div id="modalBodyContent"></div>
-        </div>
-    </div>
-
-    <!-- نافذة تكبير الصورة بملء الشاشة -->
-    <div class="fullscreen-overlay" id="fullscreenModal" onclick="closeFullscreen()">
-        <button class="close-fullscreen" onclick="closeFullscreen()">×</button>
-        <img id="fullscreenImg" src="" alt="صورة مكبرة">
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get, push, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -162,411 +152,151 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let productsListCache = [];
-        let currentCategory = 'الكل';
-        const ownerWhatsAppPhone = "201156666967";
-        let activeImageUrl = '';
-        let cart = [];
-        const currentStoreUrl = window.location.href.split('?')[0];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setRandomWelcomeMessage();
-            updateCartBadge();
-            trackRealVisitor();
-
-            const productsRef = ref(db, 'products');
-            onValue(productsRef, (snapshot) => {
-                const data = snapshot.val();
-                productsListCache = [];
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        productsListCache.push({ id: key, ...data[key] });
-                    });
-                }
-                loadStoreProducts();
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const productId = urlParams.get('id');
-                if (productId) {
-                    setTimeout(() => {
-                        openProductModal(productId);
-                    }, 300);
-                }
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
-        });
-
-        function getCurrencySymbol(code) {
-            if (code === 'USD') return '$';
-            if (code === 'SAR') return 'ر.س';
-            return 'ج.م';
         }
 
-        function trackRealVisitor() {
-            if (!sessionStorage.getItem('visited_store')) {
-                sessionStorage.setItem('visited_store', 'true');
-                const visitorRef = ref(db, 'analytics/visitors');
-                runTransaction(visitorRef, (currentVisitors) => {
-                    return (currentVisitors || 0) + 1;
-                });
-            }
-        }
+        window.saveProduct = async function() {
+            const editingId = document.getElementById('editingId').value;
+            const title = document.getElementById('prodTitle').value.trim();
+            const price = document.getElementById('prodPrice').value.trim();
+            const category = document.getElementById('prodCategory').value;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imageFiles = document.getElementById('prodImages').files;
+            const videoFile = document.getElementById('prodVideo').files[0];
 
-        window.toggleMusic = function() {
-            let audio = document.getElementById('storeAudio');
-            let btn = document.getElementById('musicToggleBtn');
-            
-            if (audio.paused) {
-                audio.play().then(() => {
-                    btn.innerHTML = "⏸";
-                }).catch(err => {
-                    console.log("Audio play error:", err);
-                });
-            } else {
-                audio.pause();
-                btn.innerHTML = "▶";
-            }
-        }
-
-        function setRandomWelcomeMessage() {
-            const messages = [
-                "🌊 أهلاً بك يا غالي! استمتع بأقوى العروض الحصرية وتصفح براحتك.",
-                "⚡ نورت متجرنا! اختر منتجاتك وأضفها للسلة بكل سهولة.",
-                "🔥 أقوى المنتجات بأفضل الأسعار وبجودة ممتازة في انتظارك اليوم."
-            ];
-            document.getElementById('welcomeMessage').innerText = messages[Math.floor(Math.random() * messages.length)];
-        }
-
-        window.addToCart = function(id, name, price, currency) {
-            let existing = cart.find(item => item.id === id);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({ id, name, price, currency: currency || 'EGP', qty: 1 });
-            }
-            updateCartBadge();
-            alert(`تم إضافة "${name}" للسلة بنجاح! 🛒`);
-        }
-
-        function updateCartBadge() {
-            let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById('cartCountBadge').innerText = totalItems;
-        }
-
-        window.openCartModal = function() {
-            let modalBody = document.getElementById('modalBodyContent');
-            
-            if (cart.length === 0) {
-                modalBody.innerHTML = `
-                    <div style="text-align:center; padding:25px; color:var(--text-muted);">
-                        <p style="font-size:14px; margin-bottom:8px;">🛒 سلة المشتريات فارغة</p>
-                        <p style="font-size:11px;">لم تقم بإضافة أي منتجات للسلة بعد.</p>
-                    </div>
-                `;
-                document.getElementById('generalModal').style.display = 'flex';
+            if (!title || !price) {
+                alert('الرجاء إدخال اسم المنتج والسعر.');
                 return;
             }
 
-            let totalsByCurrency = {};
-            let itemsHtml = cart.map((item) => {
-                let subTotal = item.price * item.qty;
-                let curCode = item.currency || 'EGP';
-                let curSymbol = getCurrencySymbol(curCode);
+            document.getElementById('loadingOverlay').style.display = 'flex';
 
-                if (!totalsByCurrency[curCode]) totalsByCurrency[curCode] = 0;
-                totalsByCurrency[curCode] += subTotal;
-
-                return `
-                    <div class="cart-item-row">
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            <span style="color:var(--accent-gold);">${item.price} ${curSymbol} × ${item.qty} = ${subTotal} ${curSymbol}</span>
-                        </div>
-                        <div class="cart-item-controls">
-                            <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
-                            <span>${item.qty}</span>
-                            <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
-                            <button class="remove-item-btn" onclick="removeFromCart('${item.id}')">حذف</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            let totalsHtml = Object.keys(totalsByCurrency).map(curCode => {
-                let curSymbol = getCurrencySymbol(curCode);
-                return `<div style="color:var(--accent-gold);">${totalsByCurrency[curCode]} ${curSymbol}</div>`;
-            }).join('');
-
-            modalBody.innerHTML = `
-                <h3 style="color:var(--accent-gold); font-size:15px; margin-bottom:10px; text-align:center;">🛒 سلة المشتريات الحالية</h3>
-                <div style="max-height:220px; overflow-y:auto; margin-bottom:10px;">${itemsHtml}</div>
-                <div style="font-size:12px; font-weight:bold; text-align:center; margin-bottom:10px; color:#fff;">
-                    الإجمالي الكلي: ${totalsHtml}
-                </div>
-                <button class="checkout-whatsapp-btn" onclick="checkoutOrder()">💬 إتمام الطلب عبر الواتساب</button>
-            `;
-
-            document.getElementById('generalModal').style.display = 'flex';
-        }
-
-        window.changeQty = function(id, change) {
-            let item = cart.find(i => i.id === id);
-            if (item) {
-                item.qty += change;
-                if (item.qty <= 0) {
-                    cart = cart.filter(i => i.id !== id);
-                }
-                updateCartBadge();
-                openCartModal();
-            }
-        }
-
-        window.removeFromCart = function(id) {
-            cart = cart.filter(i => i.id !== id);
-            updateCartBadge();
-            openCartModal();
-        }
-
-        window.checkoutOrder = function() {
-            if (cart.length === 0) return;
-
-            const ordersRef = ref(db, 'analytics/orders');
-            runTransaction(ordersRef, (currentOrders) => {
-                return (currentOrders || 0) + 1;
-            });
-
-            let message = `🛒 *طلب جديد من المتجر:*\n\n`;
-            let totalsByCurrency = {};
-
-            cart.forEach((item, index) => {
-                let itemTotal = item.price * item.qty;
-                let curCode = item.currency || 'EGP';
-                let curSymbol = getCurrencySymbol(curCode);
-
-                if (!totalsByCurrency[curCode]) totalsByCurrency[curCode] = 0;
-                totalsByCurrency[curCode] += itemTotal;
-
-                message += `${index + 1}. *${item.name}*\n   العدد: ${item.qty} | السعر: ${item.price} ${curSymbol}\n   الإجمالي: ${itemTotal} ${curSymbol}\n\n`;
-            });
-
-            let totalsText = Object.keys(totalsByCurrency).map(curCode => {
-                return `${totalsByCurrency[curCode]} ${getCurrencySymbol(curCode)}`;
-            }).join(' + ');
-
-            message += `💰 *الإجمالي الكلي:* ${totalsText}\n\nأرغب في تأكيد الأوردر وتحديد عنوان الاستلام.`;
-            
-            let waUrl = `https://wa.me/${ownerWhatsAppPhone}?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
-        }
-
-        function loadStoreProducts() {
-            let products = productsListCache;
-            let grid = document.getElementById('storeProductsGrid');
-
-            let filtered = currentCategory === 'الكل' ? products : products.filter(p => p.category === currentCategory);
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="empty-msg">لا توجد منتجات مضافة في هذا القسم حالياً.</div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => {
-                let mediaHtml = `<div style="color:#555; font-size:10px;">بدون وسائط</div>`;
-                if (p.images && p.images.length > 0) {
-                    let media = p.images[0];
-                    if (media.type === 'video' || (media.src && (media.src.includes('.mp4') || media.src.includes('video')))) {
-                        mediaHtml = `<video src="${media.src}" muted autoplay loop playsinline></video>`;
-                    } else if (media.src) {
-                        mediaHtml = `<img src="${media.src}" alt="${p.name}" onerror="this.onerror=null; this.parentElement.innerHTML='خطأ بالرابط';">`;
-                    }
+            try {
+                let images = [];
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const b64 = await fileToBase64(imageFiles[i]);
+                    images.push(b64);
                 }
 
-                let curCode = p.currency || 'EGP';
-                let curSymbol = getCurrencySymbol(curCode);
+                let videoUrl = '';
+                if (videoFile) {
+                    videoUrl = await fileToBase64(videoFile);
+                }
 
-                let discountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge">🏷️ ${p.discount}</div>` : '';
-                let isAvailable = p.inStock !== false;
-                let stockBadgeHtml = isAvailable 
-                    ? `<div class="stock-status-badge status-in">متوفر</div>` 
-                    : `<div class="stock-status-badge status-out">غير متوفر</div>`;
+                const productData = { title, price, category, desc };
+                if (images.length > 0) productData.images = images;
+                if (videoUrl) productData.videoUrl = videoUrl;
 
-                let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
-                let actionBtn = isAvailable 
-                    ? `<button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price}, '${curCode}')">🛒 أضف للسلة</button>`
-                    : `<button class="add-to-cart-btn" disabled>غير متوفر حالياً</button>`;
-
-                let fakeBuyersVal = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
-                let fakeViewsVal = p.fakeViews !== undefined ? p.fakeViews : 48;
-
-                const productLink = `${currentStoreUrl}?id=${p.id}`;
-                const discountStr = p.discount ? ` (🏷️ ${p.discount})` : '';
-                const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ${curSymbol}${discountStr}\n📝 الوصف: ${p.desc || 'متوفر الآن'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
-
-                return `
-                    <div class="product-card">
-                        ${discountHtml}
-                        ${stockBadgeHtml}
-                        <div class="product-media-box" onclick="openProductModal('${p.id}')">
-                            ${mediaHtml}
-                        </div>
-                        <div class="product-body">
-                            <div>
-                                <div class="product-title" onclick="openProductModal('${p.id}')">${p.name}</div>
-                                <div class="product-price">${p.price} ${curSymbol}</div>
-                                <div class="social-proof-tag">
-                                    <span>🔥 اشتره: ${fakeBuyersVal}</span>
-                                    <span>👁️ ${fakeViewsVal} يشاهدون</span>
-                                </div>
-                            </div>
-                            <div>
-                                ${actionBtn}
-                                <div class="card-social-bar">
-                                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}" target="_blank" class="card-soc-btn cs-wa" title="مشاركة واتساب">واتساب</a>
-                                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productLink)}" target="_blank" class="card-soc-btn cs-fb" title="مشاركة فيسبوك">فيسبوك</a>
-                                    <a href="https://www.tiktok.com/" target="_blank" onclick="copyShareText('${shareText.replace(/'/g, "\\'")}')" class="card-soc-btn cs-tk" title="نسخ لتيك توك">تيك توك</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        window.copyShareText = function(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('تم نسخ تفاصيل المنتج! افتح تيك توك والصقها بالمنشور 📋');
-            });
-        }
-
-        window.filterCategory = function(category, btnElement) {
-            currentCategory = category;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-            loadStoreProducts();
-        }
-
-        window.openProductModal = function(id) {
-            let p = productsListCache.find(item => item.id === id);
-            if (!p) return;
-
-            if (!p.comments) p.comments = [];
-
-            let mediaHtml = `<div style="color:#777; font-size:11px;">بدون وسائط</div>`;
-            if (p.images && p.images.length > 0) {
-                let media = p.images[0];
-                if (media.type === 'video' || (media.src && media.src.includes('.mp4'))) {
-                    mediaHtml = `<video src="${media.src}" controls autoplay loop playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
+                if (editingId) {
+                    await update(ref(db, 'products/' + editingId), productData);
+                    alert('تم تحديث المنتج بنجاح!');
                 } else {
-                    activeImageUrl = media.src;
-                    mediaHtml = `<img src="${media.src}" onclick="openFullscreen('${media.src}')" style="width:100%;height:100%;object-fit:contain;" title="اضغط للتكبير بملء الشاشة">`;
+                    await push(ref(db, 'products'), { ...productData, createdAt: Date.now() });
+                    alert('تم نشر المنتج بنجاح!');
                 }
-            }
 
-            let curCode = p.currency || 'EGP';
-            let curSymbol = getCurrencySymbol(curCode);
-
-            let modalDiscountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge" style="top:10px; right:10px; font-size:10px; padding:4px 10px;">🏷️ خصم: ${p.discount}</div>` : '';
-            let fakeBuyersVal = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
-            let fakeViewsVal = p.fakeViews !== undefined ? p.fakeViews : 48;
-
-            let commentsHtml = p.comments.map(c => `
-                <div class="comment-box">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                        <strong>${c.name}</strong>
-                        <span style="color:var(--accent-gold);">${'⭐'.repeat(c.rating)}</span>
-                    </div>
-                    <p style="color:#ccc;">${c.text}</p>
-                </div>
-            `).join('') || `<p style="font-size:10px; color:var(--text-muted); text-align:center; padding:8px;">كن أول من يترك تقييماً على هذا المنتج!</p>`;
-
-            let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
-            let isAvailable = p.inStock !== false;
-            let modalActionBtn = isAvailable 
-                ? `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart('${p.id}', '${cleanName}', ${p.price}, '${curCode}')">🛒 أضف هذا المنتج إلى السلة</button>`
-                : `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" disabled>غير متوفر حالياً</button>`;
-
-            let modalBody = document.getElementById('modalBodyContent');
-            modalBody.innerHTML = `
-                <div class="modal-media" onclick="openFullscreen(activeImageUrl)" title="اضغط للتكبير">
-                    ${modalDiscountHtml}
-                    ${mediaHtml}
-                    <div style="position:absolute; bottom:5px; left:5px; background:rgba(0,0,0,0.6); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px;">🔍 اضغط للتكبير</div>
-                </div>
-                <h3 style="color:var(--accent-gold); font-size:15px; margin-bottom:4px;">${p.name}</h3>
-                <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:4px;">${p.price} ${curSymbol}</div>
-                
-                <div style="font-size:10px; color:var(--accent-gold); background:var(--bg-primary); padding:6px; border-radius:6px; margin-bottom:8px; border:1px solid var(--border-color); display:flex; justify-content:space-around;">
-                    <span>🔥 تم شراؤه اليوم: <strong>${fakeBuyersVal}</strong> مرة</span>
-                    <span>👁️ يشاهده الآن: <strong>${fakeViewsVal}</strong> عميل</span>
-                </div>
-
-                <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">${p.desc || 'لا يوجد وصف تفصيلي متاح لهذا المنتج حالياً.'}</p>
-                
-                ${modalActionBtn}
-
-                <div class="comments-section">
-                    <h4 style="font-size:12px; margin-bottom:8px; color:#fff;">💬 تقييمات وآراء العملاء</h4>
-                    <div style="max-height: 120px; overflow-y: auto; margin-bottom: 8px;" id="commentsList">${commentsHtml}</div>
-                    
-                    <input type="text" id="commName" class="comment-name" placeholder="اكتب اسمك الكريم...">
-                    <select id="commRating" class="rating-select">
-                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز جداً)</option>
-                        <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
-                        <option value="3">⭐⭐⭐ (مقبول)</option>
-                        <option value="2">⭐⭐ (ضعيف)</option>
-                        <option value="1">⭐ (سيء)</option>
-                    </select>
-                    <textarea id="commText" class="comment-input" rows="2" placeholder="اكتب تعليقك ورأيك..."></textarea>
-                    <button class="submit-comment-btn" onclick="addComment('${p.id}')">إرسال التقييم 🚀</button>
-                </div>
-            `;
-
-            document.getElementById('generalModal').style.display = 'flex';
-        }
-
-        window.openFullscreen = function(imgSrc) {
-            if (!imgSrc) return;
-            document.getElementById('fullscreenImg').src = imgSrc;
-            document.getElementById('fullscreenModal').style.display = 'flex';
-        }
-
-        window.closeFullscreen = function() {
-            document.getElementById('fullscreenModal').style.display = 'none';
-        }
-
-        window.closeGeneralModal = function() {
-            document.getElementById('generalModal').style.display = 'none';
-            if (window.location.search.includes('id=')) {
-                window.history.replaceState({}, document.title, window.location.pathname);
+                resetForm();
+                loadProducts();
+            } catch (e) {
+                alert('حدث خطأ أثناء رفع الصور أو الفيديو.');
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
-        window.closeModalOnOutside = function(event) {
-            if (event.target.id === 'generalModal') closeGeneralModal();
+        async function loadProducts() {
+            try {
+                const snap = await get(ref(db, 'products'));
+                const container = document.getElementById('productsList');
+                if (!snap.exists()) {
+                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد منتجات مضافة.</p>`;
+                    return;
+                }
+                let html = '';
+                const products = snap.val();
+                for (let id in products) {
+                    const p = products[id];
+                    let imgHtml = '';
+                    if (p.images && p.images.length > 0) {
+                        imgHtml = '<div class="img-preview-box">';
+                        p.images.forEach(img => { imgHtml += `<img src="${img}" alt="صورة">`; });
+                        imgHtml += '</div>';
+                    }
+
+                    const encoded = encodeURIComponent(JSON.stringify({ id, ...p }));
+                    html += `
+                        <div class="item-card">
+                            <div class="item-title">${p.title}</div>
+                            <div class="item-info">${p.price} ج.م | ${p.category || 'عام'}</div>
+                            ${imgHtml}
+                            <div class="actions-grid">
+                                <button onclick="editProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
+                                <button onclick="deleteProduct('${id}')" class="action-btn btn-delete">حذف</button>
+                            </div>
+                            <div class="social-share">
+                                <button onclick="shareSocial('whatsapp', '${id}', '${p.title}')" class="share-btn btn-whatsapp">واتساب</button>
+                                <button onclick="shareSocial('facebook', '${id}', '${p.title}')" class="share-btn btn-facebook">فيس بوك</button>
+                                <button onclick="shareSocial('telegram', '${id}', '${p.title}')" class="share-btn btn-telegram">تيليجرام</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (e) { console.error(e); }
         }
 
-        window.addComment = function(productId) {
-            let name = document.getElementById('commName').value.trim();
-            let rating = parseInt(document.getElementById('commRating').value);
-            let text = document.getElementById('commText').value.trim();
+        window.editProduct = function(encodedData) {
+            const data = JSON.parse(decodeURIComponent(encodedData));
+            document.getElementById('editingId').value = data.id;
+            document.getElementById('prodTitle').value = data.title || '';
+            document.getElementById('prodPrice').value = data.price || '';
+            document.getElementById('prodCategory').value = data.category || 'أدوات منزلية';
+            document.getElementById('prodDesc').value = data.desc || '';
 
-            if (!name || !text) {
-                alert('الرجاء إدخال الاسم والتعليق قبل الإرسال.');
-                return;
-            }
+            document.getElementById('formTitle').innerText = '✏️ تعديل المنتج';
+            document.getElementById('submitBtn').innerText = 'تحديث المنتج 🔄';
+            document.getElementById('cancelBtn').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-            let p = productsListCache.filter(item => item.id === productId)[0];
-            if (p) {
-                if (!p.comments) p.comments = [];
-                p.comments.unshift({ name, rating, text });
-                
-                update(ref(db, 'products/' + productId), { comments: p.comments }).then(() => {
-                    document.getElementById('commName').value = '
-';
-                    document.getElementById('commText').value = '';
-                    openProductModal(productId);
-                }).catch(err => alert('خطأ في إرسال التقييم: ' + err.message));
+        window.resetForm = function() {
+            document.getElementById('editingId').value = '';
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImages').value = '';
+            document.getElementById('prodVideo').value = '';
+
+            document.getElementById('formTitle').innerText = '➕ إضافة منتج جديد';
+            document.getElementById('submitBtn').innerText = 'نشر المنتج الآن 🚀';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        window.deleteProduct = async function(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+                await remove(ref(db, 'products/' + id));
+                loadProducts();
             }
         }
+
+        window.shareSocial = function(platform, id, title) {
+            // استبدال admin.html بـ index.html ووضع معرف المنتج بجانبه
+            const baseUrl = window.location.href.replace('admin.html', 'index.html').split('?')[0];
+            const productUrl = `${baseUrl}?id=${id}`;
+            const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}\n${productUrl}`);
+            
+            if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${text}`);
+            if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`);
+            if (platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(productUrl)}&text=${text}`);
+        }
+
+        window.addEventListener('DOMContentLoaded', loadProducts);
     </script>
 </body>
 </html>

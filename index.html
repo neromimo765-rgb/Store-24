@@ -26,7 +26,7 @@
         .store-header h1 { color: var(--accent-gold); font-size: 18px; }
         
         .header-actions { display: flex; gap: 6px; align-items: center; }
-        .music-btn { background: var(--bg-card); border: 1px solid var(--success); color: var(--success); padding: 6px 12px; border-radius: 8px; font-size: 11px; text-decoration: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .music-btn { background: var(--bg-card); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 6px 12px; border-radius: 8px; font-size: 11px; text-decoration: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
 
         .welcome-banner { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(21, 21, 34, 0.8)); border: 1px solid var(--accent-gold); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 11px; color: var(--accent-gold); text-align: center; font-weight: bold; line-height: 1.4; animation: fadeIn 0.6s ease; }
 
@@ -67,7 +67,7 @@
 </head>
 <body>
 
-    <!-- ملف صوت البحر المباشر -->
+    <!-- ملف صوت البحر -->
     <audio id="storeAudio" loop preload="auto">
         <source src="https://actions.google.com/sounds/v1/water/waves_gentle_surf.ogg" type="audio/ogg">
         <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c3666f38.mp3?filename=ocean-waves-107074.mp3" type="audio/mp3">
@@ -77,7 +77,8 @@
         <div class="store-header">
             <h1>🛒 Store-24</h1>
             <div class="header-actions">
-                <button class="music-btn" id="musicToggleBtn">🌊 صوت البحر يعمل</button>
+                <!-- زر تشغيل وإيقاف صوت البحر بالطريقة الكلاسيكية -->
+                <button class="music-btn" id="musicToggleBtn" onclick="toggleMusic()">🌊 تشغيل صوت البحر</button>
             </div>
         </div>
 
@@ -112,34 +113,27 @@
         window.addEventListener('DOMContentLoaded', () => {
             setRandomWelcomeMessage();
             loadStoreProducts();
-            initAutoPlayAudio();
         });
 
-        // تشغيل صوت البحر تلقائياً مع أول ضغطة للعميل في أي مكان بالمتجر
-        function initAutoPlayAudio() {
+        // دالة التحكم اليدوي بزر الصوت فقط
+        function toggleMusic() {
             let audio = document.getElementById('storeAudio');
             let btn = document.getElementById('musicToggleBtn');
-
-            function unlockAudio() {
-                audio.play().then(() => {
-                    btn.innerHTML = "🌊 صوت البحر يعمل";
-                    btn.style.color = "#10B981";
-                    // إزالة المستشعرات بعد التشغيل الناجح ليعمل بسلاسة تامة
-                    window.removeEventListener('click', unlockAudio);
-                    window.removeEventListener('touchstart', unlockAudio);
-                    window.removeEventListener('scroll', unlockAudio);
-                }).catch(e => {
-                    console.log("انتظار تفاعل المستخدم...", e);
-                });
-            }
-
-            // الاستماع لأول تفاعل من العميل على الصفحة لفك قفل المتصفح وتشغيل الصوت فوراً
-            window.addEventListener('click', unlockAudio);
-            window.addEventListener('touchstart', unlockAudio);
-            window.addEventListener('scroll', unlockAudio);
             
-            // محاولة تشغيل مبدئية فورية
-            unlockAudio();
+            if (audio.paused) {
+                audio.play().then(() => {
+                    btn.innerHTML = "🌊 إيقاف صوت البحر";
+                    btn.style.borderColor = "var(--success)";
+                    btn.style.color = "#10B981";
+                }).catch(() => {
+                    alert('يرجى النقر مرة أخرى للسماح بتشغيل الصوت في المتجر.');
+                });
+            } else {
+                audio.pause();
+                btn.innerHTML = "🌊 تشغيل صوت البحر";
+                btn.style.borderColor = "var(--accent-gold)";
+                btn.style.color = "var(--accent-gold)";
+            }
         }
 
         function setRandomWelcomeMessage() {

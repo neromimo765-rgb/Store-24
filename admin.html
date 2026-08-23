@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store-24 | لوحة التحكم المحمية</title>
+    <title>Store-24 | لوحة التحكم والتحكم الذكي</title>
     <style>
         :root {
             --bg-primary: #0B0B10;
@@ -30,6 +30,12 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .header h1 { color: var(--accent-gold); font-size: 18px; }
         
+        /* إحصائيات حقيقية للمتجر */
+        .analytics-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), var(--bg-card)); border: 1px solid var(--accent-gold); border-radius: 10px; padding: 10px; margin-bottom: 15px; font-size: 11px; }
+        .analytics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px; }
+        .stat-card { background: var(--bg-primary); padding: 8px; border-radius: 6px; text-align: center; border: 1px solid var(--border-color); }
+        .stat-num { color: var(--accent-gold); font-weight: bold; font-size: 13px; }
+
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 11px; margin-bottom: 4px; color: var(--text-muted); font-weight: bold; }
         .form-control { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 8px; border-radius: 8px; font-size: 11px; outline: none; }
@@ -45,7 +51,6 @@
         .action-btn { background: var(--border-color); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
         .action-btn.del { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
-        /* قسم إدارة التقييمات داخل لوحة التحكم */
         .admin-comments-box { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
         .admin-comment-row { background: var(--bg-primary); padding: 6px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border: 1px solid var(--border-color); }
 
@@ -84,6 +89,21 @@
             <div style="display:flex; gap:8px; align-items:center;">
                 <span style="font-size:10px; color:var(--success);">متصل 🟢</span>
                 <button onclick="logoutAdmin()" style="background:var(--danger); color:#fff; border:none; padding:3px 6px; border-radius:4px; font-size:9px; cursor:pointer;">قفل</button>
+            </div>
+        </div>
+
+        <!-- قسم إحصائيات الزوار والمبيعات الحقيقية -->
+        <div class="analytics-box">
+            <span style="color:var(--accent-gold); font-weight:bold;">📊 إحصائيات الزوار والمبيعات الحقيقية:</span>
+            <div class="analytics-grid">
+                <div class="stat-card">
+                    <div>إجمالي الزوار الحقيقيين</div>
+                    <div class="stat-num" id="realVisitorsCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>طلبات السلة الحقيقية</div>
+                    <div class="stat-num" id="realOrdersCount">0</div>
+                </div>
             </div>
         </div>
 
@@ -126,6 +146,18 @@
                         <option value="true">🟢 متوفر</option>
                         <option value="false">🔴 غير متوفر</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- خانات التحكم في الأرقام الوهمية -->
+            <div style="display: flex; gap: 8px; background: rgba(245, 158, 11, 0.05); padding: 8px; border-radius: 8px; border: 1px dashed var(--accent-gold); margin-bottom: 10px;">
+                <div class="form-group" style="flex: 1; margin-bottom:0;">
+                    <label style="color:var(--accent-gold);">👥 عدد المشترين (وهمي)</label>
+                    <input type="number" id="fakeBuyers" class="form-control" value="14" placeholder="مثال: 14">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom:0;">
+                    <label style="color:var(--accent-gold);">👁️ عدد المشاهدين (وهمي)</label>
+                    <input type="number" id="fakeViews" class="form-control" value="48" placeholder="مثال: 48">
                 </div>
             </div>
 
@@ -201,6 +233,14 @@
                 allProducts = data || {};
                 renderAdminList();
             });
+
+            // جلب الإحصائيات الحقيقية
+            const analyticsRef = ref(db, 'analytics');
+            onValue(analyticsRef, (snapshot) => {
+                const stats = snapshot.val() || { visitors: 0, orders: 0 };
+                document.getElementById('realVisitorsCount').innerText = stats.visitors || 0;
+                document.getElementById('realOrdersCount').innerText = stats.orders || 0;
+            });
         }
 
         function showLoading(text) {
@@ -220,6 +260,8 @@
             const category = document.getElementById('pCategory').value;
             const inStock = document.getElementById('pInStock').value === 'true';
             const desc = document.getElementById('pDesc').value.trim();
+            const fakeBuyers = parseInt(document.getElementById('fakeBuyers').value) || 14;
+            const fakeViews = parseInt(document.getElementById('fakeViews').value) || 48;
             const fileInput = document.getElementById('mediaFile');
 
             if (!name || isNaN(price)) {
@@ -246,6 +288,8 @@
                     category,
                     inStock,
                     desc,
+                    fakeBuyers,
+                    fakeViews,
                     images: finalImages,
                     comments: existingComments
                 };
@@ -297,19 +341,18 @@
                 const discountText = p.discount ? ` (🏷️ ${p.discount})` : '';
                 const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ج.م${discountText}\n📝 الوصف: ${p.desc || 'متوفر الآن في المتجر'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
 
-                // عرض التقييمات الخاصة بالمنتج لتمكين المالك من حذف أي تعليق غير مرغوب فيه
                 let commentsListHtml = '';
                 if (p.comments && p.comments.length > 0) {
                     commentsListHtml = `
                         <div class="admin-comments-box">
-                            <span style="color:var(--accent-gold); font-weight:bold; display:block; margin-bottom:4px;">💬 التقييمات الحالية (${p.comments.length}):</span>
+                            <span style="color:var(--accent-gold); font-weight:bold; display:block; margin-bottom:4px;">💬 التقييمات (${p.comments.length}):</span>
                             ${p.comments.map((c, cIndex) => `
                                 <div class="admin-comment-row">
                                     <div>
                                         <strong>${c.name}</strong> (${'⭐'.repeat(c.rating)})<br>
                                         <span style="color:var(--text-muted);">${c.text}</span>
                                     </div>
-                                    <button class="action-btn del" onclick="deleteComment('${key}', ${cIndex})">حذف التعليق</button>
+                                    <button class="action-btn del" onclick="deleteComment('${key}', ${cIndex})">حذف</button>
                                 </div>
                             `).join('')}
                         </div>
@@ -322,7 +365,7 @@
                             <div>
                                 <strong>${p.name}</strong><br>
                                 <span style="color:var(--accent-gold);">${p.price} ج.م</span> | ${stockText}
-                                ${p.discount ? `<span style="color:var(--success); background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:4px; font-size:9px; margin-right:4px;">🏷️ ${p.discount}</span>` : ''}
+                                <div style="font-size:9px; color:var(--text-muted); margin-top:2px;">👥 مشترين وهمي: ${p.fakeBuyers || 14} | 👁️ مشاهدين: ${p.fakeViews || 48}</div>
                             </div>
                             <div class="actions-btns">
                                 <button class="action-btn" onclick="editProduct('${key}')">تعديل</button>
@@ -341,26 +384,19 @@
             }).join('');
         }
 
-        // دالة حذف تعليق معين من لوحة التحكم
         window.deleteComment = function(productKey, commentIndex) {
             if (confirm('هل أنت متأكد من حذف هذا التقييم؟')) {
                 let p = allProducts[productKey];
                 if (p && p.comments) {
                     p.comments.splice(commentIndex, 1);
-                    update(ref(db, 'products/' + productKey), { comments: p.comments })
-                        .then(() => {
-                            alert('تم حذف التقييم بنجاح من المتجر!');
-                        })
-                        .catch(err => {
-                            alert('خطأ أثناء الحذف: ' + err.message);
-                        });
+                    update(ref(db, 'products/' + productKey), { comments: p.comments });
                 }
             }
         }
 
         window.copyToClipboard = function(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('تم نسخ تفاصيل المنتج أو الرابط بنجاح! جاهز للمشاركة 📋');
+                alert('تم النسخ بنجاح! 📋');
             });
         }
 
@@ -373,6 +409,8 @@
             document.getElementById('pCategory').value = p.category;
             document.getElementById('pInStock').value = (p.inStock !== false) ? 'true' : 'false';
             document.getElementById('pDesc').value = p.desc || '';
+            document.getElementById('fakeBuyers').value = p.fakeBuyers || 14;
+            document.getElementById('fakeViews').value = p.fakeViews || 48;
             
             document.getElementById('formTitle').innerText = "تعديل المنتج: " + p.name;
             document.getElementById('cancelEditBtn').style.display = 'block';
@@ -387,15 +425,15 @@
             document.getElementById('pDesc').value = '';
             document.getElementById('mediaFile').value = '';
             document.getElementById('pInStock').value = 'true';
+            document.getElementById('fakeBuyers').value = '14';
+            document.getElementById('fakeViews').value = '48';
             document.getElementById('formTitle').innerText = "إضافة منتج جديد";
             document.getElementById('cancelEditBtn').style.display = 'none';
         }
 
         window.deleteProduct = function(key) {
             if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) {
-                remove(ref(db, 'products/' + key)).then(() => {
-                    alert('تم الحذف بنجاح.');
-                });
+                remove(ref(db, 'products/' + key));
             }
         }
     </script>

@@ -45,7 +45,10 @@
         .action-btn { background: var(--border-color); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
         .action-btn.del { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
-        /* أزرار المشاركة الاجتماعية داخل لوحة التحكم */
+        /* قسم إدارة التقييمات داخل لوحة التحكم */
+        .admin-comments-box { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
+        .admin-comment-row { background: var(--bg-primary); padding: 6px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border: 1px solid var(--border-color); }
+
         .social-share-bar { display: flex; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
         .social-btn { flex: 1; border: none; padding: 5px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; color: #fff; text-decoration: none; }
         .sb-wa { background: var(--wa-color); color: #000; }
@@ -146,7 +149,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove, push, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -164,7 +167,6 @@
 
         let allProducts = {};
         const correctPassword = "qweasdzxc12ASD";
-        // رابط موقع المتجر الخاص بك (قم بتعديله إذا كان رابطك على GitHub Pages مختلفاً)
         const storeBaseUrl = window.location.href.replace('admin.html', 'index.html');
 
         window.checkPassword = function() {
@@ -291,10 +293,28 @@
                 const isAvailable = p.inStock !== false;
                 const stockText = isAvailable ? '<span style="color:var(--success);">🟢 متوفر</span>' : '<span style="color:var(--danger);">🔴 غير متوفر</span>';
                 
-                // صياغة رسالة المنشور الاحترافية (بدون تكرار للسعر)
                 const productLink = `${storeBaseUrl}?id=${p.id}`;
                 const discountText = p.discount ? ` (🏷️ ${p.discount})` : '';
                 const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ج.م${discountText}\n📝 الوصف: ${p.desc || 'متوفر الآن في المتجر'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
+
+                // عرض التقييمات الخاصة بالمنتج لتمكين المالك من حذف أي تعليق غير مرغوب فيه
+                let commentsListHtml = '';
+                if (p.comments && p.comments.length > 0) {
+                    commentsListHtml = `
+                        <div class="admin-comments-box">
+                            <span style="color:var(--accent-gold); font-weight:bold; display:block; margin-bottom:4px;">💬 التقييمات الحالية (${p.comments.length}):</span>
+                            ${p.comments.map((c, cIndex) => `
+                                <div class="admin-comment-row">
+                                    <div>
+                                        <strong>${c.name}</strong> (${'⭐'.repeat(c.rating)})<br>
+                                        <span style="color:var(--text-muted);">${c.text}</span>
+                                    </div>
+                                    <button class="action-btn del" onclick="deleteComment('${key}', ${cIndex})">حذف التعليق</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
 
                 return `
                     <div class="product-list-item">
@@ -309,6 +329,7 @@
                                 <button class="action-btn del" onclick="deleteProduct('${key}')">حذف</button>
                             </div>
                         </div>
+                        ${commentsListHtml}
                         <div class="social-share-bar">
                             <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}" target="_blank" class="social-btn sb-wa">💬 واتساب</a>
                             <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productLink)}" target="_blank" class="social-btn sb-fb">👥 فيسبوك</a>
@@ -320,11 +341,26 @@
             }).join('');
         }
 
+        // دالة حذف تعليق معين من لوحة التحكم
+        window.deleteComment = function(productKey, commentIndex) {
+            if (confirm('هل أنت متأكد من حذف هذا التقييم؟')) {
+                let p = allProducts[productKey];
+                if (p && p.comments) {
+                    p.comments.splice(commentIndex, 1);
+                    update(ref(db, 'products/' + productKey), { comments: p.comments })
+                        .then(() => {
+                            alert('تم حذف التقييم بنجاح من المتجر!');
+                        })
+                        .catch(err => {
+                            alert('خطأ أثناء الحذف: ' + err.message);
+                        });
+                }
+            }
+        }
+
         window.copyToClipboard = function(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert('تم نسخ تفاصيل المنتج أو الرابط بنجاح! جاهز للمشاركة 📋');
-            }).catch(err => {
-                alert('خطأ في النسخ: ' + err);
             });
         }
 

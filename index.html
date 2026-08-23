@@ -45,6 +45,11 @@
         /* تصميم بادج الخصم الأنيق */
         .discount-badge { position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #EF4444, #DC2626); color: #fff; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; z-index: 5; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); display: flex; align-items: center; gap: 3px; border: 1px solid rgba(255, 255, 255, 0.2); }
 
+        /* شارة حالة المنتج (متوفر / غير متوفر) */
+        .stock-status-badge { position: absolute; top: 8px; left: 8px; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; z-index: 5; }
+        .status-in { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .status-out { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+
         .product-media-box { width: 100%; height: 110px; background: #000; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .product-media-box img, .product-media-box video { width: 100%; height: 100%; object-fit: cover; }
 
@@ -53,6 +58,7 @@
         .product-price { font-size: 11px; color: var(--accent-gold); font-weight: 800; margin-bottom: 6px; }
         
         .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; }
+        .add-to-cart-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
         /* نافذة المودال الرئيسية */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
@@ -327,13 +333,23 @@
                     }
                 }
 
-                // الشرط هنا: لا يظهر البادج نهائياً إذا لم يتم إدخال قيمة للخصم
                 let discountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge">🏷️ ${p.discount}</div>` : '';
+                
+                // شارة حالة المنتج وزر الإضافة للسلة بناءً على التوفر
+                let isAvailable = p.inStock !== false;
+                let stockBadgeHtml = isAvailable 
+                    ? `<div class="stock-status-badge status-in">متوفر</div>` 
+                    : `<div class="stock-status-badge status-out">غير متوفر</div>`;
+
                 let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
+                let actionBtn = isAvailable 
+                    ? `<button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف للسلة</button>`
+                    : `<button class="add-to-cart-btn" disabled>غير متوفر حالياً</button>`;
 
                 return `
                     <div class="product-card">
                         ${discountHtml}
+                        ${stockBadgeHtml}
                         <div class="product-media-box" onclick="openProductModal('${p.id}')">
                             ${mediaHtml}
                         </div>
@@ -342,7 +358,7 @@
                                 <div class="product-title" onclick="openProductModal('${p.id}')">${p.name}</div>
                                 <div class="product-price">${p.price} ج.م</div>
                             </div>
-                            <button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف للسلة</button>
+                            ${actionBtn}
                         </div>
                     </div>
                 `;
@@ -373,7 +389,6 @@
                 }
             }
 
-            // الشرط هنا أيضاً داخل تفاصيل المنتج: لا يظهر البادج نهائياً إذا لم توجد قيمة للخصم
             let modalDiscountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge" style="top:10px; right:10px; font-size:10px; padding:4px 10px;">🏷️ خصم: ${p.discount}</div>` : '';
 
             let commentsHtml = p.comments.map(c => `
@@ -387,6 +402,10 @@
             `).join('') || `<p style="font-size:10px; color:var(--text-muted); text-align:center; padding:8px;">كن أول من يترك تقييماً على هذا المنتج!</p>`;
 
             let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
+            let isAvailable = p.inStock !== false;
+            let modalActionBtn = isAvailable 
+                ? `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف هذا المنتج إلى السلة</button>`
+                : `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" disabled>غير متوفر حالياً</button>`;
 
             let modalBody = document.getElementById('modalBodyContent');
             modalBody.innerHTML = `
@@ -399,7 +418,7 @@
                 <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:6px;">${p.price} ج.م</div>
                 <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">${p.desc || 'لا يوجد وصف تفصيلي متاح لهذا المنتج حالياً.'}</p>
                 
-                <button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف هذا المنتج إلى السلة</button>
+                ${modalActionBtn}
 
                 <div class="comments-section">
                     <h4 style="font-size:12px; margin-bottom:8px; color:#fff;">💬 تقييمات وآراء العملاء</h4>

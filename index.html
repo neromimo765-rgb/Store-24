@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المتجر الأساسي</title>
+    <title>Store-24 - المتجر الأساسي</title>
     <style>
         :root {
             --bg-primary: #0f0f13;
@@ -14,129 +14,96 @@
             --text-muted: #9CA3AF;
             --border-color: rgba(255, 255, 255, 0.1);
             --success: #10B981;
-            --info: #3B82F6;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background-color: var(--bg-primary); color: var(--text-main); padding-bottom: 50px; }
         .container { max-width: 480px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; padding: 16px; }
+        
         header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;
+            margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
         }
-        header h1 { font-size: 15px; color: var(--accent-gold); font-weight: 800; }
-        .nav-btn {
-            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
-            padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;
+        .store-title { font-size: 16px; color: var(--accent-gold); font-weight: 900; display: flex; align-items: center; gap: 5px; }
+        .cart-badge {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: #fff;
+            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
         }
-        .card {
+        
+        .notice-bar {
+            background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-gold); padding: 8px 12px; border-radius: 8px; font-size: 11px;
+            text-align: center; margin-bottom: 15px; font-weight: bold;
+        }
+
+        /* شريط الأقسام الأفقي */
+        .categories-container {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;
+            scrollbar-width: none;
+        }
+        .categories-container::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted);
+            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; cursor: pointer;
+            transition: 0.2s;
+        }
+        .cat-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
+
+        /* كارت المنتج */
+        .product-card {
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 16px; margin-bottom: 20px;
+            border-radius: 12px; overflow: hidden; margin-bottom: 15px; padding: 12px;
         }
-        .card h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
-        .form-control {
-            width: 100%; background: #0f0f13; border: 1px solid var(--border-color);
-            color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; outline: none;
+        .product-status { font-size: 10px; background: rgba(16, 185, 129, 0.2); color: var(--success); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; font-weight: bold; }
+        .product-title { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #fff; }
+        .product-price { font-size: 14px; color: var(--accent-gold); font-weight: 900; margin-bottom: 10px; }
+        
+        .media-box { width: 100%; height: 200px; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 10px; position: relative; }
+        .media-box img, .media-box video { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-add-cart {
+            width: 100%; background: var(--accent-gold); color: #000; border: none;
+            padding: 10px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer;
+            margin-bottom: 8px;
         }
-        .form-control:focus { border-color: var(--accent-gold); }
-        .btn {
-            width: 100%; background: linear-gradient(135deg, #F59E0B, #D97706);
-            color: #000; border: none; padding: 12px; border-radius: 8px;
-            font-weight: 900; font-size: 13px; cursor: pointer; margin-top: 5px;
-        }
-        .btn-cancel { background: var(--text-muted); color: #000; display: none; }
-        .item-card {
-            background: #0f0f13; border: 1px solid var(--border-color);
-            border-radius: 10px; padding: 12px; margin-bottom: 12px;
-        }
-        .item-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #fff; }
-        .item-info { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-        .img-preview-box { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 8px; }
-        .img-preview-box img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
-        .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px; }
-        .action-btn { padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; }
-        .btn-edit { background: var(--info); }
-        .btn-delete { background: var(--accent-red); }
-        .social-share { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .share-btn { padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; }
-        .btn-whatsapp { background: #25D366; }
-        .btn-facebook { background: #1877F2; }
-        .btn-telegram { background: #229ED9; }
-        #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 11, 16, 0.85); display: none;
-            justify-content: center; align-items: center; z-index: 2000;
-            flex-direction: column; color: var(--accent-gold); font-size: 13px; font-weight: bold;
-        }
-        .spinner {
-            width: 35px; height: 35px; border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-gold); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 10px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .social-btn { padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 4px; }
+        .whatsapp-btn { background: #25D366; }
+        .facebook-btn { background: #1877F2; }
+        .tiktok-btn { background: #000000; border: 1px solid var(--border-color); }
+        
+        .loading-text { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 30px; }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-        <span>جاري معالجة ونشر المنتجات...</span>
-    </div>
-
     <div class="container">
         <header>
-            <h1>🛒 لوحة المتجر الأساسي</h1>
-            <a href="landing-admin.html" class="nav-btn">صفحات الهبوط 🚀</a>
+            <div class="store-title">Store-24 🛒</div>
+            <div class="cart-badge" onclick="alert('سلة المشتريات فارغة حالياً')">🛒 السلة <span id="cartCount">0</span></div>
         </header>
 
-        <div class="card">
-            <h2 id="formTitle">➕ إضافة منتج جديد</h2>
-            <input type="hidden" id="editingId" value="">
-
-            <div class="form-group">
-                <label>اسم المنتج:</label>
-                <input type="text" id="prodTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية">
-            </div>
-            <div class="form-group">
-                <label>السعر (بالجنيه):</label>
-                <input type="number" id="prodPrice" class="form-control" placeholder="مثال: 750">
-            </div>
-            <div class="form-group">
-                <label>القسم:</label>
-                <select id="prodCategory" class="form-control">
-                    <option value="أدوات منزلية">🚀 أدوات منزلية</option>
-                    <option value="إلكترونيات">📱 إلكترونيات</option>
-                    <option value="إكسسوارات">⌚ إكسسوارات</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>صور المنتج (من الهاتف - حتى 10 صور):</label>
-                <input type="file" id="prodImages" class="form-control" accept="image/*" multiple>
-            </div>
-            <div class="form-group">
-                <label>فيديو المنتج (اختياري):</label>
-                <input type="file" id="prodVideo" class="form-control" accept="video/*">
-            </div>
-            <div class="form-group">
-                <label>وصف المنتج:</label>
-                <textarea id="prodDesc" class="form-control" rows="3" placeholder="تفاصيل ومميزات المنتج..."></textarea>
-            </div>
-            <button onclick="saveProduct()" id="submitBtn" class="btn">نشر المنتج الآن 🚀</button>
-            <button onclick="resetForm()" id="cancelBtn" class="btn btn-cancel">إلغاء التعديل</button>
+        <div class="notice-bar">
+            🔥 أقوى المنتجات بأفضل الأسعار وبجودة ممتازة في انتظارك اليوم.
         </div>
 
-        <div class="card">
-            <h2>📦 المنتجات المضافة للمتجر</h2>
-            <div id="productsList">
-                <p style="text-align: center; color: var(--text-muted); font-size: 11px;">جاري تحميل المنتجات...</p>
-            </div>
+        <!-- الأقسام -->
+        <div class="categories-container" id="categoriesContainer">
+            <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
+            <button class="cat-btn" onclick="filterCategory('أدوات منزلية', this)">🚀 أدوات منزلية</button>
+            <button class="cat-btn" onclick="filterCategory('إلكترونيات', this)">📱 إلكترونيات</button>
+            <button class="cat-btn" onclick="filterCategory('إكسسوارات', this)">⌚ إكسسوارات</button>
+        </div>
+
+        <!-- قائمة المنتجات -->
+        <div id="storeProductsList">
+            <div class="loading-text">جاري تحميل المنتجات...</div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, get, push, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -152,151 +119,77 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
+        let allProducts = {};
+        let currentCategory = 'الكل';
 
-        window.saveProduct = async function() {
-            const editingId = document.getElementById('editingId').value;
-            const title = document.getElementById('prodTitle').value.trim();
-            const price = document.getElementById('prodPrice').value.trim();
-            const category = document.getElementById('prodCategory').value;
-            const desc = document.getElementById('prodDesc').value.trim();
-            const imageFiles = document.getElementById('prodImages').files;
-            const videoFile = document.getElementById('prodVideo').files[0];
-
-            if (!title || !price) {
-                alert('الرجاء إدخال اسم المنتج والسعر.');
-                return;
-            }
-
-            document.getElementById('loadingOverlay').style.display = 'flex';
-
-            try {
-                let images = [];
-                for (let i = 0; i < imageFiles.length; i++) {
-                    const b64 = await fileToBase64(imageFiles[i]);
-                    images.push(b64);
-                }
-
-                let videoUrl = '';
-                if (videoFile) {
-                    videoUrl = await fileToBase64(videoFile);
-                }
-
-                const productData = { title, price, category, desc };
-                if (images.length > 0) productData.images = images;
-                if (videoUrl) productData.videoUrl = videoUrl;
-
-                if (editingId) {
-                    await update(ref(db, 'products/' + editingId), productData);
-                    alert('تم تحديث المنتج بنجاح!');
-                } else {
-                    await push(ref(db, 'products'), { ...productData, createdAt: Date.now() });
-                    alert('تم نشر المنتج بنجاح!');
-                }
-
-                resetForm();
-                loadProducts();
-            } catch (e) {
-                alert('حدث خطأ أثناء رفع الصور أو الفيديو.');
-            } finally {
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-        }
-
-        async function loadProducts() {
+        async function loadStoreProducts() {
             try {
                 const snap = await get(ref(db, 'products'));
-                const container = document.getElementById('productsList');
+                const container = document.getElementById('storeProductsList');
+                
                 if (!snap.exists()) {
-                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد منتجات مضافة.</p>`;
+                    container.innerHTML = `<div class="loading-text">لا توجد منتجات مضافة حالياً في المتجر.</div>`;
                     return;
                 }
-                let html = '';
-                const products = snap.val();
-                for (let id in products) {
-                    const p = products[id];
-                    let imgHtml = '';
-                    if (p.images && p.images.length > 0) {
-                        imgHtml = '<div class="img-preview-box">';
-                        p.images.forEach(img => { imgHtml += `<img src="${img}" alt="صورة">`; });
-                        imgHtml += '</div>';
-                    }
 
-                    const encoded = encodeURIComponent(JSON.stringify({ id, ...p }));
-                    html += `
-                        <div class="item-card">
-                            <div class="item-title">${p.title}</div>
-                            <div class="item-info">${p.price} ج.م | ${p.category || 'عام'}</div>
-                            ${imgHtml}
-                            <div class="actions-grid">
-                                <button onclick="editProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
-                                <button onclick="deleteProduct('${id}')" class="action-btn btn-delete">حذف</button>
-                            </div>
-                            <div class="social-share">
-                                <button onclick="shareSocial('whatsapp', '${id}', '${p.title}')" class="share-btn btn-whatsapp">واتساب</button>
-                                <button onclick="shareSocial('facebook', '${id}', '${p.title}')" class="share-btn btn-facebook">فيس بوك</button>
-                                <button onclick="shareSocial('telegram', '${id}', '${p.title}')" class="share-btn btn-telegram">تيليجرام</button>
-                            </div>
-                        </div>
-                    `;
-                }
-                container.innerHTML = html;
-            } catch (e) { console.error(e); }
-        }
-
-        window.editProduct = function(encodedData) {
-            const data = JSON.parse(decodeURIComponent(encodedData));
-            document.getElementById('editingId').value = data.id;
-            document.getElementById('prodTitle').value = data.title || '';
-            document.getElementById('prodPrice').value = data.price || '';
-            document.getElementById('prodCategory').value = data.category || 'أدوات منزلية';
-            document.getElementById('prodDesc').value = data.desc || '';
-
-            document.getElementById('formTitle').innerText = '✏️ تعديل المنتج';
-            document.getElementById('submitBtn').innerText = 'تحديث المنتج 🔄';
-            document.getElementById('cancelBtn').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        window.resetForm = function() {
-            document.getElementById('editingId').value = '';
-            document.getElementById('prodTitle').value = '';
-            document.getElementById('prodPrice').value = '';
-            document.getElementById('prodDesc').value = '';
-            document.getElementById('prodImages').value = '';
-            document.getElementById('prodVideo').value = '';
-
-            document.getElementById('formTitle').innerText = '➕ إضافة منتج جديد';
-            document.getElementById('submitBtn').innerText = 'نشر المنتج الآن 🚀';
-            document.getElementById('cancelBtn').style.display = 'none';
-        }
-
-        window.deleteProduct = async function(id) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                await remove(ref(db, 'products/' + id));
-                loadProducts();
+                allProducts = snap.val();
+                renderProducts();
+            } catch (e) {
+                document.getElementById('storeProductsList').innerHTML = `<div class="loading-text" style="color:var(--accent-red);">حدث خطأ أثناء تحميل المنتجات.</div>`;
             }
         }
 
-        window.shareSocial = function(platform, id, title) {
-            // استبدال admin.html بـ index.html ووضع معرف المنتج بجانبه
-            const baseUrl = window.location.href.replace('admin.html', 'index.html').split('?')[0];
-            const productUrl = `${baseUrl}?id=${id}`;
-            const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}\n${productUrl}`);
-            
-            if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${text}`);
-            if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`);
-            if (platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(productUrl)}&text=${text}`);
+        window.filterCategory = function(category, btnElement) {
+            currentCategory = category;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderProducts();
         }
 
-        window.addEventListener('DOMContentLoaded', loadProducts);
+        function renderProducts() {
+            const container = document.getElementById('storeProductsList');
+            let html = '';
+            let found = false;
+
+            for (let id in allProducts) {
+                const p = allProducts[id];
+                if (currentCategory !== 'الكل' && p.category !== currentCategory) continue;
+
+                found = true;
+                let mediaHtml = '';
+                if (p.images && p.images.length > 0) {
+                    mediaHtml = `<div class="media-box"><img src="${p.images[0]}" alt="${p.title}"></div>`;
+                } else if (p.videoUrl) {
+                    mediaHtml = `<div class="media-box"><video src="${p.videoUrl}" controls></video></div>`;
+                } else {
+                    mediaHtml = `<div class="media-box" style="display:flex;justify-content:center;align-items:center;color:var(--text-muted);font-size:11px;">بدون وسائط</div>`;
+                }
+
+                html += `
+                    <div class="product-card">
+                        <span class="product-status">متوفر</span>
+                        <div class="product-title">${p.title}</div>
+                        <div class="product-price">${p.price} ج.م</div>
+                        ${mediaHtml}
+                        <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">${p.desc || ''}</div>
+                        <button onclick="alert('تمت إضافة المنتج إلى السلة بنجاح!')" class="btn-add-cart">🛒 أضف للسلة</button>
+                        <div class="social-grid">
+                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent('مرحباً، أهتم بشراء: ' + p.title + ' بسعر ' + p.price + ' ج.م')}" target="_blank" class="social-btn whatsapp-btn">واتساب</a>
+                            <a href="https://www.facebook.com" target="_blank" class="social-btn facebook-btn">فيس بوك</a>
+                            <a href="https://www.tiktok.com" target="_blank" class="social-btn tiktok-btn">تيك توك</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (!found) {
+                container.innerHTML = `<div class="loading-text">لا توجد منتجات في هذا القسم حالياً.</div>`;
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadStoreProducts);
     </script>
 </body>
 </html>

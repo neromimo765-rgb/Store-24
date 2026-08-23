@@ -165,7 +165,7 @@
         let productsListCache = [];
         let currentCategory = 'الكل';
         const ownerWhatsAppPhone = "201156666967";
-        let letActiveImageUrl = '';
+        let activeImageUrl = '';
         let cart = [];
         const currentStoreUrl = window.location.href.split('?')[0];
 
@@ -456,7 +456,7 @@
                 if (media.type === 'video' || (media.src && media.src.includes('.mp4'))) {
                     mediaHtml = `<video src="${media.src}" controls autoplay loop playsinline style="width:100%;height:100%;object-fit:contain;"></video>`;
                 } else {
-                    letActiveImageUrl = media.src;
+                    activeImageUrl = media.src;
                     mediaHtml = `<img src="${media.src}" onclick="openFullscreen('${media.src}')" style="width:100%;height:100%;object-fit:contain;" title="اضغط للتكبير بملء الشاشة">`;
                 }
             }
@@ -486,7 +486,7 @@
 
             let modalBody = document.getElementById('modalBodyContent');
             modalBody.innerHTML = `
-                <div class="modal-media" onclick="openFullscreen(letActiveImageUrl)" title="اضغط للتكبير">
+                <div class="modal-media" onclick="openFullscreen(activeImageUrl)" title="اضغط للتكبير">
                     ${modalDiscountHtml}
                     ${mediaHtml}
                     <div style="position:absolute; bottom:5px; left:5px; background:rgba(0,0,0,0.6); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px;">🔍 اضغط للتكبير</div>
@@ -554,13 +554,14 @@
                 return;
             }
 
-            let p = productsListCache.find(item => item.id === productId);
+            let p = productsListCache.filter(item => item.id === productId)[0];
             if (p) {
                 if (!p.comments) p.comments = [];
                 p.comments.unshift({ name, rating, text });
                 
                 update(ref(db, 'products/' + productId), { comments: p.comments }).then(() => {
-                    document.getElementById('commName').value = '';
+                    document.getElementById('commName').value = '
+';
                     document.getElementById('commText').value = '';
                     openProductModal(productId);
                 }).catch(err => alert('خطأ في إرسال التقييم: ' + err.message));

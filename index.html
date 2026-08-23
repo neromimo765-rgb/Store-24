@@ -56,7 +56,6 @@
         .product-title { font-size: 11px; color: #fff; margin-bottom: 4px; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
         .product-price { font-size: 11px; color: var(--accent-gold); font-weight: 800; margin-bottom: 4px; }
         
-        /* مظهر العدادات الوهمية في البطاقة */
         .social-proof-tag { font-size: 9px; color: var(--text-muted); margin-bottom: 6px; background: var(--bg-primary); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; }
 
         .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; margin-bottom: 6px; }
@@ -147,7 +146,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -173,7 +172,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             setRandomWelcomeMessage();
             updateCartBadge();
-            trackRealVisitor(); // تسجيل زائر حقيقي
+            trackRealVisitor();
 
             const productsRef = ref(db, 'products');
             onValue(productsRef, (snapshot) => {
@@ -196,7 +195,12 @@
             });
         });
 
-        // تسجيل زائر حقيقي مرة واحدة في الجلسة
+        function getCurrencySymbol(code) {
+            if (code === 'USD') return '$';
+            if (code === 'SAR') return 'ر.س';
+            return 'ج.م';
+        }
+
         function trackRealVisitor() {
             if (!sessionStorage.getItem('visited_store')) {
                 sessionStorage.setItem('visited_store', 'true');
@@ -232,12 +236,12 @@
             document.getElementById('welcomeMessage').innerText = messages[Math.floor(Math.random() * messages.length)];
         }
 
-        window.addToCart = function(id, name, price) {
+        window.addToCart = function(id, name, price, currency) {
             let existing = cart.find(item => item.id === id);
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({ id, name, price, qty: 1 });
+                cart.push({ id, name, price, currency: currency || 'EGP', qty: 1 });
             }
             updateCartBadge();
             alert(`تم إضافة "${name}" للسلة بنجاح! 🛒`);
@@ -262,15 +266,20 @@
                 return;
             }
 
-            let totalPrice = 0;
+            let totalsByCurrency = {};
             let itemsHtml = cart.map((item) => {
                 let subTotal = item.price * item.qty;
-                totalPrice += subTotal;
+                let curCode = item.currency || 'EGP';
+                let curSymbol = getCurrencySymbol(curCode);
+
+                if (!totalsByCurrency[curCode]) totalsByCurrency[curCode] = 0;
+                totalsByCurrency[curCode] += subTotal;
+
                 return `
                     <div class="cart-item-row">
                         <div>
                             <strong>${item.name}</strong><br>
-                            <span style="color:var(--accent-gold);">${item.price} ج.م × ${item.qty} = ${subTotal} ج.م</span>
+                            <span style="color:var(--accent-gold);">${item.price} ${curSymbol} × ${item.qty} = ${subTotal} ${curSymbol}</span>
                         </div>
                         <div class="cart-item-controls">
                             <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
@@ -282,11 +291,16 @@
                 `;
             }).join('');
 
+            let totalsHtml = Object.keys(totalsByCurrency).map(curCode => {
+                let curSymbol = getCurrencySymbol(curCode);
+                return `<div style="color:var(--accent-gold);">${totalsByCurrency[curCode]} ${curSymbol}</div>`;
+            }).join('');
+
             modalBody.innerHTML = `
                 <h3 style="color:var(--accent-gold); font-size:15px; margin-bottom:10px; text-align:center;">🛒 سلة المشتريات الحالية</h3>
                 <div style="max-height:220px; overflow-y:auto; margin-bottom:10px;">${itemsHtml}</div>
-                <div style="font-size:13px; font-weight:bold; text-align:center; margin-bottom:10px; color:#fff;">
-                    الإجمالي الكلي: <span style="color:var(--accent-gold);">${totalPrice} ج.م</span>
+                <div style="font-size:12px; font-weight:bold; text-align:center; margin-bottom:10px; color:#fff;">
+                    الإجمالي الكلي: ${totalsHtml}
                 </div>
                 <button class="checkout-whatsapp-btn" onclick="checkoutOrder()">💬 إتمام الطلب عبر الواتساب</button>
             `;
@@ -315,22 +329,30 @@
         window.checkoutOrder = function() {
             if (cart.length === 0) return;
 
-            // تسجيل طلب حقيقي في الإحصائيات
             const ordersRef = ref(db, 'analytics/orders');
             runTransaction(ordersRef, (currentOrders) => {
                 return (currentOrders || 0) + 1;
             });
 
             let message = `🛒 *طلب جديد من المتجر:*\n\n`;
-            let totalPrice = 0;
+            let totalsByCurrency = {};
 
             cart.forEach((item, index) => {
                 let itemTotal = item.price * item.qty;
-                totalPrice += itemTotal;
-                message += `${index + 1}. *${item.name}*\n   العدد: ${item.qty} | السعر: ${item.price} ج.م\n   الإجمالي: ${itemTotal} ج.م\n\n`;
+                let curCode = item.currency || 'EGP';
+                let curSymbol = getCurrencySymbol(curCode);
+
+                if (!totalsByCurrency[curCode]) totalsByCurrency[curCode] = 0;
+                totalsByCurrency[curCode] += itemTotal;
+
+                message += `${index + 1}. *${item.name}*\n   العدد: ${item.qty} | السعر: ${item.price} ${curSymbol}\n   الإجمالي: ${itemTotal} ${curSymbol}\n\n`;
             });
 
-            message += `💰 *الإجمالي الكلي:* ${totalPrice} ج.م\n\nأرغب في تأكيد الأوردر وتحديد عنوان الاستلام.`;
+            let totalsText = Object.keys(totalsByCurrency).map(curCode => {
+                return `${totalsByCurrency[curCode]} ${getCurrencySymbol(curCode)}`;
+            }).join(' + ');
+
+            message += `💰 *الإجمالي الكلي:* ${totalsText}\n\nأرغب في تأكيد الأوردر وتحديد عنوان الاستلام.`;
             
             let waUrl = `https://wa.me/${ownerWhatsAppPhone}?text=${encodeURIComponent(message)}`;
             window.open(waUrl, '_blank');
@@ -358,6 +380,9 @@
                     }
                 }
 
+                let curCode = p.currency || 'EGP';
+                let curSymbol = getCurrencySymbol(curCode);
+
                 let discountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge">🏷️ ${p.discount}</div>` : '';
                 let isAvailable = p.inStock !== false;
                 let stockBadgeHtml = isAvailable 
@@ -366,16 +391,15 @@
 
                 let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
                 let actionBtn = isAvailable 
-                    ? `<button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف للسلة</button>`
+                    ? `<button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price}, '${curCode}')">🛒 أضف للسلة</button>`
                     : `<button class="add-to-cart-btn" disabled>غير متوفر حالياً</button>`;
 
-                // العدادات الوهمية للثقة التي تتحكم بها من لوحة التحكم
                 let fakeBuyersVal = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
                 let fakeViewsVal = p.fakeViews !== undefined ? p.fakeViews : 48;
 
                 const productLink = `${currentStoreUrl}?id=${p.id}`;
                 const discountStr = p.discount ? ` (🏷️ ${p.discount})` : '';
-                const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ج.م${discountStr}\n📝 الوصف: ${p.desc || 'متوفر الآن'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
+                const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ${curSymbol}${discountStr}\n📝 الوصف: ${p.desc || 'متوفر الآن'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
 
                 return `
                     <div class="product-card">
@@ -387,7 +411,7 @@
                         <div class="product-body">
                             <div>
                                 <div class="product-title" onclick="openProductModal('${p.id}')">${p.name}</div>
-                                <div class="product-price">${p.price} ج.م</div>
+                                <div class="product-price">${p.price} ${curSymbol}</div>
                                 <div class="social-proof-tag">
                                     <span>🔥 اشتره: ${fakeBuyersVal}</span>
                                     <span>👁️ ${fakeViewsVal} يشاهدون</span>
@@ -437,6 +461,9 @@
                 }
             }
 
+            let curCode = p.currency || 'EGP';
+            let curSymbol = getCurrencySymbol(curCode);
+
             let modalDiscountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge" style="top:10px; right:10px; font-size:10px; padding:4px 10px;">🏷️ خصم: ${p.discount}</div>` : '';
             let fakeBuyersVal = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
             let fakeViewsVal = p.fakeViews !== undefined ? p.fakeViews : 48;
@@ -454,7 +481,7 @@
             let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
             let isAvailable = p.inStock !== false;
             let modalActionBtn = isAvailable 
-                ? `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف هذا المنتج إلى السلة</button>`
+                ? `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart('${p.id}', '${cleanName}', ${p.price}, '${curCode}')">🛒 أضف هذا المنتج إلى السلة</button>`
                 : `<button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" disabled>غير متوفر حالياً</button>`;
 
             let modalBody = document.getElementById('modalBodyContent');
@@ -465,7 +492,7 @@
                     <div style="position:absolute; bottom:5px; left:5px; background:rgba(0,0,0,0.6); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px;">🔍 اضغط للتكبير</div>
                 </div>
                 <h3 style="color:var(--accent-gold); font-size:15px; margin-bottom:4px;">${p.name}</h3>
-                <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:4px;">${p.price} ج.م</div>
+                <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:4px;">${p.price} ${curSymbol}</div>
                 
                 <div style="font-size:10px; color:var(--accent-gold); background:var(--bg-primary); padding:6px; border-radius:6px; margin-bottom:8px; border:1px solid var(--border-color); display:flex; justify-content:space-around;">
                     <span>🔥 تم شراؤه اليوم: <strong>${fakeBuyersVal}</strong> مرة</span>

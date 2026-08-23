@@ -102,20 +102,20 @@
             
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div>
-                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">عنوان العرض أو اسم المنتج:</label>
+                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">عنوان العرض أو اسم المنتج (إلزامي):</label>
                     <input type="text" id="lpTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية بتصميم عصري">
                 </div>
 
                 <!-- خانة وصف المنتج لصفحة الهبوط -->
                 <div>
-                    <label style="font-size: 11px; color: var(--accent-gold); display: block; margin-bottom: 4px;">📝 وصف المنتج (الذي سيظهر للعملاء في صفحة الهبوط):</label>
+                    <label style="font-size: 11px; color: var(--accent-gold); display: block; margin-bottom: 4px;">📝 وصف المنتج (اختياري):</label>
                     <textarea id="lpDesc" class="form-control" rows="3" placeholder="اكتب مميزات المنتج، فوائده، ولماذا يجب على العميل شراؤه..."></textarea>
                 </div>
 
                 <div style="display: flex; gap: 8px;">
                     <div style="flex: 2;">
-                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">السعر بعد الخصم:</label>
-                        <input type="number" id="lpPrice" class="form-control" placeholder="299">
+                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">السعر بعد الخصم (اختياري):</label>
+                        <input type="number" id="lpPrice" class="form-control" placeholder="299 (أو اتركه فارغاً)">
                     </div>
                     <div style="flex: 1.5;">
                         <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">العملة:</label>
@@ -126,7 +126,7 @@
                         </select>
                     </div>
                     <div style="flex: 2;">
-                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">السعر القديم:</label>
+                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">السعر القديم (اختياري):</label>
                         <input type="number" id="lpOldPrice" class="form-control" placeholder="599">
                     </div>
                 </div>
@@ -340,7 +340,7 @@
 
         window.createCustomLandingPageFromFile = async function() {
             const title = document.getElementById('lpTitle').value.trim();
-            const desc = document.getElementById('lpDesc').value.trim(); // تم جلب وصف المنتج هنا
+            const desc = document.getElementById('lpDesc').value.trim(); 
             const price = document.getElementById('lpPrice').value.trim();
             const currency = document.getElementById('lpCurrency').value;
             const oldPrice = document.getElementById('lpOldPrice').value.trim();
@@ -349,8 +349,9 @@
             const imageFile = document.getElementById('lpImageFile').files[0];
             const videoFile = document.getElementById('lpVideoFile').files[0];
 
-            if (!title || !price) {
-                alert('الرجاء إدخال عنوان العرض والسعر على الأقل.');
+            // تم جعل التحقق يقتصر على العنوان فقط، بحيث السعر اختياري تماماً
+            if (!title) {
+                alert('الرجاء إدخال عنوان العرض أو اسم المنتج على الأقل.');
                 return;
             }
 
@@ -370,11 +371,11 @@
                 const landingId = 'lp_' + Date.now();
                 const landingData = {
                     title,
-                    desc, // حفظ الوصف في قاعدة البيانات
-                    price,
+                    desc: desc || '', 
+                    price: price || '', // قبول القيمة حتى لو كانت فارغة
                     currency,
-                    oldPrice,
-                    timer,
+                    oldPrice: oldPrice || '',
+                    timer: timer || '02:45:00',
                     imageUrl,
                     videoUrl,
                     createdAt: Date.now()
@@ -423,12 +424,13 @@
                     const l = data[id];
                     const link = baseUrl + `landing.html?id=${id}`;
                     const curSym = getCurrencySymbol(l.currency);
+                    const priceDisplay = l.price ? `${l.price} ${curSym}` : 'بدون سعر (حسب الطلب)';
 
                     return `
                         <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px;">
                             <div>
                                 <strong style="color: var(--accent-gold); font-size: 11px;">${l.title}</strong><br>
-                                <span style="color: #fff;">السعر: ${l.price} ${curSym}</span>
+                                <span style="color: #fff;">السعر: ${priceDisplay}</span>
                             </div>
                             <div style="display: flex; gap: 4px;">
                                 <button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('تم نسخ الرابط!'))" class="action-btn">🔗 نسخ</button>

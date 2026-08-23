@@ -240,9 +240,9 @@
                                 <button onclick="deleteProduct('${id}')" class="action-btn btn-delete">حذف</button>
                             </div>
                             <div class="social-share">
-                                <button onclick="shareSocial('whatsapp', '${p.title}')" class="share-btn btn-whatsapp">واتساب</button>
-                                <button onclick="shareSocial('facebook', '${p.title}')" class="share-btn btn-facebook">فيس بوك</button>
-                                <button onclick="shareSocial('telegram', '${p.title}')" class="share-btn btn-telegram">تيليجرام</button>
+                                <button onclick="shareSocial('whatsapp', '${id}', '${p.title}')" class="share-btn btn-whatsapp">واتساب</button>
+                                <button onclick="shareSocial('facebook', '${id}', '${p.title}')" class="share-btn btn-facebook">فيس بوك</button>
+                                <button onclick="shareSocial('telegram', '${id}', '${p.title}')" class="share-btn btn-telegram">تيليجرام</button>
                             </div>
                         </div>
                     `;
@@ -285,12 +285,20 @@
             }
         }
 
-        window.shareSocial = function(platform, title) {
-            const currentUrl = window.location.origin + window.location.pathname.replace('store-admin.html', 'store.html');
-            const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}`);
-            if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${text}%20${encodeURIComponent(currentUrl)}`);
-            if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`);
-            if (platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${text}`);
+        window.shareSocial = function(platform, id, title) {
+            // رابط متجرك الأساسي صراحة بدون أي ارتباط بصفحة الكنترول
+            const storeUrl = `https://neromimo765-rgb.github.io/Store-24/index.html?id=${id}`;
+            const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}\n${storeUrl}`);
+            
+            if (platform === 'whatsapp') {
+                window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+            }
+            if (platform === 'facebook') {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(storeUrl)}`, '_blank');
+            }
+            if (platform === 'telegram') {
+                window.open(`https://t.me/share/url?url=${encodeURIComponent(storeUrl)}&text=${text}`, '_blank');
+            }
         }
 
         window.addEventListener('DOMContentLoaded', loadProducts);

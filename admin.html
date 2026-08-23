@@ -140,8 +140,18 @@
                 return;
             }
 
+            // استخراج رابط المتجر الأساسي تلقائياً من رابط جيت هاب الحالي
+            let currentUrl = window.location.href;
+            let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1) + 'index.html';
+
             container.innerHTML = products.map(p => {
-                let shareText = encodeURIComponent(`🔥 لا يفوتك هذا العرض: *${p.name}* \n💰 السعر: ${p.price} ج.م\n📂 القسم: ${p.category || 'عام'}\n📝 التفاصيل: ${p.desc || 'منتج عالي الجودة'}`);
+                // إنشاء رابط مباشر خاص بكل منتج
+                let productLink = `${baseUrl}?id=${p.id}`;
+                
+                // النص الذي سيتم مشاركته (يحتوي على التفاصيل ورابط المتجر المباشر للمنتج)
+                let messageText = `🔥 لا يفوتك هذا العرض: *${p.name}*\n💰 السعر: ${p.price} ج.م\n📂 القسم: ${p.category || 'عام'}\n📝 التفاصيل: ${p.desc || 'منتج عالي الجودة'}\n\n🛒 *اطلبه مباشرة من هنا:* \n${productLink}`;
+                let shareText = encodeURIComponent(messageText);
+                
                 let imgCount = (p.images || []).length;
                 let hasVid = p.video ? ' | 🎥 يوجد فيديو' : '';
                 
@@ -159,15 +169,15 @@
                         </div>
                         <div class="social-share-box">
                             <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" class="social-btn s-wa">واتساب 📱</a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u=&quote=${shareText}" target="_blank" class="social-btn s-fb">فيسبوك 📘</a>
-                            <a href="https://t.me/share/url?url=&text=${shareText}" target="_blank" class="social-btn s-tg">تيليجرام ✈️</a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productLink)}&quote=${shareText}" target="_blank" class="social-btn s-fb">فيسبوك 📘</a>
+                            <a href="https://t.me/share/url?url=${encodeURIComponent(productLink)}&text=${shareText}" target="_blank" class="social-btn s-tg">تيليجرام ✈️</a>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        // دالة ضغط الصور لتقليل الحجم وجعل المتجر صاروخ
+        // دالة ضغط الصور لتسريع المتجر
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -219,7 +229,6 @@
             let newImages = [...temporaryMediaCache.images];
             let newVideo = temporaryMediaCache.video;
 
-            // معالجة الصور (بحد أقصى 10 صور)
             if (imageFiles.length > 0) {
                 newImages = [];
                 let limit = Math.min(imageFiles.length, 10);
@@ -229,7 +238,6 @@
                 }
             }
 
-            // معالجة الفيديو (فيديو واحد)
             if (videoFile) {
                 let reader = new FileReader();
                 await new Promise((resolve) => {

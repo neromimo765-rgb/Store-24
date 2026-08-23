@@ -54,12 +54,14 @@
 
         .product-body { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
         .product-title { font-size: 11px; color: #fff; margin-bottom: 4px; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
-        .product-price { font-size: 11px; color: var(--accent-gold); font-weight: 800; margin-bottom: 6px; }
+        .product-price { font-size: 11px; color: var(--accent-gold); font-weight: 800; margin-bottom: 4px; }
         
+        /* مظهر العدادات الوهمية في البطاقة */
+        .social-proof-tag { font-size: 9px; color: var(--text-muted); margin-bottom: 6px; background: var(--bg-primary); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+
         .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; margin-bottom: 6px; }
         .add-to-cart-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
-        /* أزرار المشاركة السريعة في بطاقة المنتج بالمتجر */
         .card-social-bar { display: flex; gap: 4px; border-top: 1px solid var(--border-color); padding-top: 5px; }
         .card-soc-btn { flex: 1; border: none; padding: 3px; border-radius: 4px; font-size: 8px; font-weight: bold; cursor: pointer; color: #fff; text-decoration: none; text-align: center; }
         .cs-wa { background: var(--wa-color); color: #000; }
@@ -145,7 +147,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -171,6 +173,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             setRandomWelcomeMessage();
             updateCartBadge();
+            trackRealVisitor(); // تسجيل زائر حقيقي
 
             const productsRef = ref(db, 'products');
             onValue(productsRef, (snapshot) => {
@@ -192,6 +195,17 @@
                 }
             });
         });
+
+        // تسجيل زائر حقيقي مرة واحدة في الجلسة
+        function trackRealVisitor() {
+            if (!sessionStorage.getItem('visited_store')) {
+                sessionStorage.setItem('visited_store', 'true');
+                const visitorRef = ref(db, 'analytics/visitors');
+                runTransaction(visitorRef, (currentVisitors) => {
+                    return (currentVisitors || 0) + 1;
+                });
+            }
+        }
 
         window.toggleMusic = function() {
             let audio = document.getElementById('storeAudio');
@@ -301,6 +315,12 @@
         window.checkoutOrder = function() {
             if (cart.length === 0) return;
 
+            // تسجيل طلب حقيقي في الإحصائيات
+            const ordersRef = ref(db, 'analytics/orders');
+            runTransaction(ordersRef, (currentOrders) => {
+                return (currentOrders || 0) + 1;
+            });
+
             let message = `🛒 *طلب جديد من المتجر:*\n\n`;
             let totalPrice = 0;
 
@@ -349,7 +369,10 @@
                     ? `<button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف للسلة</button>`
                     : `<button class="add-to-cart-btn" disabled>غير متوفر حالياً</button>`;
 
-                // بيانات المشاركة لكل منتج
+                // العدادات الوهمية للثقة التي تتحكم بها من لوحة التحكم
+                let fakeBuyersVal = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
+                let fakeViewsVal = p.fakeViews !== undefined ? p.fakeViews : 48;
+
                 const productLink = `${currentStoreUrl}?id=${p.id}`;
                 const discountStr = p.discount ? ` (🏷️ ${p.discount})` : '';
                 const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ج.م${discountStr}\n📝 الوصف: ${p.desc || 'متوفر الآن'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
@@ -365,6 +388,10 @@
                             <div>
                                 <div class="product-title" onclick="openProductModal('${p.id}')">${p.name}</div>
                                 <div class="product-price">${p.price} ج.م</div>
+                                <div class="social-proof-tag">
+                                    <span>🔥 اشتره: ${fakeBuyersVal}</span>
+                                    <span>👁️ ${fakeViewsVal} يشاهدون</span>
+                                </div>
                             </div>
                             <div>
                                 ${actionBtn}
@@ -411,6 +438,8 @@
             }
 
             let modalDiscountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge" style="top:10px; right:10px; font-size:10px; padding:4px 10px;">🏷️ خصم: ${p.discount}</div>` : '';
+            let fakeBuyersVal = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
+            let fakeViewsVal = p.fakeViews !== undefined ? p.fakeViews : 48;
 
             let commentsHtml = p.comments.map(c => `
                 <div class="comment-box">
@@ -436,7 +465,13 @@
                     <div style="position:absolute; bottom:5px; left:5px; background:rgba(0,0,0,0.6); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px;">🔍 اضغط للتكبير</div>
                 </div>
                 <h3 style="color:var(--accent-gold); font-size:15px; margin-bottom:4px;">${p.name}</h3>
-                <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:6px;">${p.price} ج.م</div>
+                <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:4px;">${p.price} ج.م</div>
+                
+                <div style="font-size:10px; color:var(--accent-gold); background:var(--bg-primary); padding:6px; border-radius:6px; margin-bottom:8px; border:1px solid var(--border-color); display:flex; justify-content:space-around;">
+                    <span>🔥 تم شراؤه اليوم: <strong>${fakeBuyersVal}</strong> مرة</span>
+                    <span>👁️ يشاهده الآن: <strong>${fakeViewsVal}</strong> عميل</span>
+                </div>
+
                 <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">${p.desc || 'لا يوجد وصف تفصيلي متاح لهذا المنتج حالياً.'}</p>
                 
                 ${modalActionBtn}

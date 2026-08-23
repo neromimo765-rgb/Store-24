@@ -15,6 +15,8 @@
             --danger: #EF4444;
             --success: #10B981;
             --wa-color: #25D366;
+            --fb-color: #1877F2;
+            --tk-color: #FE2C55;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -42,10 +44,7 @@
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
         .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
-        /* تصميم بادج الخصم الأنيق */
         .discount-badge { position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #EF4444, #DC2626); color: #fff; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; z-index: 5; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4); display: flex; align-items: center; gap: 3px; border: 1px solid rgba(255, 255, 255, 0.2); }
-
-        /* شارة حالة المنتج (متوفر / غير متوفر) */
         .stock-status-badge { position: absolute; top: 8px; left: 8px; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px; z-index: 5; }
         .status-in { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
         .status-out { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
@@ -57,10 +56,16 @@
         .product-title { font-size: 11px; color: #fff; margin-bottom: 4px; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
         .product-price { font-size: 11px; color: var(--accent-gold); font-weight: 800; margin-bottom: 6px; }
         
-        .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; }
+        .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; margin-bottom: 6px; }
         .add-to-cart-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
-        /* نافذة المودال الرئيسية */
+        /* أزرار المشاركة السريعة في بطاقة المنتج بالمتجر */
+        .card-social-bar { display: flex; gap: 4px; border-top: 1px solid var(--border-color); padding-top: 5px; }
+        .card-soc-btn { flex: 1; border: none; padding: 3px; border-radius: 4px; font-size: 8px; font-weight: bold; cursor: pointer; color: #fff; text-decoration: none; text-align: center; }
+        .cs-wa { background: var(--wa-color); color: #000; }
+        .cs-fb { background: var(--fb-color); }
+        .cs-tk { background: var(--tk-color); }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
         .modal-content { background: var(--bg-card); border: 1px solid var(--accent-gold); width: 100%; max-width: 420px; max-height: 90vh; border-radius: 14px; overflow-y: auto; padding: 14px; position: relative; }
         .close-modal { position: absolute; top: 10px; left: 10px; background: var(--danger); color: #fff; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
@@ -68,7 +73,6 @@
         .modal-media { width: 100%; height: 200px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; position: relative; cursor: zoom-in; }
         .modal-media img, .modal-media video { width: 100%; height: 100%; object-fit: contain; }
 
-        /* نافذة تكبير الصورة بملء الشاشة */
         .fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 4000; padding: 15px; }
         .fullscreen-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
         .close-fullscreen { position: absolute; top: 15px; left: 15px; background: var(--danger); color: #fff; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 4010; }
@@ -162,6 +166,7 @@
         const ownerWhatsAppPhone = "201156666967";
         let letActiveImageUrl = '';
         let cart = [];
+        const currentStoreUrl = window.location.href.split('?')[0];
 
         window.addEventListener('DOMContentLoaded', () => {
             setRandomWelcomeMessage();
@@ -183,7 +188,7 @@
                 if (productId) {
                     setTimeout(() => {
                         openProductModal(productId);
-                    }, 200);
+                    }, 300);
                 }
             });
         });
@@ -334,8 +339,6 @@
                 }
 
                 let discountHtml = (p.discount && p.discount.trim() !== "") ? `<div class="discount-badge">🏷️ ${p.discount}</div>` : '';
-                
-                // شارة حالة المنتج وزر الإضافة للسلة بناءً على التوفر
                 let isAvailable = p.inStock !== false;
                 let stockBadgeHtml = isAvailable 
                     ? `<div class="stock-status-badge status-in">متوفر</div>` 
@@ -345,6 +348,11 @@
                 let actionBtn = isAvailable 
                     ? `<button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف للسلة</button>`
                     : `<button class="add-to-cart-btn" disabled>غير متوفر حالياً</button>`;
+
+                // بيانات المشاركة لكل منتج
+                const productLink = `${currentStoreUrl}?id=${p.id}`;
+                const discountStr = p.discount ? ` (🏷️ ${p.discount})` : '';
+                const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ج.م${discountStr}\n📝 الوصف: ${p.desc || 'متوفر الآن'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
 
                 return `
                     <div class="product-card">
@@ -358,11 +366,24 @@
                                 <div class="product-title" onclick="openProductModal('${p.id}')">${p.name}</div>
                                 <div class="product-price">${p.price} ج.م</div>
                             </div>
-                            ${actionBtn}
+                            <div>
+                                ${actionBtn}
+                                <div class="card-social-bar">
+                                    <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}" target="_blank" class="card-soc-btn cs-wa" title="مشاركة واتساب">واتساب</a>
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productLink)}" target="_blank" class="card-soc-btn cs-fb" title="مشاركة فيسبوك">فيسبوك</a>
+                                    <a href="https://www.tiktok.com/" target="_blank" onclick="copyShareText('${shareText.replace(/'/g, "\\'")}')" class="card-soc-btn cs-tk" title="نسخ لتيك توك">تيك توك</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        window.copyShareText = function(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('تم نسخ تفاصيل المنتج! افتح تيك توك والصقها بالمنشور 📋');
+            });
         }
 
         window.filterCategory = function(category, btnElement) {

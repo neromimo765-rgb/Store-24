@@ -47,9 +47,6 @@
         .action-btn { background: var(--border-color); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
         .action-btn.del { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
-        .admin-comments-box { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
-        .admin-comment-row { background: var(--bg-primary); padding: 6px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 10px; border: 1px solid var(--border-color); }
-
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; color: var(--accent-gold); font-size: 13px; font-weight: bold; }
         .spinner { width: 35px; height: 35px; border: 4px solid var(--border-color); border-top: 4px solid var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -107,6 +104,12 @@
                 <div>
                     <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">عنوان العرض أو اسم المنتج:</label>
                     <input type="text" id="lpTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية بتصميم عصري">
+                </div>
+
+                <!-- خانة وصف المنتج لصفحة الهبوط -->
+                <div>
+                    <label style="font-size: 11px; color: var(--accent-gold); display: block; margin-bottom: 4px;">📝 وصف المنتج (الذي سيظهر للعملاء في صفحة الهبوط):</label>
+                    <textarea id="lpDesc" class="form-control" rows="3" placeholder="اكتب مميزات المنتج، فوائده، ولماذا يجب على العميل شراؤه..."></textarea>
                 </div>
 
                 <div style="display: flex; gap: 8px;">
@@ -176,7 +179,6 @@
                 <input type="text" id="pName" class="form-control" placeholder="اكتب اسم المنتج...">
             </div>
 
-            <!-- اختيار السعر والعملة (جنيه مصري / دولار / ريال سعودي) -->
             <div style="display: flex; gap: 8px;">
                 <div class="form-group" style="flex: 2;">
                     <label>السعر</label>
@@ -330,7 +332,6 @@
             });
         }
 
-        // دالة مساعدة للحصول على رمز العملة المناسب
         function getCurrencySymbol(code) {
             if (code === 'USD') return '$';
             if (code === 'SAR') return 'ر.س';
@@ -339,172 +340,173 @@
 
         window.createCustomLandingPageFromFile = async function() {
             const title = document.getElementById('lpTitle').value.trim();
+            const desc = document.getElementById('lpDesc').value.trim(); // تم جلب وصف المنتج هنا
             const price = document.getElementById('lpPrice').value.trim();
             const currency = document.getElementById('lpCurrency').value;
             const oldPrice = document.getElementById('lpOldPrice').value.trim();
             const timer = document.getElementById('lpTimer').value.trim();
-            
+
             const imageFile = document.getElementById('lpImageFile').files[0];
             const videoFile = document.getElementById('lpVideoFile').files[0];
 
             if (!title || !price) {
-                alert("برجاء كتابة عنوان العرض والسعر الحالي على الأقل!");
+                alert('الرجاء إدخال عنوان العرض والسعر على الأقل.');
                 return;
             }
 
-            showLoading('جاري معالجة ورفع الملفات من هاتفك...');
+            showLoading('جاري رفع الوسائط وإنشاء صفحة الهبوط...');
 
-            let imageBase64 = '';
-            let videoBase64 = '';
+            try {
+                let imageUrl = '';
+                let videoUrl = '';
 
-            if (imageFile) imageBase64 = await readFileAsDataURL(imageFile);
-            if (videoFile) videoBase64 = await readFileAsDataURL(videoFile);
+                if (imageFile) {
+                    imageUrl = await readFileAsDataURL(imageFile);
+                }
+                if (videoFile) {
+                    videoUrl = await readFileAsDataURL(videoFile);
+                }
 
-            const landingRef = push(ref(db, 'custom_landings'));
-            const landingId = landingRef.key;
+                const landingId = 'lp_' + Date.now();
+                const landingData = {
+                    title,
+                    desc, // حفظ الوصف في قاعدة البيانات
+                    price,
+                    currency,
+                    oldPrice,
+                    timer,
+                    imageUrl,
+                    videoUrl,
+                    createdAt: Date.now()
+                };
 
-            await set(landingRef, {
-                title: title,
-                price: price,
-                currency: currency,
-                oldPrice: oldPrice || '',
-                timer: timer || '02:45:00',
-                image: imageBase64,
-                video: videoBase64
-            });
+                await set(ref(db, 'landings/' + landingId), landingData);
+                hideLoading();
 
-            hideLoading();
+                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                const generatedUrl = baseUrl + `landing.html?id=${landingId}`;
 
-            const baseUrl = window.location.href.replace('admin.html', 'landing.html');
-            const fullLink = `${baseUrl}?lid=${landingId}`;
+                document.getElementById('finalLandingLink').value = generatedUrl;
+                document.getElementById('generatedLinkResult').style.display = 'block';
+                
+                // تفريغ الحقول بعد النجاح
+                document.getElementById('lpTitle').value = '';
+                document.getElementById('lpDesc').value = '';
+                document.getElementById('lpPrice').value = '';
+                document.getElementById('lpOldPrice').value = '';
+                document.getElementById('lpImageFile').value = '';
+                document.getElementById('lpVideoFile').value = '';
 
-            document.getElementById('finalLandingLink').value = fullLink;
-            document.getElementById('generatedLinkResult').style.display = 'block';
-            
-            alert("تم نشر صفحة الهبوط وتوليد الرابط بنجاح! 🚀");
-        }
+                initLandingsManagement();
+                alert('تم إنشاء ونشر صفحة الهبوط بنجاح! 🚀');
 
-        window.copyGeneratedLink = function() {
-            const linkInput = document.getElementById('finalLandingLink');
-            linkInput.select();
-            navigator.clipboard.writeText(linkInput.value);
-            alert("تم نسخ الرابط إلى الحافظة بنجاح! 📋");
-        }
+            } catch (err) {
+                hideLoading();
+                alert('حدث خطأ أثناء الرفع: ' + err.message);
+            }
+        };
 
         function initLandingsManagement() {
-            const landingsRef = ref(db, 'custom_landings');
+            const landingsRef = ref(db, 'landings');
             onValue(landingsRef, (snapshot) => {
+                const data = snapshot.val();
                 const container = document.getElementById('landingsListContainer');
-                container.innerHTML = '';
-
-                if (!snapshot.exists()) {
-                    container.innerHTML = `<p style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 8px;">لا توجد صفحات هبوط منشأة حالياً.</p>`;
+                
+                if (!data) {
+                    container.innerHTML = `<p style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 8px;">لا توجد صفحات هبوط نشطة حالياً.</p>`;
                     return;
                 }
 
-                const landings = snapshot.val();
-                const baseUrl = window.location.href.replace('admin.html', 'landing.html');
+                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                
+                container.innerHTML = Object.keys(data).map(id => {
+                    const l = data[id];
+                    const link = baseUrl + `landing.html?id=${id}`;
+                    const curSym = getCurrencySymbol(l.currency);
 
-                Object.keys(landings).forEach((id) => {
-                    const item = landings[id];
-                    const pageLink = `${baseUrl}?lid=${id}`;
-                    const curSymbol = getCurrencySymbol(item.currency);
-
-                    const cardDiv = document.createElement('div');
-                    cardDiv.style.cssText = "background: #0B0B10; border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; font-size: 11px;";
-                    
-                    cardDiv.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: #fff; font-weight: bold;">📌 ${item.title}</span>
-                            <span style="color: var(--accent-gold); font-weight: bold;">${item.price} ${curSymbol}</span>
-                        </div>
-                        <div style="color: var(--text-muted); font-size: 10px;">⏱️ العداد: ${item.timer || 'غير محدد'}</div>
-                        <div style="display: flex; gap: 4px; margin-top: 2px;">
-                            <input type="text" value="${pageLink}" readonly style="flex:1; padding: 5px; background: #151522; border: none; color: #38BDF8; border-radius: 4px; font-size: 9px;" id="link_${id}">
-                            <button onclick="navigator.clipboard.writeText('${pageLink}'); alert('تم نسخ الرابط بنجاح!');" style="background: #38BDF8; color: #000; border: none; padding: 0 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">نسخ</button>
-                            <button onclick="deleteLanding('${id}')" style="background: rgba(239, 68, 68, 0.2); color: var(--danger); border: none; padding: 0 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">حذف</button>
+                    return `
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px;">
+                            <div>
+                                <strong style="color: var(--accent-gold); font-size: 11px;">${l.title}</strong><br>
+                                <span style="color: #fff;">السعر: ${l.price} ${curSym}</span>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('تم نسخ الرابط!'))" class="action-btn">🔗 نسخ</button>
+                                <a href="${link}" target="_blank" class="action-btn" style="text-decoration:none; text-align:center; background:var(--accent-gold); color:#000; font-weight:bold;">👁️ معاينة</a>
+                                <button onclick="deleteLanding('${id}')" class="action-btn del">🗑️ حذف</button>
+                            </div>
                         </div>
                     `;
-                    container.appendChild(cardDiv);
-                });
+                }).join('');
             });
         }
 
-        window.deleteLanding = async function(id) {
-            if (confirm("هل أنت متأكد من حذف صفحة الهبوط هذه نهائياً؟")) {
-                await remove(ref(db, `custom_landings/${id}`));
-                alert("تم حذف صفحة الهبوط بنجاح.");
+        window.deleteLanding = function(id) {
+            if (confirm('هل أنت متأكد من حذف صفحة الهبوط هذه؟')) {
+                remove(ref(db, 'landings/' + id)).then(() => {
+                    alert('تم حذف الصفحة بنجاح.');
+                });
             }
-        };
+        }
 
-        window.saveProduct = function() {
-            const id = document.getElementById('editProductId').value;
+        window.copyGeneratedLink = function() {
+            const input = document.getElementById('finalLandingLink');
+            input.select();
+            document.execCommand('copy');
+            alert('تم نسخ رابط صفحة الهبوط بنجاح! 📋');
+        }
+
+        window.saveProduct = async function() {
             const name = document.getElementById('pName').value.trim();
-            const price = parseFloat(document.getElementById('pPrice').value);
+            const price = document.getElementById('pPrice').value.trim();
             const currency = document.getElementById('pCurrency').value;
             const discount = document.getElementById('pDiscount').value.trim();
-            const category = document.getElementById('pCategory').value;
             const inStock = document.getElementById('pInStock').value === 'true';
-            const desc = document.getElementById('pDesc').value.trim();
+            const category = document.getElementById('pCategory').value;
             const fakeBuyers = parseInt(document.getElementById('fakeBuyers').value) || 14;
             const fakeViews = parseInt(document.getElementById('fakeViews').value) || 48;
+            const desc = document.getElementById('pDesc').value.trim();
             const fileInput = document.getElementById('mediaFile');
+            const editId = document.getElementById('editProductId').value;
 
-            if (!name || isNaN(price)) {
-                alert('الرجاء إدخال اسم المنتج والسعر على الأقل.');
+            if (!name || !price) {
+                alert('الرجاء إدخال اسم المنتج والسعر.');
                 return;
             }
 
-            showLoading('جاري معالجة البيانات...');
+            showLoading('جاري حفظ المنتج...');
 
-            const processSave = (mediaUrl, mediaType) => {
-                const productId = id ? id : push(ref(db, 'products')).key;
-                const existingComments = (id && allProducts[id] && allProducts[id].comments) ? allProducts[id].comments : [];
-                
-                let finalImages = allProducts[id] && allProducts[id].images ? allProducts[id].images : [];
-                if (mediaUrl) {
-                    finalImages = [{ src: mediaUrl, type: mediaType }];
+            try {
+                let images = [];
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const base64Data = await readFileAsDataURL(file);
+                    const fileType = file.type.startsWith('video') ? 'video' : 'image';
+                    images.push({ src: base64Data, type: fileType });
                 }
 
-                const productData = {
-                    id: productId,
-                    name,
-                    price,
-                    currency,
-                    discount,
-                    category,
-                    inStock,
-                    desc,
-                    fakeBuyers,
-                    fakeViews,
-                    images: finalImages,
-                    comments: existingComments
-                };
+                const productData = { name, price, currency, discount, inStock, category, fakeBuyers, fakeViews, desc };
+                if (images.length > 0) {
+                    productData.images = images;
+                }
 
-                set(ref(db, 'products/' + productId), productData)
-                    .then(() => {
-                        hideLoading();
-                        resetForm();
-                        alert('تم حفظ ونشر المنتج بنجاح! 🎉');
-                    })
-                    .catch((error) => {
-                        hideLoading();
-                        alert('حدث خطأ أثناء الحفظ: ' + error.message);
-                    });
-            };
+                if (editId) {
+                    await update(ref(db, 'products/' + editId), productData);
+                    alert('تم تحديث المنتج بنجاح! ✅');
+                } else {
+                    const newRef = push(ref(db, 'products'));
+                    await set(newRef, productData);
+                    alert('تم إضافة ونشر المنتج بنجاح! 🚀');
+                }
 
-            if (fileInput.files && fileInput.files[0]) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                showLoading('جاري ضغط وتحويل الوسائط...');
-                reader.onload = function(e) {
-                    processSave(e.target.result, file.type.startsWith('video') ? 'video' : 'image');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                processSave(null, null);
+                hideLoading();
+                resetForm();
+
+            } catch (err) {
+                hideLoading();
+                alert('خطأ أثناء الحفظ: ' + err.message);
             }
-        };
+        }
 
         function renderAdminList() {
             const listEl = document.getElementById('adminProductsList');
@@ -512,101 +514,66 @@
             document.getElementById('productsCount').innerText = keys.length;
 
             if (keys.length === 0) {
-                listEl.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:15px; font-size:11px;">لا توجد منتجات مسجلة حالياً في المتجر.</div>`;
+                listEl.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:11px; padding:15px;">لا توجد منتجات مضافة بعد.</p>`;
                 return;
             }
 
-            listEl.innerHTML = keys.map(key => {
-                const p = allProducts[key];
-                const isAvailable = p.inStock !== false;
-                const stockText = isAvailable ? '<span style="color:var(--success);">🟢 متوفر</span>' : '<span style="color:var(--danger);">🔴 غير متوفر</span>';
-                const curSymbol = getCurrencySymbol(p.currency);
-
-                let commentsListHtml = '';
-                if (p.comments && p.comments.length > 0) {
-                    commentsListHtml = `
-                        <div class="admin-comments-box">
-                            <span style="color:var(--accent-gold); font-weight:bold; display:block; margin-bottom:4px;">💬 التقييمات (${p.comments.length}):</span>
-                            ${p.comments.map((c, cIndex) => `
-                                <div class="admin-comment-row">
-                                    <div>
-                                        <strong>${c.name}</strong> (${'⭐'.repeat(c.rating)})<br>
-                                        <span style="color:var(--text-muted);">${c.text}</span>
-                                    </div>
-                                    <button class="action-btn del" onclick="deleteComment('${key}', ${cIndex})">حذف</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-
+            listEl.innerHTML = keys.map(id => {
+                const p = allProducts[id];
+                const curSym = getCurrencySymbol(p.currency);
                 return `
                     <div class="product-list-item">
                         <div class="product-info-row">
                             <div>
-                                <strong>${p.name}</strong><br>
-                                <span style="color:var(--accent-gold);">${p.price} ${curSymbol}</span> | ${stockText}
-                                <div style="font-size:9px; color:var(--text-muted); margin-top:2px;">👥 مشترين: ${p.fakeBuyers || 14} | 👁️ مشاهدين: ${p.fakeViews || 48}</div>
+                                <strong style="color:var(--accent-gold); font-size:12px;">${p.name}</strong><br>
+                                <span style="font-size:11px; color:#fff;">السعر: ${p.price} ${curSym} | القسم: ${p.category}</span>
                             </div>
                             <div class="actions-btns">
-                                <button class="action-btn" onclick="editProduct('${key}')">تعديل</button>
-                                <button class="action-btn del" onclick="deleteProduct('${key}')">حذف</button>
+                                <button class="action-btn" onclick="editProduct('${id}')">تعديل</button>
+                                <button class="action-btn del" onclick="deleteProduct('${id}')">حذف</button>
                             </div>
                         </div>
-                        ${commentsListHtml}
                     </div>
                 `;
             }).join('');
         }
 
-        window.editProduct = function(key) {
-            const p = allProducts[key];
+        window.editProduct = function(id) {
+            const p = allProducts[id];
             if (!p) return;
 
-            document.getElementById('editProductId').value = key;
+            document.getElementById('editProductId').value = id;
             document.getElementById('pName').value = p.name || '';
             document.getElementById('pPrice').value = p.price || '';
             document.getElementById('pCurrency').value = p.currency || 'EGP';
             document.getElementById('pDiscount').value = p.discount || '';
+            document.getElementById('pInStock').value = p.inStock !== false ? 'true' : 'false';
             document.getElementById('pCategory').value = p.category || 'أدوات منزلية';
-            document.getElementById('pInStock').value = p.inStock ? 'true' : 'false';
+            document.getElementById('fakeBuyers').value = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
+            document.getElementById('fakeViews').value = p.fakeViews !== undefined ? p.fakeViews : 48;
             document.getElementById('pDesc').value = p.desc || '';
-            document.getElementById('fakeBuyers').value = p.fakeBuyers || 14;
-            document.getElementById('fakeViews').value = p.fakeViews || 48;
 
-            document.getElementById('formTitle').innerText = 'تعديل المنتج';
+            document.getElementById('formTitle').innerText = "تعديل المنتج الحالي";
             document.getElementById('cancelEditBtn').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 400, behavior: 'smooth' });
         }
 
         window.resetForm = function() {
             document.getElementById('editProductId').value = '';
             document.getElementById('pName').value = '';
             document.getElementById('pPrice').value = '';
-            document.getElementById('pCurrency').value = 'EGP';
             document.getElementById('pDiscount').value = '';
             document.getElementById('pDesc').value = '';
             document.getElementById('mediaFile').value = '';
-            document.getElementById('formTitle').innerText = 'إضافة منتج جديد للمتجر';
+            document.getElementById('formTitle').innerText = "إضافة منتج جديد للمتجر";
             document.getElementById('cancelEditBtn').style.display = 'none';
         }
 
-        window.deleteProduct = function(key) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) {
-                remove(ref(db, 'products/' + key))
-                    .then(() => alert('تم الحذف بنجاح.'))
-                    .catch(err => alert('خطأ أثناء الحذف: ' + err.message));
-            }
-        }
-
-        window.deleteComment = function(productKey, commentIndex) {
-            if (confirm('هل تريد حذف هذا التقييم؟')) {
-                const p = allProducts[productKey];
-                if (p && p.comments) {
-                    p.comments.splice(commentIndex, 1);
-                    update(ref(db, 'products/' + productKey), { comments: p.comments })
-                        .then(() => alert('تم حذف التقييم بنجاح.'));
-                }
+        window.deleteProduct = function(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+                remove(ref(db, 'products/' + id)).then(() => {
+                    alert('تم حذف المنتج بنجاح.');
+                });
             }
         }
     </script>

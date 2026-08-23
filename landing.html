@@ -113,8 +113,6 @@
             color: #E5E7EB;
         }
         .description-card h3 { color: var(--accent-gold); font-size: 14px; margin-bottom: 8px; font-weight: bold; }
-        .description-card ul { padding-right: 18px; margin-top: 8px; }
-        .description-card li { margin-bottom: 6px; }
 
         /* شارات الثقة */
         .trust-badges {
@@ -219,7 +217,6 @@
         </div>
 
         <div class="content-padding" id="mainContent">
-            <!-- سيتم تعبئة البيانات هنا ديناميكياً من قاعدة البيانات -->
             <div style="text-align: center; padding: 40px; color: var(--text-muted);">جاري تحميل تفاصيل العرض...</div>
         </div>
     </div>
@@ -250,9 +247,8 @@
 
         // تشغيل العداد التنازلي الحقيقي المتحرك
         function startCountdown(durationStr) {
-            let [hours, minutes, seconds] = durationStr.split(':').map(Number);
+            let [hours, minutes, seconds] = (durationStr || "02:45:00").split(':').map(Number);
             let totalSeconds = (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
-            if (isNaN(totalSeconds) || totalSeconds <= 0) totalSeconds = 9900; // افتدري 2:45:00
 
             const timerElement = document.getElementById('liveTimer');
             if (!timerElement) return;
@@ -290,7 +286,6 @@
                 const l = snapshot.val();
                 const curSym = getCurrencySymbol(l.currency);
 
-                // حساب نسبة الخصم تلقائياً إذا وجد السعر القديم والجديد
                 let discountPercentage = '';
                 if (l.price && l.oldPrice && Number(l.oldPrice) > Number(l.price)) {
                     const diff = Number(l.oldPrice) - Number(l.price);
@@ -298,7 +293,6 @@
                     discountPercentage = `خصم ${pct}%`;
                 }
 
-                // بناء محتوى الصفحة بشكل احترافي للغاية
                 let mediaHtml = '';
                 if (l.imageUrl) {
                     mediaHtml += `<div class="media-container"><img src="${l.imageUrl}" alt="${l.title}"></div>`;
@@ -362,7 +356,6 @@
                     </div>
                 `;
 
-                // تفعيل العداد المتحرك
                 startCountdown(l.timer || "02:45:00");
 
             } catch (err) {
@@ -384,7 +377,6 @@
             document.getElementById('loadingOverlay').style.display = 'flex';
 
             try {
-                // حفظ الطلب في قاعدة البيانات وتحسين عداد المبيعات
                 await push(ref(db, 'orders'), {
                     productTitle,
                     name,
@@ -393,7 +385,6 @@
                     createdAt: Date.now()
                 });
 
-                // تحديث إحصائيات المبيعات الحقيقية في لوحة التحكم
                 const analyticsRef = ref(db, 'analytics/orders');
                 const snapshot = await get(analyticsRef);
                 const currentOrders = snapshot.exists() ? snapshot.val() : 0;

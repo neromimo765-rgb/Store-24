@@ -14,10 +14,13 @@
             --border-color: rgba(255, 255, 255, 0.08);
             --danger: #EF4444;
             --success: #10B981;
+            --wa-color: #25D366;
+            --fb-color: #1877F2;
+            --tg-color: #0088CC;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-primary); color: var(--text-main); padding: 15px; padding-bottom: 50px; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 15px; padding-bottom: 60px; }
 
         .container { max-width: 480px; margin: 0 auto; }
 
@@ -34,12 +37,25 @@
         .form-control:focus { border-color: var(--accent-gold); }
 
         .btn-primary { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 11px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; margin-top: 8px; }
-        .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; padding: 4px 8px; border-radius: 6px; font-size: 9px; cursor: pointer; font-weight: bold; }
+        .btn-cancel { width: 100%; background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 7px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; margin-top: 5px; display: none; }
 
-        .products-list { display: flex; flex-direction: column; gap: 8px; }
-        .admin-product-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .admin-product-info h4 { font-size: 11px; color: #fff; margin-bottom: 2px; }
-        .admin-product-info span { font-size: 9px; color: var(--text-muted); }
+        .products-list { display: flex; flex-direction: column; gap: 10px; }
+        .admin-product-item { background: var(--bg-primary); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; }
+        
+        .admin-product-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .admin-product-info h4 { font-size: 12px; color: #fff; margin-bottom: 2px; }
+        .admin-product-info span { font-size: 10px; color: var(--accent-gold); font-weight: bold; }
+        
+        .admin-actions { display: flex; gap: 5px; }
+        .btn-edit { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); border: 1px solid rgba(245, 158, 11, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold; }
+
+        /* أزرار مواقع التواصل الاجتماعي تحت كل منتج في لوحة التحكم */
+        .social-share-box { display: flex; gap: 4px; border-top: 1px solid var(--border-color); padding-top: 8px; }
+        .social-btn { flex: 1; font-size: 9px; padding: 5px 2px; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: center; gap: 2px; }
+        .s-wa { background: rgba(37, 211, 102, 0.2); border: 1px solid var(--wa-color); color: var(--wa-color); }
+        .s-fb { background: rgba(24, 119, 242, 0.2); border: 1px solid var(--fb-color); color: var(--fb-color); }
+        .s-tg { background: rgba(0, 136, 204, 0.2); border: 1px solid var(--tg-color); color: var(--tg-color); }
     </style>
 </head>
 <body>
@@ -47,22 +63,23 @@
     <div class="container">
         <div class="header">
             <h2>⚙️ لوحة تحكم المالك</h2>
-            <a href="index.html" class="back-store-btn">عرض المتجر 🛒</a>
+            <a href="index.html" class="back-store-btn" target="_blank">عرض المتجر 🛒</a>
         </div>
 
-        <!-- نموذج إضافة منتج جديد -->
+        <!-- نموذج إضافة أو تعديل منتج -->
         <div class="card">
-            <h3>➕ إضافة منتج جديد وتحديد القسم</h3>
+            <h3 id="formTitle">➕ إضافة منتج جديد</h3>
+            <input type="hidden" id="editingId" value="">
             <div class="form-group">
                 <label>اسم المنتج:</label>
-                <input type="text" id="pName" class="form-control" placeholder="مثال: تيشرت رجالي / طعام قطط">
+                <input type="text" id="pName" class="form-control" placeholder="مثال: ساعة ذكية أصلية">
             </div>
             <div class="form-group">
                 <label>السعر (بالجنيه):</label>
-                <input type="number" id="pPrice" class="form-control" placeholder="مثال: 350">
+                <input type="number" id="pPrice" class="form-control" placeholder="مثال: 750">
             </div>
             <div class="form-group">
-                <label>اختر القسم (الكتالوج):</label>
+                <label>اختر القسم:</label>
                 <select id="pCategory" class="form-control">
                     <option value="أدوات منزلية">🚿 أدوات منزلية</option>
                     <option value="إلكترونيات">⚡ إلكترونيات</option>
@@ -75,18 +92,19 @@
             </div>
             <div class="form-group">
                 <label>رابط الصورة أو الفيديو المباشر (.jpg أو .mp4):</label>
-                <input type="text" id="pImage" class="form-control" placeholder="https://example.com/media.jpg">
+                <input type="text" id="pImage" class="form-control" placeholder="https://example.com/image.jpg">
             </div>
             <div class="form-group">
                 <label>وصف المنتج:</label>
-                <textarea id="pDesc" class="form-control" rows="2" placeholder="تفاصيل المنتج ومميزاته..."></textarea>
+                <textarea id="pDesc" class="form-control" rows="2" placeholder="تفاصيل ومميزات المنتج..."></textarea>
             </div>
-            <button class="btn-primary" onclick="addNewProduct()">نشر المنتج الآن في الكتالوج 🚀</button>
+            <button class="btn-primary" id="saveBtn" onclick="saveProduct()">نشر المنتج الآن 🚀</button>
+            <button class="btn-cancel" id="cancelBtn" onclick="cancelEdit()">إلغاء التعديل ✕</button>
         </div>
 
-        <!-- قائمة المنتجات الحالية -->
+        <!-- قائمة المنتجات الحالية للإدارة والتعديل والمشاركة -->
         <div class="card">
-            <h3>📦 إدارة المنتجات (<span id="totalAdminCount">0</span>)</h3>
+            <h3>📦 إدارة المنتجات الحالية (<span id="totalAdminCount">0</span>)</h3>
             <div class="products-list" id="adminProductsList"></div>
         </div>
     </div>
@@ -104,22 +122,39 @@
             let container = document.getElementById('adminProductsList');
 
             if (products.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px;">لا توجد منتجات مضافة حالياً.</p>`;
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 11px; padding: 15px;">لا توجد منتجات مضافة حالياً.</p>`;
                 return;
             }
 
-            container.innerHTML = products.map(p => `
-                <div class="admin-product-item">
-                    <div class="admin-product-info">
-                        <h4>${p.name}</h4>
-                        <span>${p.price} ج.م | القسم: ${p.category || 'عام'}</span>
+            container.innerHTML = products.map(p => {
+                let shareText = encodeURIComponent(`🔥 لا يفوتك هذا العرض المميز: *${p.name}* \n💰 السعر: ${p.price} ج.م\n📂 القسم: ${p.category || 'عام'}\n📝 التفاصيل: ${p.desc || 'منتج عالي الجودة'}`);
+                
+                return `
+                    <div class="admin-product-item">
+                        <div class="admin-product-header">
+                            <div class="admin-product-info">
+                                <h4>${p.name}</h4>
+                                <span>${p.price} ج.م | <em style="color:#aaa;">${p.category || 'عام'}</em></span>
+                            </div>
+                            <div class="admin-actions">
+                                <button class="btn-edit" onclick="editProduct(${p.id})">تعديل ✏️</button>
+                                <button class="btn-danger" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
+                            </div>
+                        </div>
+                        
+                        <!-- أزرار مواقع التواصل الاجتماعي تحت كل منتج للنشر المباشر -->
+                        <div class="social-share-box">
+                            <a href="https://api.whatsapp.com/send?text=${shareText}" target="_blank" class="social-btn s-wa">واتساب 📱</a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=&quote=${shareText}" target="_blank" class="social-btn s-fb">فيسبوك 📘</a>
+                            <a href="https://t.me/share/url?url=&text=${shareText}" target="_blank" class="social-btn s-tg">تيليجرام ✈️</a>
+                        </div>
                     </div>
-                    <button class="btn-danger" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        function addNewProduct() {
+        function saveProduct() {
+            let id = document.getElementById('editingId').value;
             let name = document.getElementById('pName').value.trim();
             let price = parseFloat(document.getElementById('pPrice').value);
             let category = document.getElementById('pCategory').value;
@@ -140,34 +175,80 @@
             let data = localStorage.getItem('store_products');
             let products = data ? JSON.parse(data) : [];
 
-            let newProduct = {
-                id: Date.now(),
-                name: name,
-                price: price,
-                category: category,
-                desc: desc,
-                images: images
-            };
-
-            products.unshift(newProduct);
+            if (id) {
+                // تعديل المنتج الموجود
+                let index = products.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    products[index].name = name;
+                    products[index].price = price;
+                    products[index].category = category;
+                    products[index].desc = desc;
+                    if (mediaUrl) products[index].images = images;
+                }
+                alert('✅ تم تعديل وتحديث المنتج بنجاح تام!');
+                cancelEdit();
+            } else {
+                // إضافة منتج جديد
+                let newProduct = {
+                    id: Date.now(),
+                    name: name,
+                    price: price,
+                    category: category,
+                    desc: desc,
+                    images: images,
+                    comments: []
+                };
+                products.unshift(newProduct);
+                alert('✅ تم نشر المنتج الجديد بنجاح!');
+                clearForm();
+            }
             
-            try {
-                localStorage.setItem('store_products', JSON.stringify(products));
-                
-                document.getElementById('pName').value = '';
-                document.getElementById('pPrice').value = '';
-                document.getElementById('pImage').value = '';
-                document.getElementById('pDesc').value = '';
+            localStorage.setItem('store_products', JSON.stringify(products));
+            loadAdminProducts();
+        }
 
-                loadAdminProducts();
-                alert('✅ تم نشر المنتج وتحديد القسم بنجاح!');
-            } catch (e) {
-                alert('⚠️ حدث خطأ في الذاكرة.');
+        function editProduct(id) {
+            let data = localStorage.getItem('store_products');
+            if (!data) return;
+            let products = JSON.parse(data);
+            let p = products.find(item => item.id == id);
+            
+            if (p) {
+                document.getElementById('editingId').value = p.id;
+                document.getElementById('pName').value = p.name;
+                document.getElementById('pPrice').value = p.price;
+                document.getElementById('pCategory').value = p.category || 'أدوات منزلية';
+                document.getElementById('pDesc').value = p.desc || '';
+                if (p.images && p.images.length > 0) {
+                    document.getElementById('pImage').value = p.images[0].src;
+                } else {
+                    document.getElementById('pImage').value = '';
+                }
+                
+                document.getElementById('formTitle').innerText = '✏️ تعديل المنتج الحالي';
+                document.getElementById('saveBtn').innerText = 'حفظ التعديلات والتحديث 💾';
+                document.getElementById('cancelBtn').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
+        function cancelEdit() {
+            document.getElementById('editingId').value = '';
+            clearForm();
+            document.getElementById('formTitle').innerText = '➕ إضافة منتج جديد';
+            document.getElementById('saveBtn').innerText = 'نشر المنتج الآن 🚀';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function clearForm() {
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pImage').value = '';
+            document.getElementById('pDesc').value = '';
+        }
+
         function deleteProduct(id) {
-            if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+            if (!confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) return;
 
             let data = localStorage.getItem('store_products');
             if (!data) return;

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store-24 | تفاصيل العرض</title>
+    <style>
+        :root {
+            --bg-primary: #0B0B10;
+            --bg-card: #151522;
+            --accent-gold: #F59E0B;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 12px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { max-width: 440px; width: 100%; margin: 0 auto; }
+        
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .title { color: var(--accent-gold); font-size: 16px; font-weight: 800; margin-bottom: 10px; line-height: 1.4; }
+        .desc { color: var(--text-muted); font-size: 12px; margin-bottom: 12px; line-height: 1.6; }
+        
+        .price-box { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; background: rgba(16, 185, 129, 0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .price { font-size: 18px; color: var(--success); font-weight: bold; }
+        .old-price { color: var(--text-muted); font-size: 13px; text-decoration: line-through; }
+
+        .media-box { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 12px; background: #000; border: 1px solid var(--border-color); }
+        .media-box img, .media-box video { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+        
+        .timer-box { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 8px; border-radius: 8px; font-weight: bold; font-size: 11px; text-align: center; margin-bottom: 12px; }
+
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 11px; margin-bottom: 4px; color: var(--text-muted); font-weight: bold; }
+        .form-control { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-color); color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; outline: none; }
+        .form-control:focus { border-color: var(--accent-gold); }
+
+        .btn { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; text-align: center; }
+        .btn:active { transform: scale(0.98); }
+
+        #loadingState { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="loadingState" class="card">
+            <p>⏳ جاري تحميل تفاصيل العرض...</p>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <!-- بطاقة تفاصيل المنتج والعداد -->
+            <div class="card">
+                <div class="timer-box" id="displayTimer">⏱️ ينتهي العرض خلال: 02:45:00</div>
+                <h1 class="title" id="displayTitle">عنوان العرض</h1>
+                <div id="mediaContainer"></div>
+                <div class="desc" id="displayDesc">وصف العرض يظهر هنا...</div>
+                <div class="price-box">
+                    <div class="price" id="displayPrice">0 ج.م</div>
+                    <div class="old-price" id="displayOldPrice" style="display: none;">0 ج.م</div>
+                </div>
+            </div>
+
+            <!-- بطاقة اطلب الآن (نموذج الطلب السريع) -->
+            <div class="card">
+                <h3 style="color: var(--accent-gold); font-size: 13px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">🛒 اطلب العرض الآن (الدفع عند الاستلام)</h3>
+                
+                <div class="form-group">
+                    <label>الاسم الكامل (إلزامي):</label>
+                    <input type="text" id="orderName" class="form-control" placeholder="اكتب اسمك الثلاثي...">
+                </div>
+
+                <div class="form-group">
+                    <label>رقم الهاتف (إلزامي):</label>
+                    <input type="tel" id="orderPhone" class="form-control" placeholder="اكتب رقم هاتفك المتاح للتواصل...">
+                </div>
+
+                <div class="form-group">
+                    <label>العنوان بالتفصيل (المحافظة / المنطقة / الشارع):</label>
+                    <textarea id="orderAddress" class="form-control" rows="2" placeholder="اكتب عنوانك بالتفصيل..."></textarea>
+                </div>
+
+                <button class="btn" onclick="submitOrder()">تأكيد وإرسال الطلب 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
+          authDomain: "store-24-4df16.firebaseapp.com",
+          databaseURL: "https://store-24-4df16-default-rtdb.firebaseio.com",
+          projectId: "store-24-4df16",
+          storageBucket: "store-24-4df16.firebasestorage.app",
+          messagingSenderId: "81493388397",
+          appId: "1:81493388397:web:920f9dbe1f080638ebe364",
+          measurementId: "G-WEM3CVD7CQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const landingId = urlParams.get('id');
+
+        let currentLandingData = null;
+
+        async function initLandingPage() {
+            if (!landingId) {
+                document.getElementById('loadingState').innerHTML = `<h3 style="color:var(--danger);">❌ رابط العرض غير صحيح أو ناقص.</h3>`;
+                return;
+            }
+
+            try {
+                // تسجيل الزيارة للوحة التحكم
+                const analyticsRef = ref(db, 'analytics');
+                const snapAnalytics = await get(analyticsRef);
+                let currentVisits = 0;
+                if (snapAnalytics.exists()) {
+                    currentVisits = snapAnalytics.val().visitors || 0;
+                }
+                await update(analyticsRef, { visitors: currentVisits + 1 });
+
+                // جلب بيانات العرض المحددة
+                const landingSnapshot = await get(ref(db, 'landings/' + landingId));
+                if (!landingSnapshot.exists()) {
+                    document.getElementById('loadingState').innerHTML = `<h3 style="color:var(--danger);">❌ عذراً، صفحة الهبوط غير موجودة أو تم حذفها.</h3>`;
+                    return;
+                }
+
+                currentLandingData = landingSnapshot.val();
+                renderData(currentLandingData);
+
+            } catch (err) {
+                document.getElementById('loadingState').innerHTML = `<h3 style="color:var(--danger);">⚠️ حدث خطأ أثناء الاتصال بالخادم.</h3>`;
+            }
+        }
+
+        function renderData(data) {
+            const curSym = data.currency === 'USD' ? '$' : (data.currency === 'SAR' ? 'ر.س' : 'ج.م');
+
+            document.getElementById('displayTitle').innerText = data.title || '';
+            document.getElementById('displayDesc').innerHTML = data.desc ? data.desc.replace(/\n/g, '<br>') : '';
+            document.getElementById('displayTimer').innerText = `⏱️ ينتهي العرض خلال: ${data.timer || '02:45:00'}`;
+
+            if (data.price) {
+                document.getElementById('displayPrice').innerText = `${data.price} ${curSym}`;
+            } else {
+                document.getElementById('displayPrice').innerText = 'عرض خاص';
+            }
+
+            if (data.oldPrice) {
+                const oldPriceEl = document.getElementById('displayOldPrice');
+                oldPriceEl.innerText = `${data.oldPrice} ${curSym}`;
+                oldPriceEl.style.display = 'inline';
+            }
+
+            let mediaHtml = '';
+            if (data.imageUrl) {
+                mediaHtml += `<div class="media-box"><img src="${data.imageUrl}" alt="صورة المنتج"></div>`;
+            }
+            if (data.videoUrl) {
+                mediaHtml += `<div class="media-box"><video src="${data.videoUrl}" controls autoplay muted loop></video></div>`;
+            }
+            document.getElementById('mediaContainer').innerHTML = mediaHtml;
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        window.submitOrder = async function() {
+            const name = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const address = document.getElementById('orderAddress').value.trim();
+
+            if (!name || !phone) {
+                alert('الرجاء إدخال الاسم ورقم الهاتف على الأقل لنتمكن من التواصل معك.');
+                return;
+            }
+
+            try {
+                const ordersRef = ref(db, 'orders');
+                const newOrderRef = push(ordersRef);
+                await set(newOrderRef, {
+                    landingId: landingId,
+                    productTitle: currentLandingData.title || 'عرض خاص',
+                    customerName: name,
+                    customerPhone: phone,
+                    customerAddress: address || 'بدون عنوان',
+                    timestamp: Date.now()
+                });
+
+                const analyticsRef = ref(db, 'analytics');
+                const snapAnalytics = await get(analyticsRef);
+                let currentOrders = 0;
+                if (snapAnalytics.exists() && snapAnalytics.val().orders) {
+                    currentOrders = snapAnalytics.val().orders;
+                }
+                await update(analyticsRef, { orders: currentOrders + 1 });
+
+                alert('🎉 تم إرسال طلبك بنجاح! شكراً لك، سنتواصل معك قريباً.');
+                document.getElementById('orderName').value = '';
+                document.getElementById('orderPhone').value = '';
+                document.getElementById('orderAddress').value = '';
+
+            } catch (err) {
+                alert('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        initLandingPage();
+    </script>
+</body>
+</html>

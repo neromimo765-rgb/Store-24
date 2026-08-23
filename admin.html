@@ -3,255 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store-24 | لوحة التحكم والتحكم الذكي</title>
+    <title>لوحة التحكم | إدارة صفحة الهبوط</title>
     <style>
         :root {
-            --bg-primary: #0B0B10;
-            --bg-card: #151522;
+            --bg-primary: #0f0f13;
+            --bg-card: #181824;
             --accent-gold: #F59E0B;
+            --accent-red: #EF4444;
             --text-main: #FFFFFF;
             --text-muted: #9CA3AF;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --danger: #EF4444;
+            --border-color: rgba(255, 255, 255, 0.1);
             --success: #10B981;
+            --info: #3B82F6;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-primary); color: var(--text-main); padding: 12px; padding-bottom: 70px; }
-        .container { max-width: 480px; margin: 0 auto; }
-        
-        #authScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
-        .auth-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; width: 100%; max-width: 360px; text-align: center; }
-        .auth-card h2 { color: var(--accent-gold); font-size: 16px; margin-bottom: 12px; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding-bottom: 50px; }
+        .container { max-width: 480px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; padding: 16px; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        .header h1 { color: var(--accent-gold); font-size: 18px; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        header h1 { font-size: 17px; color: var(--accent-gold); font-weight: 800; }
         
-        .analytics-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), var(--bg-card)); border: 1px solid var(--accent-gold); border-radius: 10px; padding: 10px; margin-bottom: 15px; font-size: 11px; }
-        .analytics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px; }
-        .stat-card { background: var(--bg-primary); padding: 8px; border-radius: 6px; text-align: center; border: 1px solid var(--border-color); }
-        .stat-num { color: var(--accent-gold); font-weight: bold; font-size: 13px; }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+        .card h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; }
 
         .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 11px; margin-bottom: 4px; color: var(--text-muted); font-weight: bold; }
-        .form-control { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 8px; border-radius: 8px; font-size: 11px; outline: none; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: bold; }
+        .form-control {
+            width: 100%; background: #0f0f13; border: 1px solid var(--border-color);
+            color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; outline: none;
+        }
         .form-control:focus { border-color: var(--accent-gold); }
-        
-        .btn { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; margin-top: 5px; }
-        .btn-danger { background: var(--danger); color: #fff; }
 
-        .product-list-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 11px; }
-        .product-info-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        
-        .actions-btns { display: flex; gap: 4px; align-items: center; }
-        .action-btn { background: var(--border-color); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
-        .action-btn.del { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .btn {
+            width: 100%; background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: #000; border: none; padding: 12px; border-radius: 8px;
+            font-weight: 900; font-size: 13px; cursor: pointer; margin-top: 5px;
+        }
+        .btn-cancel { background: var(--text-muted); color: #000; display: none; }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; color: var(--accent-gold); font-size: 13px; font-weight: bold; }
-        .spinner { width: 35px; height: 35px; border: 4px solid var(--border-color); border-top: 4px solid var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .landing-item {
+            background: #0f0f13;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .landing-title { font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #fff; }
+        .landing-info { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .action-btn {
+            padding: 8px 4px; border-radius: 6px; font-size: 10px; font-weight: bold;
+            border: none; cursor: pointer; text-align: center; color: #fff;
+        }
+        .btn-edit { background: var(--info); }
+        .btn-copy { background: #6366F1; }
+        .btn-preview { background: var(--accent-gold); color: #000; }
+        .btn-delete { background: var(--accent-red); }
     </style>
 </head>
 <body>
 
-    <div id="authScreen">
-        <div class="auth-card">
-            <h2>🔒 لوحة التحكم محمية</h2>
-            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">الرجاء إدخال كلمة المرور للمتابعة</p>
-            <input type="password" id="adminPasswordInput" class="form-control" placeholder="اكتب كلمة المرور..." style="margin-bottom: 10px; text-align: center;">
-            <button class="btn" onclick="checkPassword()">دخول 🚀</button>
-            <p id="authErrorMsg" style="color: var(--danger); font-size: 10px; margin-top: 8px; display: none;">كلمة المرور غير صحيحة!</p>
-        </div>
-    </div>
-
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-        <span id="loadingText">جاري المعالجة والرفع...</span>
-    </div>
-
     <div class="container">
-        <div class="header">
-            <h1>⚙️ لوحة تحكم Store-24</h1>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <span style="font-size:10px; color:var(--success);">متصل 🟢</span>
-                <button onclick="logoutAdmin()" style="background:var(--danger); color:#fff; border:none; padding:3px 6px; border-radius:4px; font-size:9px; cursor:pointer;">قفل</button>
-            </div>
-        </div>
+        <header>
+            <h1>🛠️ لوحة تحكم صفحة الهبوط</h1>
+            <span id="totalOrdersCount" style="font-size: 11px; background: var(--bg-card); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color);">الطلبات: 0</span>
+        </header>
 
-        <!-- إحصائيات الزوار والمبيعات الحقيقية -->
-        <div class="analytics-box">
-            <span style="color:var(--accent-gold); font-weight:bold;">📊 إحصائيات الزوار والمبيعات الحقيقية:</span>
-            <div class="analytics-grid">
-                <div class="stat-card">
-                    <div>إجمالي الزوار الحقيقيين</div>
-                    <div class="stat-num" id="realVisitorsCount">0</div>
-                </div>
-                <div class="stat-card">
-                    <div>طلبات السلة الحقيقية</div>
-                    <div class="stat-num" id="realOrdersCount">0</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- قسم إنشاء صفحة الهبوط الاحترافي -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <span style="font-size: 16px;">🚀</span>
-                <h3 style="color: var(--accent-gold); font-size: 14px; font-weight: 800; margin: 0;">منشئ صفحات الهبوط (بالعداد التنازلي)</h3>
-            </div>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div>
-                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">عنوان العرض أو اسم المنتج (إلزامي):</label>
-                    <input type="text" id="lpTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية بتصميم عصري">
-                </div>
-
-                <div>
-                    <label style="font-size: 11px; color: var(--accent-gold); display: block; margin-bottom: 4px;">📝 وصف المنتج (اختياري):</label>
-                    <textarea id="lpDesc" class="form-control" rows="3" placeholder="اكتب مميزات المنتج، فوائده، ولماذا يجب على العميل شراؤه..."></textarea>
-                </div>
-
-                <div style="display: flex; gap: 8px;">
-                    <div style="flex: 2;">
-                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">السعر بعد الخصم (اختياري):</label>
-                        <input type="number" id="lpPrice" class="form-control" placeholder="299 (أو اتركه فارغاً)">
-                    </div>
-                    <div style="flex: 1.5;">
-                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">العملة:</label>
-                        <select id="lpCurrency" class="form-control">
-                            <option value="EGP">ج.م (مصري)</option>
-                            <option value="USD">$ (دولار)</option>
-                            <option value="SAR">ر.س (سعودي)</option>
-                        </select>
-                    </div>
-                    <div style="flex: 2;">
-                        <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">السعر القديم (اختياري):</label>
-                        <input type="number" id="lpOldPrice" class="form-control" placeholder="599">
-                    </div>
-                </div>
-
-                <div>
-                    <label style="font-size: 11px; color: var(--accent-gold); display: block; margin-bottom: 4px;">⏱️ مدة العداد التنازلي:</label>
-                    <input type="text" id="lpTimer" class="form-control" value="02:45:00" placeholder="02:45:00" style="text-align: center; font-weight: bold; letter-spacing: 1px;">
-                </div>
-
-                <div style="background: #0B0B10; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">🖼️ رفع صورة العرض الأساسية من الهاتف:</label>
-                    <input type="file" id="lpImageFile" accept="image/*" style="font-size: 11px; color: #fff; width: 100%;">
-                </div>
-
-                <div style="background: #0B0B10; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">🎬 رفع فيديو العرض من الهاتف (اختياري):</label>
-                    <input type="file" id="lpVideoFile" accept="video/*" style="font-size: 11px; color: #fff; width: 100%;">
-                </div>
-
-                <button onclick="createCustomLandingPageFromFile()" class="btn" style="background: var(--accent-gold); color: #000;">⚡ نشر صفحة الهبوط وتوليد الرابط الفوري</button>
-            </div>
-
-            <div id="generatedLinkResult" style="margin-top: 12px; display: none; background: #0B0B10; padding: 10px; border-radius: 8px; border: 1px dashed var(--accent-gold);">
-                <p style="font-size: 11px; color: var(--accent-gold); margin-bottom: 6px; font-weight: bold;">🎉 تم إنشاء صفحة الهبوط! انسخ الرابط وضعه في إعلاناتك:</p>
-                <div style="display: flex; gap: 6px;">
-                    <input type="text" id="finalLandingLink" readonly style="width: 100%; padding: 8px; background: #151522; border: none; color: #38BDF8; border-radius: 4px; font-size: 11px; text-align: center;">
-                    <button onclick="copyGeneratedLink()" style="background: #38BDF8; color: #000; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">نسخ</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- جدول إدارة صفحات الهبوط النشطة -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                <span style="font-size: 16px;">📋</span>
-                <h3 style="color: var(--accent-gold); font-size: 14px; font-weight: 800; margin: 0;">إدارة صفحات الهبوط النشطة</h3>
-            </div>
-            <div id="landingsListContainer" style="display: flex; flex-direction: column; gap: 8px;">
-                <p style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 8px;">جاري تحميل صفحات الهبوط...</p>
-            </div>
-        </div>
-
-        <!-- قسم إضافة المنتجات العادية للمتجر -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px; border-radius: 12px; margin-bottom: 15px;">
-            <h3 id="formTitle" style="color:var(--accent-gold); font-size:13px; margin-bottom:10px;">إضافة منتج جديد للمتجر</h3>
-            <input type="hidden" id="editProductId">
+        <!-- نموذج إدارة صفحة الهبوط (إضافة وتعديل كامل) -->
+        <div class="card">
+            <h2 id="formTitle">➕ إنشاء صفحة هبوط جديدة</h2>
+            <input type="hidden" id="editingLandingId" value="">
             
             <div class="form-group">
-                <label>اسم المنتج</label>
-                <input type="text" id="pName" class="form-control" placeholder="اكتب اسم المنتج...">
+                <label>عنوان العرض الرئيسي في الصفحة:</label>
+                <input type="text" id="title" class="form-control" placeholder="مثال: عرض بكج أجهزة منزلية...">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="form-group">
+                    <label>السعر الحالي:</label>
+                    <input type="number" id="price" class="form-control" placeholder="250">
+                </div>
+                <div class="form-group">
+                    <label>السعر القديم (مشطوب):</label>
+                    <input type="number" id="oldPrice" class="form-control" placeholder="350">
+                </div>
             </div>
 
-            <div style="display: flex; gap: 8px;">
-                <div class="form-group" style="flex: 2;">
-                    <label>السعر</label>
-                    <input type="number" id="pPrice" class="form-control" placeholder="اكتب السعر...">
-                </div>
-                <div class="form-group" style="flex: 2;">
-                    <label>العملة</label>
-                    <select id="pCurrency" class="form-control">
-                        <option value="EGP">جنيه مصري (ج.م)</option>
-                        <option value="USD">دولار أمريكي ($)</option>
-                        <option value="SAR">ريال سعودي (ر.س)</option>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="form-group">
+                    <label>العملة:</label>
+                    <select id="currency" class="form-control">
+                        <option value="SAR">ريال سعودي (SAR)</option>
+                        <option value="EGP">جنيه مصري (EGP)</option>
+                        <option value="USD">دولار أمريكي (USD)</option>
                     </select>
                 </div>
-            </div>
-
-            <div style="display: flex; gap: 8px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>الخصم (اختياري)</label>
-                    <input type="text" id="pDiscount" class="form-control" placeholder="مثال: خصم 20%">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>حالة التوفر</label>
-                    <select id="pInStock" class="form-control">
-                        <option value="true">🟢 متوفر</option>
-                        <option value="false">🔴 غير متوفر</option>
-                    </select>
+                <div class="form-group">
+                    <label>وقت العداد (ساعات:دقائق:ثواني):</label>
+                    <input type="text" id="timer" class="form-control" value="02:45:00" placeholder="02:45:00">
                 </div>
             </div>
 
             <div class="form-group">
-                <label>القسم</label>
-                <select id="pCategory" class="form-control">
-                    <option value="أدوات منزلية">🚿 أدوات منزلية</option>
-                    <option value="إلكترونيات">⚡ إلكترونيات</option>
-                    <option value="ملابس">👕 ملابس</option>
-                    <option value="مستلزمات حيوانات أليفة">🐾 حيوانات</option>
-                    <option value="الصحة والجمال">💄 جمال</option>
-                    <option value="أجهزة كمبيوتر">💻 كمبيوتر</option>
-                    <option value="عروض خاصة">🔥 عروض</option>
-                </select>
-            </div>
-
-            <div style="display: flex; gap: 8px; background: rgba(245, 158, 11, 0.05); padding: 8px; border-radius: 8px; border: 1px dashed var(--accent-gold); margin-bottom: 10px;">
-                <div class="form-group" style="flex: 1; margin-bottom:0;">
-                    <label style="color:var(--accent-gold);">👥 عدد المشترين (وهمي)</label>
-                    <input type="number" id="fakeBuyers" class="form-control" value="14" placeholder="مثال: 14">
-                </div>
-                <div class="form-group" style="flex: 1; margin-bottom:0;">
-                    <label style="color:var(--accent-gold);">👁️ عدد المشاهدين (وهمي)</label>
-                    <input type="number" id="fakeViews" class="form-control" value="48" placeholder="مثال: 48">
-                </div>
+                <label>رابط الصورة المباشر:</label>
+                <input type="text" id="imageUrl" class="form-control" placeholder="https://...">
             </div>
 
             <div class="form-group">
-                <label>رفع صورة أو فيديو</label>
-                <input type="file" id="mediaFile" class="form-control" accept="image/*,video/*">
+                <label>رابط الفيديو المباشر (اختياري):</label>
+                <input type="text" id="videoUrl" class="form-control" placeholder="https://...">
             </div>
 
             <div class="form-group">
-                <label>وصف المنتج</label>
-                <textarea id="pDesc" class="form-control" rows="2" placeholder="اكتب تفاصيل المنتج..."></textarea>
+                <label>تفاصيل ومميزات العرض (تقسيمها بأسطر):</label>
+                <textarea id="desc" class="form-control" rows="4" placeholder="اكتب تفاصيل ومميزات المنتج..."></textarea>
             </div>
 
-            <button class="btn" onclick="saveProduct()">حفظ ونشر المنتج 🚀</button>
-            <button id="cancelEditBtn" class="btn btn-danger" style="display:none; margin-top:5px;" onclick="resetForm()">إلغاء التعديل</button>
+            <button onclick="saveOrUpdateLanding()" id="submitBtn" class="btn">حفظ وإنشاء صفحة الهبوط 🚀</button>
+            <button onclick="resetForm()" id="cancelBtn" class="btn btn-cancel" style="margin-top: 5px;">إلغاء التعديل</button>
         </div>
 
-        <h3 style="font-size: 13px; margin-bottom: 8px; color: var(--text-muted);">المنتجات المضافة حالياً للمتجر (<span id="productsCount">0</span>)</h3>
-        <div id="adminProductsList"></div>
+        <!-- قائمة صفحات الهبوط المتاحة -->
+        <div class="card">
+            <h2>📦 صفحات الهبوط الحالية</h2>
+            <div id="landingsList">
+                <p style="text-align: center; color: var(--text-muted); font-size: 12px;">جاري التحميل...</p>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, remove, push, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get, set, push, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -267,316 +170,138 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let allProducts = {};
-        const correctPassword = "qweasdzxc12ASD";
-
-        window.checkPassword = function() {
-            const inputVal = document.getElementById('adminPasswordInput').value;
-            if (inputVal === correctPassword) {
-                sessionStorage.setItem('store24_auth', 'true');
-                document.getElementById('authScreen').style.display = 'none';
-                initAdminPanel();
-            } else {
-                const errEl = document.getElementById('authErrorMsg');
-                errEl.style.display = 'block';
-                setTimeout(() => { errEl.style.display = 'none'; }, 2500);
-            }
-        }
-
-        window.logoutAdmin = function() {
-            sessionStorage.removeItem('store24_auth');
-            window.location.reload();
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('store24_auth') === 'true') {
-                document.getElementById('authScreen').style.display = 'none';
-                initAdminPanel();
-            }
-        });
-
-        function initAdminPanel() {
-            const productsRef = ref(db, 'products');
-            onValue(productsRef, (snapshot) => {
-                const data = snapshot.val();
-                allProducts = data || {};
-                renderAdminList();
-            });
-
-            const analyticsRef = ref(db, 'analytics');
-            onValue(analyticsRef, (snapshot) => {
-                const stats = snapshot.val() || { visitors: 0, orders: 0 };
-                document.getElementById('realVisitorsCount').innerText = stats.visitors || 0;
-                document.getElementById('realOrdersCount').innerText = stats.orders || 0;
-            });
-
-            initLandingsManagement();
-        }
-
-        function showLoading(text) {
-            document.getElementById('loadingText').innerText = text;
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        function readFileAsDataURL(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function getCurrencySymbol(code) {
-            if (code === 'USD') return '$';
-            if (code === 'SAR') return 'ر.س';
-            return 'ج.م';
-        }
-
-        window.createCustomLandingPageFromFile = async function() {
-            const title = document.getElementById('lpTitle').value.trim();
-            const desc = document.getElementById('lpDesc').value.trim(); 
-            const price = document.getElementById('lpPrice').value.trim();
-            const currency = document.getElementById('lpCurrency').value;
-            const oldPrice = document.getElementById('lpOldPrice').value.trim();
-            const timer = document.getElementById('lpTimer').value.trim();
-
-            const imageFile = document.getElementById('lpImageFile').files[0];
-            const videoFile = document.getElementById('lpVideoFile').files[0];
-
-            if (!title) {
-                alert('الرجاء إدخال عنوان العرض أو اسم المنتج على الأقل.');
-                return;
-            }
-
-            showLoading('جاري رفع الوسائط وإنشاء صفحة الهبوط...');
-
+        async function loadStats() {
             try {
-                let imageUrl = '';
-                let videoUrl = '';
-
-                if (imageFile) {
-                    imageUrl = await readFileAsDataURL(imageFile);
+                const snap = await get(ref(db, 'analytics/orders'));
+                if (snap.exists()) {
+                    document.getElementById('totalOrdersCount').innerText = `الطلبات: ${snap.val()}`;
                 }
-                if (videoFile) {
-                    videoUrl = await readFileAsDataURL(videoFile);
-                }
+            } catch (e) { console.error(e); }
+        }
 
-                const landingId = 'lp_' + Date.now();
-                const landingData = {
-                    title,
-                    desc: desc || '', 
-                    price: price || '', 
-                    currency,
-                    oldPrice: oldPrice || '',
-                    timer: timer || '02:45:00',
-                    imageUrl,
-                    videoUrl,
-                    createdAt: Date.now()
-                };
-
-                await set(ref(db, 'landings/' + landingId), landingData);
-                hideLoading();
-
-                // توليد الرابط ليوجه تماماً إلى ملف landing.html المستقل
-                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                const generatedUrl = baseUrl + `landing.html?id=${landingId}`;
-
-                document.getElementById('finalLandingLink').value = generatedUrl;
-                document.getElementById('generatedLinkResult').style.display = 'block';
+        async function loadLandings() {
+            try {
+                const snap = await get(ref(db, 'landings'));
+                const container = document.getElementById('landingsList');
                 
-                document.getElementById('lpTitle').value = '';
-                document.getElementById('lpDesc').value = '';
-                document.getElementById('lpPrice').value = '';
-                document.getElementById('lpOldPrice').value = '';
-                document.getElementById('lpImageFile').value = '';
-                document.getElementById('lpVideoFile').value = '';
-
-                initLandingsManagement();
-                alert('تم إنشاء ونشر صفحة الهبوط بنجاح! 🚀');
-
-            } catch (err) {
-                hideLoading();
-                alert('حدث خطأ أثناء الرفع: ' + err.message);
-            }
-        };
-
-        function initLandingsManagement() {
-            const landingsRef = ref(db, 'landings');
-            onValue(landingsRef, (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('landingsListContainer');
-                
-                if (!data) {
-                    container.innerHTML = `<p style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 8px;">لا توجد صفحات هبوط نشطة حالياً.</p>`;
+                if (!snap.exists()) {
+                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">لا توجد صفحات هبوط مضافة.</p>`;
                     return;
                 }
 
-                const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                let html = '';
+                const landings = snap.val();
                 
-                container.innerHTML = Object.keys(data).map(id => {
-                    const l = data[id];
-                    // الرابط الموجه لصفحة landing.html المستقلة
-                    const link = baseUrl + `landing.html?id=${id}`;
-                    const curSym = getCurrencySymbol(l.currency);
-                    const priceDisplay = l.price ? `${l.price} ${curSym}` : 'بدون سعر (حسب الطلب)';
-
-                    return `
-                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 10px;">
-                            <div>
-                                <strong style="color: var(--accent-gold); font-size: 11px;">${l.title}</strong><br>
-                                <span style="color: #fff;">السعر: ${priceDisplay}</span>
-                            </div>
-                            <div style="display: flex; gap: 4px;">
-                                <button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('تم نسخ الرابط!'))" class="action-btn">🔗 نسخ</button>
-                                <a href="${link}" target="_blank" class="action-btn" style="text-decoration:none; text-align:center; background:var(--accent-gold); color:#000; font-weight:bold;">👁️ معاينة</a>
-                                <button onclick="deleteLanding('${id}')" class="action-btn del">🗑️ حذف</button>
+                for (let id in landings) {
+                    const l = landings[id];
+                    const landingJson = encodeURIComponent(JSON.stringify({ id, ...l }));
+                    
+                    html += `
+                        <div class="landing-item">
+                            <div class="landing-title">${l.title || 'بدون عنوان'}</div>
+                            <div class="landing-info">السعر: ${l.price || 0} ${l.currency || 'SAR'}</div>
+                            <div class="actions-grid">
+                                <button onclick="prepareEdit('${landingJson}')" class="action-btn btn-edit">تعديل</button>
+                                <button onclick="copyLink('${id}')" class="action-btn btn-copy">نسخ</button>
+                                <button onclick="previewLanding('${id}')" class="action-btn btn-preview">معاينة</button>
+                                <button onclick="deleteLanding('${id}')" class="action-btn btn-delete">حذف</button>
                             </div>
                         </div>
                     `;
-                }).join('');
-            });
+                }
+                container.innerHTML = html;
+            } catch (err) { console.error(err); }
         }
 
-        window.deleteLanding = function(id) {
-            if (confirm('هل أنت متأكد من حذف صفحة الهبوط هذه؟')) {
-                remove(ref(db, 'landings/' + id)).then(() => {
-                    alert('تم حذف الصفحة بنجاح.');
-                });
-            }
-        }
+        window.saveOrUpdateLanding = async function() {
+            const editingId = document.getElementById('editingLandingId').value;
+            const title = document.getElementById('title').value.trim();
+            const price = document.getElementById('price').value.trim();
+            const oldPrice = document.getElementById('oldPrice').value.trim();
+            const currency = document.getElementById('currency').value;
+            const timer = document.getElementById('timer').value.trim() || "02:45:00";
+            const imageUrl = document.getElementById('imageUrl').value.trim();
+            const videoUrl = document.getElementById('videoUrl').value.trim();
+            const desc = document.getElementById('desc').value.trim();
 
-        window.copyGeneratedLink = function() {
-            const input = document.getElementById('finalLandingLink');
-            input.select();
-            document.execCommand('copy');
-            alert('تم نسخ رابط صفحة الهبوط بنجاح! 📋');
-        }
-
-        window.saveProduct = async function() {
-            const name = document.getElementById('pName').value.trim();
-            const price = document.getElementById('pPrice').value.trim();
-            const currency = document.getElementById('pCurrency').value;
-            const discount = document.getElementById('pDiscount').value.trim();
-            const inStock = document.getElementById('pInStock').value === 'true';
-            const category = document.getElementById('pCategory').value;
-            const fakeBuyers = parseInt(document.getElementById('fakeBuyers').value) || 14;
-            const fakeViews = parseInt(document.getElementById('fakeViews').value) || 48;
-            const desc = document.getElementById('pDesc').value.trim();
-            const fileInput = document.getElementById('mediaFile');
-            const editId = document.getElementById('editProductId').value;
-
-            if (!name || !price) {
-                alert('الرجاء إدخال اسم المنتج والسعر.');
+            if (!title || !price) {
+                alert('الرجاء كتابة العنوان والسعر الحالي.');
                 return;
             }
 
-            showLoading('جاري حفظ المنتج...');
+            const landingData = { title, price, oldPrice, currency, timer, imageUrl, videoUrl, desc };
 
             try {
-                let images = [];
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    const base64Data = await readFileAsDataURL(file);
-                    const fileType = file.type.startsWith('video') ? 'video' : 'image';
-                    images.push({ src: base64Data, type: fileType });
-                }
-
-                const productData = { name, price, currency, discount, inStock, category, fakeBuyers, fakeViews, desc };
-                if (images.length > 0) {
-                    productData.images = images;
-                }
-
-                if (editId) {
-                    await update(ref(db, 'products/' + editId), productData);
-                    alert('تم تحديث المنتج بنجاح! ✅');
+                if (editingId) {
+                    await update(ref(db, 'landings/' + editingId), landingData);
+                    alert('تم تحديث صفحة الهبوط بنجاح!');
                 } else {
-                    const newRef = push(ref(db, 'products'));
-                    await set(newRef, productData);
-                    alert('تم إضافة ونشر المنتج بنجاح! 🚀');
+                    await push(ref(db, 'landings'), { ...landingData, createdAt: Date.now() });
+                    alert('تم إنشاء صفحة الهبوط بنجاح!');
                 }
-
-                hideLoading();
                 resetForm();
-
-            } catch (err) {
-                hideLoading();
-                alert('خطأ أثناء الحفظ: ' + err.message);
+                loadLandings();
+            } catch (e) {
+                alert('حدث خطأ، يرجى المحاولة مرة أخرى.');
             }
         }
 
-        function renderAdminList() {
-            const listEl = document.getElementById('adminProductsList');
-            const keys = Object.keys(allProducts);
-            document.getElementById('productsCount').innerText = keys.length;
+        window.prepareEdit = function(encodedData) {
+            const data = JSON.parse(decodeURIComponent(encodedData));
+            
+            document.getElementById('editingLandingId').value = data.id;
+            document.getElementById('title').value = data.title || '';
+            document.getElementById('price').value = data.price || '';
+            document.getElementById('oldPrice').value = data.oldPrice || '';
+            document.getElementById('currency').value = data.currency || 'SAR';
+            document.getElementById('timer').value = data.timer || '02:45:00';
+            document.getElementById('imageUrl').value = data.imageUrl || '';
+            document.getElementById('videoUrl').value = data.videoUrl || '';
+            document.getElementById('desc').value = data.desc || '';
 
-            if (keys.length === 0) {
-                listEl.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:11px; padding:15px;">لا توجد منتجات مضافة بعد.</p>`;
-                return;
-            }
+            document.getElementById('formTitle').innerText = '✏️ تعديل صفحة الهبوط';
+            document.getElementById('submitBtn').innerText = 'تحديث صفحة الهبوط 🔄';
+            document.getElementById('cancelBtn').style.display = 'block';
 
-            listEl.innerHTML = keys.map(id => {
-                const p = allProducts[id];
-                const curSym = getCurrencySymbol(p.currency);
-                return `
-                    <div class="product-list-item">
-                        <div class="product-info-row">
-                            <div>
-                                <strong style="color:var(--accent-gold); font-size:12px;">${p.name}</strong><br>
-                                <span style="font-size:11px; color:#fff;">السعر: ${p.price} ${curSym} | القسم: ${p.category}</span>
-                            </div>
-                            <div class="actions-btns">
-                                <button class="action-btn" onclick="editProduct('${id}')">تعديل</button>
-                                <button class="action-btn del" onclick="deleteProduct('${id}')">حذف</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        window.editProduct = function(id) {
-            const p = allProducts[id];
-            if (!p) return;
-
-            document.getElementById('editProductId').value = id;
-            document.getElementById('pName').value = p.name || '';
-            document.getElementById('pPrice').value = p.price || '';
-            document.getElementById('pCurrency').value = p.currency || 'EGP';
-            document.getElementById('pDiscount').value = p.discount || '';
-            document.getElementById('pInStock').value = p.inStock !== false ? 'true' : 'false';
-            document.getElementById('pCategory').value = p.category || 'أدوات منزلية';
-            document.getElementById('fakeBuyers').value = p.fakeBuyers !== undefined ? p.fakeBuyers : 14;
-            document.getElementById('fakeViews').value = p.fakeViews !== undefined ? p.fakeViews : 48;
-            document.getElementById('pDesc').value = p.desc || '';
-
-            document.getElementById('formTitle').innerText = "تعديل المنتج الحالي";
-            document.getElementById('cancelEditBtn').style.display = 'block';
-            window.scrollTo({ top: 400, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         window.resetForm = function() {
-            document.getElementById('editProductId').value = '';
-            document.getElementById('pName').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('pDiscount').value = '';
-            document.getElementById('pDesc').value = '';
-            document.getElementById('mediaFile').value = '';
-            document.getElementById('formTitle').innerText = "إضافة منتج جديد للمتجر";
-            document.getElementById('cancelEditBtn').style.display = 'none';
+            document.getElementById('editingLandingId').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('oldPrice').value = '';
+            document.getElementById('timer').value = '02:45:00';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('videoUrl').value = '';
+            document.getElementById('desc').value = '';
+
+            document.getElementById('formTitle').innerText = '➕ إنشاء صفحة هبوط جديدة';
+            document.getElementById('submitBtn').innerText = 'حفظ وإنشاء صفحة الهبوط 🚀';
+            document.getElementById('cancelBtn').style.display = 'none';
         }
 
-        window.deleteProduct = function(id) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                remove(ref(db, 'products/' + id)).then(() => {
-                    alert('تم حذف المنتج بنجاح.');
-                });
+        window.copyLink = function(id) {
+            const link = window.location.origin + window.location.pathname.replace('index.html', '') + 'landing.html?id=' + id;
+            navigator.clipboard.writeText(link);
+            alert('تم نسخ رابط صفحة الهبوط بنجاح!');
+        }
+
+        window.previewLanding = function(id) {
+            window.open('landing.html?id=' + id, '_blank');
+        }
+
+        window.deleteLanding = async function(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الصفحة نهائياً؟')) {
+                await remove(ref(db, 'landings/' + id));
+                loadLandings();
             }
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadLandings();
+        });
     </script>
 </body>
 </html>

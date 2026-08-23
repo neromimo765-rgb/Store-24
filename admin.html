@@ -37,7 +37,7 @@
         .btn-danger { background: var(--danger); color: #fff; }
 
         .product-list-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-        .actions-btns { display: flex; gap: 4px; }
+        .actions-btns { display: flex; gap: 4px; align-items: center; }
         .action-btn { background: var(--border-color); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
         .action-btn.del { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
         
@@ -88,22 +88,31 @@
                     <input type="number" id="pPrice" class="form-control" placeholder="السعر...">
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>الخصم (اختياري - مثلاً: 20% أو 50 ج)</label>
+                    <label>الخصم (اختياري)</label>
                     <input type="text" id="pDiscount" class="form-control" placeholder="مثال: خصم 20%">
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>القسم</label>
-                <select id="pCategory" class="form-control">
-                    <option value="أدوات منزلية">🚿 أدوات منزلية</option>
-                    <option value="إلكترونيات">⚡ إلكترونيات</option>
-                    <option value="ملابس">👕 ملابس</option>
-                    <option value="مستلزمات حيوانات أليفة">🐾 حيوانات</option>
-                    <option value="الصحة والجمال">💄 جمال</option>
-                    <option value="أجهزة كمبيوتر">💻 كمبيوتر</option>
-                    <option value="عروض خاصة">🔥 عروض</option>
-                </select>
+            <div style="display: flex; gap: 8px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>القسم</label>
+                    <select id="pCategory" class="form-control">
+                        <option value="أدوات منزلية">🚿 أدوات منزلية</option>
+                        <option value="إلكترونيات">⚡ إلكترونيات</option>
+                        <option value="ملابس">👕 ملابس</option>
+                        <option value="مستلزمات حيوانات أليفة">🐾 حيوانات</option>
+                        <option value="الصحة والجمال">💄 جمال</option>
+                        <option value="أجهزة كمبيوتر">💻 كمبيوتر</option>
+                        <option value="عروض خاصة">🔥 عروض</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>حالة التوفر في المتجر</label>
+                    <select id="pInStock" class="form-control">
+                        <option value="true">🟢 متوفر</option>
+                        <option value="false">🔴 غير متوفر</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -164,7 +173,6 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // التحقق إذا كان مسجل دخول مسبقاً في الجلسة الحالية
             if (sessionStorage.getItem('store24_auth') === 'true') {
                 document.getElementById('authScreen').style.display = 'none';
                 initAdminPanel();
@@ -195,6 +203,7 @@
             const price = parseFloat(document.getElementById('pPrice').value);
             const discount = document.getElementById('pDiscount').value.trim();
             const category = document.getElementById('pCategory').value;
+            const inStock = document.getElementById('pInStock').value === 'true';
             const desc = document.getElementById('pDesc').value.trim();
             const fileInput = document.getElementById('mediaFile');
 
@@ -220,6 +229,7 @@
                     price,
                     discount,
                     category,
+                    inStock,
                     desc,
                     images: finalImages,
                     comments: existingComments
@@ -265,12 +275,15 @@
 
             listEl.innerHTML = keys.map(key => {
                 const p = allProducts[key];
+                const isAvailable = p.inStock !== false;
+                const stockText = isAvailable ? '<span style="color:var(--success);">🟢 متوفر</span>' : '<span style="color:var(--danger);">🔴 غير متوفر</span>';
+                
                 return `
                     <div class="product-list-item">
                         <div>
                             <strong>${p.name}</strong><br>
-                            <span style="color:var(--accent-gold);">${p.price} ج.م</span> 
-                            ${p.discount ? `<span style="color:var(--success); background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:4px; font-size:9px;">🏷️ ${p.discount}</span>` : ''}
+                            <span style="color:var(--accent-gold);">${p.price} ج.م</span> | ${stockText}
+                            ${p.discount ? `<span style="color:var(--success); background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:4px; font-size:9px; margin-right:4px;">🏷️ ${p.discount}</span>` : ''}
                         </div>
                         <div class="actions-btns">
                             <button class="action-btn" onclick="editProduct('${key}')">تعديل</button>
@@ -288,6 +301,7 @@
             document.getElementById('pPrice').value = p.price;
             document.getElementById('pDiscount').value = p.discount || '';
             document.getElementById('pCategory').value = p.category;
+            document.getElementById('pInStock').value = (p.inStock !== false) ? 'true' : 'false';
             document.getElementById('pDesc').value = p.desc || '';
             
             document.getElementById('formTitle').innerText = "تعديل المنتج: " + p.name;
@@ -296,13 +310,13 @@
         }
 
         window.resetForm = function() {
-            document.getElementById('editProductId').value;
             document.getElementById('editProductId').value = '';
             document.getElementById('pName').value = '';
             document.getElementById('pPrice').value = '';
             document.getElementById('pDiscount').value = '';
             document.getElementById('pDesc').value = '';
             document.getElementById('mediaFile').value = '';
+            document.getElementById('pInStock').value = 'true';
             document.getElementById('formTitle').innerText = "إضافة منتج جديد";
             document.getElementById('cancelEditBtn').style.display = 'none';
         }

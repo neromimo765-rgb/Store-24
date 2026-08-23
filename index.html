@@ -25,7 +25,6 @@
         .store-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .store-header h1 { color: var(--accent-gold); font-size: 18px; display: flex; align-items: center; gap: 6px; }
         
-        /* أداة السلة وزر الصوت في الهيدر */
         .header-tools { display: flex; align-items: center; gap: 10px; }
         .cart-icon-btn { background: var(--bg-card); border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         
@@ -52,7 +51,6 @@
         
         .add-to-cart-btn { background: var(--accent-gold); color: #000; text-align: center; text-decoration: none; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: 800; display: block; width: 100%; border: none; cursor: pointer; }
 
-        /* نافذة عامة منبثقة (للمنتج أو السلة) */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
         .modal-content { background: var(--bg-card); border: 1px solid var(--accent-gold); width: 100%; max-width: 420px; max-height: 90vh; border-radius: 14px; overflow-y: auto; padding: 14px; position: relative; }
         .close-modal { position: absolute; top: 10px; left: 10px; background: var(--danger); color: #fff; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
@@ -60,7 +58,6 @@
         .modal-media { width: 100%; height: 200px; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
         .modal-media img, .modal-media video { width: 100%; height: 100%; object-fit: contain; }
         
-        /* تصميم عناصر سلة المشتريات داخل النافذة المنبثقة */
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 8px; border-radius: 8px; margin-bottom: 6px; border: 1px solid var(--border-color); font-size: 11px; }
         .cart-item-controls { display: flex; align-items: center; gap: 6px; }
         .qty-btn { background: var(--border-color); color: #fff; border: none; width: 22px; height: 22px; border-radius: 4px; font-weight: bold; cursor: pointer; }
@@ -79,9 +76,9 @@
 </head>
 <body>
 
-    <!-- صوت خفيف وخالي من التعليق -->
-    <audio id="storeAudio" loop preload="none">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=gentle-waves-110055.mp3" type="audio/mp3">
+    <!-- رابط صوتي جديد، هادئ جداً ومستقر تماماً -->
+    <audio id="storeAudio" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3" type="audio/mp3">
     </audio>
 
     <div class="container">
@@ -114,7 +111,6 @@
         <div class="products-grid" id="storeProductsGrid"></div>
     </div>
 
-    <!-- نافذة منبثقة عامة (تعرض تفاصيل المنتج أو محتويات السلة) -->
     <div class="modal-overlay" id="generalModal" onclick="closeModalOnOutside(event)">
         <div class="modal-content">
             <button class="close-modal" onclick="closeGeneralModal()">×</button>
@@ -133,7 +129,6 @@
             updateCartBadge();
         });
 
-        // تشغيل وإيقاف الصوت بسلاسة تامة
         function toggleMusic() {
             let audio = document.getElementById('storeAudio');
             let btn = document.getElementById('musicToggleBtn');
@@ -142,7 +137,7 @@
                 audio.play().then(() => {
                     btn.innerHTML = "⏸";
                 }).catch(err => {
-                    console.log("Audio play blocked", err);
+                    console.log("Audio play error:", err);
                 });
             } else {
                 audio.pause();
@@ -159,7 +154,6 @@
             document.getElementById('welcomeMessage').innerText = messages[Math.floor(Math.random() * messages.length)];
         }
 
-        // إضافة منتج للسلة
         function addToCart(id, name, price) {
             let existing = cart.find(item => item.id === id);
             if (existing) {
@@ -176,7 +170,6 @@
             document.getElementById('cartCountBadge').innerText = totalItems;
         }
 
-        // فتح نافذة السلة لكي يراها العميل ويلغي أو يعدل أو يتمم الطلب
         function openCartModal() {
             let modalBody = document.getElementById('modalBodyContent');
             
@@ -192,7 +185,7 @@
             }
 
             let totalPrice = 0;
-            let itemsHtml = cart.map((item, index) => {
+            let itemsHtml = cart.map((item) => {
                 let subTotal = item.price * item.qty;
                 totalPrice += subTotal;
                 return `
@@ -231,7 +224,7 @@
                     cart = cart.filter(i => i.id !== id);
                 }
                 updateCartBadge();
-                openCartModal(); // تحديث النافذة فوراً
+                openCartModal();
             }
         }
 
@@ -241,7 +234,6 @@
             openCartModal();
         }
 
-        // إرسال تفاصيل السلة دفعة واحدة للواتساب
         function checkoutOrder() {
             if (cart.length === 0) return;
 

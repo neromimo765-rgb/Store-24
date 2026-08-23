@@ -14,13 +14,15 @@
             --border-color: rgba(255, 255, 255, 0.08);
             --danger: #EF4444;
             --success: #10B981;
+            --wa-color: #25D366;
+            --fb-color: #1877F2;
+            --tk-color: #FE2C55;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background-color: var(--bg-primary); color: var(--text-main); padding: 12px; padding-bottom: 70px; }
         .container { max-width: 480px; margin: 0 auto; }
         
-        /* شاشة تسجيل الدخول */
         #authScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); display: flex; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
         .auth-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; width: 100%; max-width: 360px; text-align: center; }
         .auth-card h2 { color: var(--accent-gold); font-size: 16px; margin-bottom: 12px; }
@@ -36,11 +38,21 @@
         .btn { width: 100%; background: var(--accent-gold); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; margin-top: 5px; }
         .btn-danger { background: var(--danger); color: #fff; }
 
-        .product-list-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+        .product-list-item { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 11px; }
+        .product-info-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        
         .actions-btns { display: flex; gap: 4px; align-items: center; }
         .action-btn { background: var(--border-color); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
         .action-btn.del { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        
+
+        /* أزرار المشاركة الاجتماعية داخل لوحة التحكم */
+        .social-share-bar { display: flex; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); }
+        .social-btn { flex: 1; border: none; padding: 5px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; color: #fff; text-decoration: none; }
+        .sb-wa { background: var(--wa-color); color: #000; }
+        .sb-fb { background: var(--fb-color); }
+        .sb-tk { background: var(--tk-color); }
+        .sb-copy { background: var(--border-color); }
+
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; flex-direction: column; color: var(--accent-gold); font-size: 13px; font-weight: bold; }
         .spinner { width: 35px; height: 35px; border: 4px solid var(--border-color); border-top: 4px solid var(--accent-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -48,7 +60,6 @@
 </head>
 <body>
 
-    <!-- شاشة كلمة المرور -->
     <div id="authScreen">
         <div class="auth-card">
             <h2>🔒 لوحة التحكم محمية</h2>
@@ -107,7 +118,7 @@
                     </select>
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>حالة التوفر في المتجر</label>
+                    <label>حالة التوفر</label>
                     <select id="pInStock" class="form-control">
                         <option value="true">🟢 متوفر</option>
                         <option value="false">🔴 غير متوفر</option>
@@ -153,6 +164,8 @@
 
         let allProducts = {};
         const correctPassword = "qweasdzxc12ASD";
+        // رابط موقع المتجر الخاص بك (قم بتعديله إذا كان رابطك على GitHub Pages مختلفاً)
+        const storeBaseUrl = window.location.href.replace('admin.html', 'index.html');
 
         window.checkPassword = function() {
             const inputVal = document.getElementById('adminPasswordInput').value;
@@ -278,20 +291,41 @@
                 const isAvailable = p.inStock !== false;
                 const stockText = isAvailable ? '<span style="color:var(--success);">🟢 متوفر</span>' : '<span style="color:var(--danger);">🔴 غير متوفر</span>';
                 
+                // صياغة رسالة المنشور الاحترافية (بدون تكرار للسعر)
+                const productLink = `${storeBaseUrl}?id=${p.id}`;
+                const discountText = p.discount ? ` (🏷️ ${p.discount})` : '';
+                const shareText = `🔥 *${p.name}*\n💰 السعر: ${p.price} ج.م${discountText}\n📝 الوصف: ${p.desc || 'متوفر الآن في المتجر'}\n\n🛒 اطلبه مباشرة من هنا:\n${productLink}`;
+
                 return `
                     <div class="product-list-item">
-                        <div>
-                            <strong>${p.name}</strong><br>
-                            <span style="color:var(--accent-gold);">${p.price} ج.م</span> | ${stockText}
-                            ${p.discount ? `<span style="color:var(--success); background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:4px; font-size:9px; margin-right:4px;">🏷️ ${p.discount}</span>` : ''}
+                        <div class="product-info-row">
+                            <div>
+                                <strong>${p.name}</strong><br>
+                                <span style="color:var(--accent-gold);">${p.price} ج.م</span> | ${stockText}
+                                ${p.discount ? `<span style="color:var(--success); background:rgba(16,185,129,0.1); padding:1px 4px; border-radius:4px; font-size:9px; margin-right:4px;">🏷️ ${p.discount}</span>` : ''}
+                            </div>
+                            <div class="actions-btns">
+                                <button class="action-btn" onclick="editProduct('${key}')">تعديل</button>
+                                <button class="action-btn del" onclick="deleteProduct('${key}')">حذف</button>
+                            </div>
                         </div>
-                        <div class="actions-btns">
-                            <button class="action-btn" onclick="editProduct('${key}')">تعديل</button>
-                            <button class="action-btn del" onclick="deleteProduct('${key}')">حذف</button>
+                        <div class="social-share-bar">
+                            <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}" target="_blank" class="social-btn sb-wa">💬 واتساب</a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productLink)}" target="_blank" class="social-btn sb-fb">👥 فيسبوك</a>
+                            <a href="https://www.tiktok.com/" target="_blank" onclick="copyToClipboard('${shareText.replace(/'/g, "\\'")}')" class="social-btn sb-tk">🎵 تيك توك</a>
+                            <button class="social-btn sb-copy" onclick="copyToClipboard('${productLink}')">🔗 الرابط</button>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        window.copyToClipboard = function(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('تم نسخ تفاصيل المنتج أو الرابط بنجاح! جاهز للمشاركة 📋');
+            }).catch(err => {
+                alert('خطأ في النسخ: ' + err);
+            });
         }
 
         window.editProduct = function(key) {

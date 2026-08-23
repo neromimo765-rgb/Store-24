@@ -76,7 +76,6 @@
 </head>
 <body>
 
-    <!-- رابط صوتي جديد، هادئ جداً ومستقر تماماً -->
     <audio id="storeAudio" loop preload="auto">
         <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=lofi-study-112191.mp3" type="audio/mp3">
     </audio>
@@ -127,6 +126,15 @@
             setRandomWelcomeMessage();
             loadStoreProducts();
             updateCartBadge();
+
+            // فحص الرابط تلقائياً أول ما الصفحة تفتح لو فيها ?id= لعرض المنتج مباشرة
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (productId) {
+                setTimeout(() => {
+                    openProductModal(Number(productId));
+                }, 200);
+            }
         });
 
         function toggleMusic() {
@@ -358,6 +366,10 @@
 
         function closeGeneralModal() {
             document.getElementById('generalModal').style.display = 'none';
+            // إذا كان العميل دخل برابط منتج ثم أغلق النافذة، نقوم بتنظيف الـ URL ليعود للمتجر الرئيسي بسلاسة
+            if (window.location.search.includes('id=')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         }
 
         function closeModalOnOutside(event) {

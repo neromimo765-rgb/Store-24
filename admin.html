@@ -117,38 +117,56 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', loadAdminProducts);
+    <!-- ربط فايربيس (Firebase SDKs) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
+          authDomain: "store-24-4df16.firebaseapp.com",
+          databaseURL: "https://store-24-4df16-default-rtdb.firebaseio.com",
+          projectId: "store-24-4df16",
+          storageBucket: "store-24-4df16.firebasestorage.app",
+          messagingSenderId: "81493388397",
+          appId: "1:81493388397:web:920f9dbe1f080638ebe364",
+          measurementId: "G-WEM3CVD7CQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let productsListCache = [];
         let temporaryMediaCache = { images: [], video: null };
 
-        function getProducts() {
-            let data = localStorage.getItem('store_products');
-            return data ? JSON.parse(data) : [];
-        }
+        // الاستماع المباشر للتحديثات من قاعدة البيانات
+        const productsRef = ref(db, 'products');
+        onValue(productsRef, (snapshot) => {
+            const data = snapshot.val();
+            productsListCache = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    productsListCache.push({ id: key, ...data[key] });
+                });
+            }
+            renderAdminProducts();
+        });
 
-        function saveProducts(products) {
-            localStorage.setItem('store_products', JSON.stringify(products));
-        }
-
-        function loadAdminProducts() {
-            let products = getProducts();
+        window.renderAdminProducts = function() {
+            let products = productsListCache;
             document.getElementById('totalAdminCount').innerText = products.length;
             let container = document.getElementById('adminProductsList');
 
             if (products.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 10px; padding: 10px;">لا توجد منتجات مضافة حالياً.</p>`;
+                container.innerHTML = `<p style="color: var(--text-muted); text-align: center; font-size: 10px; padding: 10px;">لا توجد منتجات مضافة حالياً في قاعدة البيانات.</p>`;
                 return;
             }
 
-            // استخراج رابط المتجر الأساسي تلقائياً من رابط جيت هاب الحالي
             let currentUrl = window.location.href;
             let baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1) + 'index.html';
 
             container.innerHTML = products.map(p => {
-                // إنشاء رابط مباشر خاص بكل منتج
                 let productLink = `${baseUrl}?id=${p.id}`;
-                
-                // النص الذي سيتم مشاركته (يحتوي على التفاصيل ورابط المتجر المباشر للمنتج)
                 let messageText = `🔥 لا يفوتك هذا العرض: *${p.name}*\n💰 السعر: ${p.price} ج.م\n📂 القسم: ${p.category || 'عام'}\n📝 التفاصيل: ${p.desc || 'منتج عالي الجودة'}\n\n🛒 *اطلبه مباشرة من هنا:* \n${productLink}`;
                 let shareText = encodeURIComponent(messageText);
                 
@@ -163,8 +181,8 @@
                                 <span>${p.price} ج.م | <em style="color:#aaa;">${p.category || 'عام'}</em> | 🖼️ ${imgCount} صور${hasVid}</span>
                             </div>
                             <div class="admin-actions">
-                                <button class="btn-edit" onclick="editProduct(${p.id})">تعديل ✏️</button>
-                                <button class="btn-danger" onclick="deleteProduct(${p.id})">حذف 🗑️</button>
+                                <button class="btn-edit" onclick="editProduct('${p.id}')">تعديل ✏️</button>
+                                <button class="btn-danger" onclick="deleteProduct('${p.id}')">حذف 🗑️</button>
                             </div>
                         </div>
                         <div class="social-share-box">
@@ -177,7 +195,6 @@
             }).join('');
         }
 
-        // دالة ضغط الصور لتسريع المتجر
         async function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -209,7 +226,7 @@
             });
         }
 
-        async function processAndSaveProduct() {
+        window.processAndSaveProduct = async function() {
             let id = document.getElementById('editingId').value;
             let name = document.getElementById('pName').value.trim();
             let price = parseFloat(document.getElementById('pPrice').value);
@@ -251,39 +268,34 @@
 
             document.getElementById('loadingOverlay').style.display = 'none';
 
-            let products = getProducts();
-
             if (id) {
-                let p = products.find(item => item.id == id);
-                if (p) {
-                    p.name = name;
-                    p.price = price;
-                    p.category = category;
-                    p.desc = desc;
-                    if (imageFiles.length > 0) p.images = newImages;
-                    if (videoFile) p.video = newVideo;
-                }
-                alert('✅ تم تحديث المنتج بنجاح!');
-                cancelEdit();
+                // تعديل منتج موجود
+                let productData = {
+                    name, price, category, desc,
+                    images: newImages,
+                    video: newVideo
+                };
+                update(ref(db, 'products/' + id), productData).then(() => {
+                    alert('✅ تم تحديث المنتج بنجاح أونلاين!');
+                    cancelEdit();
+                }).catch(err => alert('خطأ: ' + err.message));
             } else {
-                products.unshift({
-                    id: Date.now(),
+                // إضافة منتج جديد
+                let newProductRef = push(ref(db, 'products'));
+                set(newProductRef, {
                     name, price, category, desc,
                     images: newImages,
                     video: newVideo,
                     comments: []
-                });
-                alert('✅ تم نشر المنتج بنجاح!');
-                clearForm();
+                }).then(() => {
+                    alert('✅ تم نشر المنتج بنجاح في قاعدة البيانات!');
+                    clearForm();
+                }).catch(err => alert('خطأ: ' + err.message));
             }
-            
-            saveProducts(products);
-            loadAdminProducts();
         }
 
-        function editProduct(id) {
-            let products = getProducts();
-            let p = products.find(item => item.id == id);
+        window.editProduct = function(id) {
+            let p = productsListCache.find(item => item.id == id);
             
             if (p) {
                 document.getElementById('editingId').value = p.id;
@@ -302,7 +314,7 @@
             }
         }
 
-        function cancelEdit() {
+        window.cancelEdit = function() {
             document.getElementById('editingId').value = '';
             clearForm();
             temporaryMediaCache = { images: [], video: null };
@@ -319,11 +331,11 @@
             document.getElementById('pDesc').value = '';
         }
 
-        function deleteProduct(id) {
-            if (!confirm('هل أنت متأكد من الحذف؟')) return;
-            let products = getProducts().filter(p => p.id !== id);
-            saveProducts(products);
-            loadAdminProducts();
+        window.deleteProduct = function(id) {
+            if (!confirm('هل أنت متأكد من الحذف النهائي من قاعدة البيانات؟')) return;
+            remove(ref(db, 'products/' + id)).then(() => {
+                alert('🗑️ تم حذف المنتج بنجاح.');
+            }).catch(err => alert('خطأ: ' + err.message));
         }
     </script>
 </body>

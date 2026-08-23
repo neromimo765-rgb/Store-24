@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المالك | المتجر وصفحات الهبوط</title>
+    <title>لوحة تحكم المتجر الأساسي</title>
     <style>
         :root {
             --bg-primary: #0f0f13;
@@ -16,42 +16,23 @@
             --success: #10B981;
             --info: #3B82F6;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
         body { background-color: var(--bg-primary); color: var(--text-main); padding-bottom: 50px; }
         .container { max-width: 480px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; padding: 16px; }
-
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;
         }
-        header h1 { font-size: 15px; color: var(--accent-gold); font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        
-        .store-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
+        header h1 { font-size: 15px; color: var(--accent-gold); font-weight: 800; }
+        .nav-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; text-decoration: none;
         }
-
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 16px; margin-bottom: 20px;
         }
-        .card h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-
+        .card h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
         .form-control {
@@ -59,67 +40,32 @@
             color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; outline: none;
         }
         .form-control:focus { border-color: var(--accent-gold); }
-
         .btn {
             width: 100%; background: linear-gradient(135deg, #F59E0B, #D97706);
             color: #000; border: none; padding: 12px; border-radius: 8px;
             font-weight: 900; font-size: 13px; cursor: pointer; margin-top: 5px;
         }
         .btn-cancel { background: var(--text-muted); color: #000; display: none; }
-
         .item-card {
-            background: #0f0f13;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
+            background: #0f0f13; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 12px; margin-bottom: 12px;
         }
         .item-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #fff; }
-        .item-info { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-        }
-        .action-btn {
-            padding: 6px 4px; border-radius: 6px; font-size: 11px; font-weight: bold;
-            border: none; cursor: pointer; text-align: center; color: #fff;
-        }
+        .item-info { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .img-preview-box { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 8px; }
+        .img-preview-box img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
+        .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px; }
+        .action-btn { padding: 6px; border-radius: 6px; font-size: 11px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; }
         .btn-edit { background: var(--info); }
         .btn-delete { background: var(--accent-red); }
-
-        .landing-actions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-        }
-        .landing-action-btn {
-            padding: 6px 4px; border-radius: 6px; font-size: 10px; font-weight: bold;
-            border: none; cursor: pointer; text-align: center; color: #fff;
-        }
-        .btn-copy { background: #6366F1; }
-        .btn-preview { background: var(--accent-gold); color: #000; }
-        
-        .social-share {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-top: 8px;
-        }
-        .share-btn {
-            padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold;
-            border: none; cursor: pointer; text-align: center; color: #fff;
-        }
+        .social-share { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .share-btn { padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; text-align: center; color: #fff; }
         .btn-whatsapp { background: #25D366; }
         .btn-facebook { background: #1877F2; }
         .btn-telegram { background: #229ED9; }
-
-        .section-divider { border: 0; height: 1px; background: var(--border-color); margin: 25px 0; }
-        
         #loadingOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 11, 16, 0.8); display: none;
+            background: rgba(11, 11, 16, 0.85); display: none;
             justify-content: center; align-items: center; z-index: 2000;
             flex-direction: column; color: var(--accent-gold); font-size: 13px; font-weight: bold;
         }
@@ -135,120 +81,55 @@
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
-        <span>جاري معالجة الملفات والنشر...</span>
+        <span>جاري معالجة ونشر المنتجات...</span>
     </div>
 
     <div class="container">
         <header>
-            <h1>⚙️ لوحة تحكم المالك</h1>
-            <a href="store.html" class="store-btn">عرض المتجر 🛒</a>
+            <h1>🛒 لوحة المتجر الأساسي</h1>
+            <a href="landing-admin.html" class="nav-btn">صفحات الهبوط 🚀</a>
         </header>
 
-        <!-- 1. لوحة تحكم المتجر الأساسي (مع رفع الصور والفيديوهات من الهاتف) -->
         <div class="card">
-            <h2 id="storeFormTitle">➕ إضافة منتج جديد للمتجر</h2>
-            <input type="hidden" id="editingStoreId" value="">
+            <h2 id="formTitle">➕ إضافة منتج جديد</h2>
+            <input type="hidden" id="editingId" value="">
 
             <div class="form-group">
                 <label>اسم المنتج:</label>
-                <input type="text" id="storeTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية">
+                <input type="text" id="prodTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية">
             </div>
             <div class="form-group">
                 <label>السعر (بالجنيه):</label>
-                <input type="number" id="storePrice" class="form-control" placeholder="مثال: 750">
+                <input type="number" id="prodPrice" class="form-control" placeholder="مثال: 750">
             </div>
             <div class="form-group">
-                <label>اختر القسم:</label>
-                <select id="storeCategory" class="form-control">
+                <label>القسم:</label>
+                <select id="prodCategory" class="form-control">
                     <option value="أدوات منزلية">🚀 أدوات منزلية</option>
                     <option value="إلكترونيات">📱 إلكترونيات</option>
                     <option value="إكسسوارات">⌚ إكسسوارات</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>اختر صور المنتج (من الهاتف - من 1 لـ 10):</label>
-                <input type="file" id="storeImages" class="form-control" accept="image/*" multiple>
+                <label>صور المنتج (من الهاتف - حتى 10 صور):</label>
+                <input type="file" id="prodImages" class="form-control" accept="image/*" multiple>
             </div>
             <div class="form-group">
-                <label>اختر فيديو للمنتج (اختياري من الهاتف):</label>
-                <input type="file" id="storeVideo" class="form-control" accept="video/*">
+                <label>فيديو المنتج (اختياري):</label>
+                <input type="file" id="prodVideo" class="form-control" accept="video/*">
             </div>
             <div class="form-group">
                 <label>وصف المنتج:</label>
-                <textarea id="storeDesc" class="form-control" rows="3" placeholder="تفاصيل ومميزات المنتج..."></textarea>
+                <textarea id="prodDesc" class="form-control" rows="3" placeholder="تفاصيل ومميزات المنتج..."></textarea>
             </div>
-            <button onclick="saveOrUpdateStoreProduct()" id="storeSubmitBtn" class="btn">نشر المنتج الآن 🚀</button>
-            <button onclick="resetStoreForm()" id="storeCancelBtn" class="btn btn-cancel" style="margin-top: 5px;">إلغاء التعديل</button>
+            <button onclick="saveProduct()" id="submitBtn" class="btn">نشر المنتج الآن 🚀</button>
+            <button onclick="resetForm()" id="cancelBtn" class="btn btn-cancel">إلغاء التعديل</button>
         </div>
 
         <div class="card">
-            <h2>📦 إدارة المنتجات الحالية في المتجر</h2>
-            <div id="storeProductsList">
+            <h2>📦 المنتجات المضافة للمتجر</h2>
+            <div id="productsList">
                 <p style="text-align: center; color: var(--text-muted); font-size: 11px;">جاري تحميل المنتجات...</p>
-            </div>
-        </div>
-
-        <hr class="section-divider">
-
-        <!-- 2. لوحة تحكم صفحات الهبوط (مع سعر خصم اختياري تماماً ورفع الملفات من الهاتف) -->
-        <div class="card">
-            <h2 id="landingFormTitle">🚀 إنشاء صفحة هبوط مستقلة</h2>
-            <input type="hidden" id="editingLandingId" value="">
-            
-            <div class="form-group">
-                <label>عنوان العرض:</label>
-                <input type="text" id="landingTitle" class="form-control" placeholder="مثال: عرض خاص ومحدود...">
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div class="form-group">
-                    <label>سعر المنتج الأساسي:</label>
-                    <input type="number" id="landingPrice" class="form-control" placeholder="250">
-                </div>
-                <div class="form-group">
-                    <label>سعر الخصم (اختياري تماماً):</label>
-                    <input type="number" id="landingDiscountPrice" class="form-control" placeholder="اتركه فارغاً إن لم يوجد">
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <div class="form-group">
-                    <label>العملة:</label>
-                    <select id="landingCurrency" class="form-control">
-                        <option value="EGP">ج.م (EGP)</option>
-                        <option value="SAR">ر.س (SAR)</option>
-                        <option value="USD">$ (USD)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>وقت العداد:</label>
-                    <input type="text" id="landingTimer" class="form-control" value="02:45:00">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>صورة صفحة الهبوط (من الهاتف - اختيارية):</label>
-                <input type="file" id="landingImageFile" class="form-control" accept="image/*">
-            </div>
-
-            <div class="form-group">
-                <label>فيديو صفحة الهبوط (من الهاتف - اختياري):</label>
-                <input type="file" id="landingVideoFile" class="form-control" accept="video/*">
-            </div>
-
-            <div class="form-group">
-                <label>تفاصيل ومميزات العرض:</label>
-                <textarea id="landingDesc" class="form-control" rows="3" placeholder="تفاصيل صفحة الهبوط..."></textarea>
-            </div>
-
-            <button onclick="saveOrUpdateLanding()" id="landingSubmitBtn" class="btn">حفظ وإنشاء صفحة الهبوط ⚡</button>
-            <button onclick="resetLandingForm()" id="landingCancelBtn" class="btn btn-cancel" style="margin-top: 5px;">إلغاء التعديل</button>
-        </div>
-
-        <div class="card">
-            <h2>📑 إدارة صفحات الهبوط الحالية</h2>
-            <div id="landingsList">
-                <p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد صفحات هبوط مضافة.</p>
             </div>
         </div>
     </div>
@@ -280,15 +161,14 @@
             });
         }
 
-        // --- 1. وظائف المتجر الأساسي ---
-        window.saveOrUpdateStoreProduct = async function() {
-            const editingId = document.getElementById('editingStoreId').value;
-            const title = document.getElementById('storeTitle').value.trim();
-            const price = document.getElementById('storePrice').value.trim();
-            const category = document.getElementById('storeCategory').value;
-            const desc = document.getElementById('storeDesc').value.trim();
-            const imageFiles = document.getElementById('storeImages').files;
-            const videoFile = document.getElementById('storeVideo').files[0];
+        window.saveProduct = async function() {
+            const editingId = document.getElementById('editingId').value;
+            const title = document.getElementById('prodTitle').value.trim();
+            const price = document.getElementById('prodPrice').value.trim();
+            const category = document.getElementById('prodCategory').value;
+            const desc = document.getElementById('prodDesc').value.trim();
+            const imageFiles = document.getElementById('prodImages').files;
+            const videoFile = document.getElementById('prodVideo').files[0];
 
             if (!title || !price) {
                 alert('الرجاء إدخال اسم المنتج والسعر.');
@@ -300,8 +180,8 @@
             try {
                 let images = [];
                 for (let i = 0; i < imageFiles.length; i++) {
-                    const base64 = await fileToBase64(imageFiles[i]);
-                    images.push(base64);
+                    const b64 = await fileToBase64(imageFiles[i]);
+                    images.push(b64);
                 }
 
                 let videoUrl = '';
@@ -315,46 +195,54 @@
 
                 if (editingId) {
                     await update(ref(db, 'products/' + editingId), productData);
-                    alert('تم تحديث بيانات المنتج بنجاح!');
+                    alert('تم تحديث المنتج بنجاح!');
                 } else {
                     await push(ref(db, 'products'), { ...productData, createdAt: Date.now() });
-                    alert('تم نشر المنتج في المتجر بنجاح!');
+                    alert('تم نشر المنتج بنجاح!');
                 }
 
-                resetStoreForm();
-                loadStoreProducts();
+                resetForm();
+                loadProducts();
             } catch (e) {
-                alert('حدث خطأ أثناء رفع الملفات.');
+                alert('حدث خطأ أثناء رفع الصور أو الفيديو.');
             } finally {
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
-        async function loadStoreProducts() {
+        async function loadProducts() {
             try {
                 const snap = await get(ref(db, 'products'));
-                const container = document.getElementById('storeProductsList');
+                const container = document.getElementById('productsList');
                 if (!snap.exists()) {
-                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد منتجات في المتجر حالياً.</p>`;
+                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد منتجات مضافة.</p>`;
                     return;
                 }
                 let html = '';
                 const products = snap.val();
                 for (let id in products) {
                     const p = products[id];
+                    let imgHtml = '';
+                    if (p.images && p.images.length > 0) {
+                        imgHtml = '<div class="img-preview-box">';
+                        p.images.forEach(img => { imgHtml += `<img src="${img}" alt="صورة">`; });
+                        imgHtml += '</div>';
+                    }
+
                     const encoded = encodeURIComponent(JSON.stringify({ id, ...p }));
                     html += `
                         <div class="item-card">
                             <div class="item-title">${p.title}</div>
                             <div class="item-info">${p.price} ج.م | ${p.category || 'عام'}</div>
+                            ${imgHtml}
                             <div class="actions-grid">
-                                <button onclick="prepareEditStoreProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
-                                <button onclick="deleteStoreProduct('${id}')" class="action-btn btn-delete">حذف</button>
+                                <button onclick="editProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
+                                <button onclick="deleteProduct('${id}')" class="action-btn btn-delete">حذف</button>
                             </div>
                             <div class="social-share">
-                                <button onclick="shareTo('whatsapp', '${p.title}')" class="share-btn btn-whatsapp">واتساب</button>
-                                <button onclick="shareTo('facebook', '${p.title}')" class="share-btn btn-facebook">فيس بوك</button>
-                                <button onclick="shareTo('telegram', '${p.title}')" class="share-btn btn-telegram">تيليجرام</button>
+                                <button onclick="shareSocial('whatsapp', '${p.title}')" class="share-btn btn-whatsapp">واتساب</button>
+                                <button onclick="shareSocial('facebook', '${p.title}')" class="share-btn btn-facebook">فيس بوك</button>
+                                <button onclick="shareSocial('telegram', '${p.title}')" class="share-btn btn-telegram">تيليجرام</button>
                             </div>
                         </div>
                     `;
@@ -363,182 +251,49 @@
             } catch (e) { console.error(e); }
         }
 
-        window.prepareEditStoreProduct = function(encodedData) {
+        window.editProduct = function(encodedData) {
             const data = JSON.parse(decodeURIComponent(encodedData));
-            document.getElementById('editingStoreId').value = data.id;
-            document.getElementById('storeTitle').value = data.title || '';
-            document.getElementById('storePrice').value = data.price || '';
-            document.getElementById('storeCategory').value = data.category || 'أدوات منزلية';
-            document.getElementById('storeDesc').value = data.desc || '';
+            document.getElementById('editingId').value = data.id;
+            document.getElementById('prodTitle').value = data.title || '';
+            document.getElementById('prodPrice').value = data.price || '';
+            document.getElementById('prodCategory').value = data.category || 'أدوات منزلية';
+            document.getElementById('prodDesc').value = data.desc || '';
 
-            document.getElementById('storeFormTitle').innerText = '✏️ تعديل منتج المتجر';
-            document.getElementById('storeSubmitBtn').innerText = 'تحديث المنتج 🔄';
-            document.getElementById('storeCancelBtn').style.display = 'block';
+            document.getElementById('formTitle').innerText = '✏️ تعديل المنتج';
+            document.getElementById('submitBtn').innerText = 'تحديث المنتج 🔄';
+            document.getElementById('cancelBtn').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        window.resetStoreForm = function() {
-            document.getElementById('editingStoreId').value = '';
-            document.getElementById('storeTitle').value = '';
-            document.getElementById('storePrice').value = '';
-            document.getElementById('storeDesc').value = '';
-            document.getElementById('storeImages').value = '';
-            document.getElementById('storeVideo').value = '';
+        window.resetForm = function() {
+            document.getElementById('editingId').value = '';
+            document.getElementById('prodTitle').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodImages').value = '';
+            document.getElementById('prodVideo').value = '';
 
-            document.getElementById('storeFormTitle').innerText = '➕ إضافة منتج جديد للمتجر';
-            document.getElementById('storeSubmitBtn').innerText = 'نشر المنتج الآن 🚀';
-            document.getElementById('storeCancelBtn').style.display = 'none';
+            document.getElementById('formTitle').innerText = '➕ إضافة منتج جديد';
+            document.getElementById('submitBtn').innerText = 'نشر المنتج الآن 🚀';
+            document.getElementById('cancelBtn').style.display = 'none';
         }
 
-        window.deleteStoreProduct = async function(id) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج من المتجر؟')) {
+        window.deleteProduct = async function(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
                 await remove(ref(db, 'products/' + id));
-                loadStoreProducts();
+                loadProducts();
             }
         }
 
-        window.shareTo = function(platform, title) {
-            const text = encodeURIComponent(`شاهد هذا المنتج المميز: ${title}`);
-            if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${text}`);
-            if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`);
-            if (platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${text}`);
+        window.shareSocial = function(platform, title) {
+            const currentUrl = window.location.origin + window.location.pathname.replace('store-admin.html', 'store.html');
+            const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}`);
+            if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${text}%20${encodeURIComponent(currentUrl)}`);
+            if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`);
+            if (platform === 'telegram') window.open(`https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${text}`);
         }
 
-        // --- 2. وظائف صفحات الهبوط المستقلة (مع سعر خصم اختياري تماماً) ---
-        window.saveOrUpdateLanding = async function() {
-            const editingId = document.getElementById('editingLandingId').value;
-            const title = document.getElementById('landingTitle').value.trim();
-            const price = document.getElementById('landingPrice').value.trim();
-            const discountPrice = document.getElementById('landingDiscountPrice').value.trim(); // اختياري
-            const currency = document.getElementById('landingCurrency').value;
-            const timer = document.getElementById('landingTimer').value.trim() || "02:45:00";
-            const imageFile = document.getElementById('landingImageFile').files[0];
-            const videoFile = document.getElementById('landingVideoFile').files[0];
-            const desc = document.getElementById('landingDesc').value.trim();
-
-            if (!title || !price) {
-                alert('الرجاء كتابة عنوان العرض وسعر المنتج الأساسي لصفحة الهبوط.');
-                return;
-            }
-
-            document.getElementById('loadingOverlay').style.display = 'flex';
-
-            try {
-                let landingData = { 
-                    title, 
-                    price, 
-                    oldPrice: discountPrice ? discountPrice : '', // يتم حفظه إن وجد أو تركه فارغاً بأمان
-                    currency, 
-                    timer, 
-                    desc 
-                };
-
-                if (imageFile) {
-                    landingData.imageUrl = await fileToBase64(imageFile);
-                }
-                if (videoFile) {
-                    landingData.videoUrl = await fileToBase64(videoFile);
-                }
-
-                if (editingId) {
-                    await update(ref(db, 'landings/' + editingId), landingData);
-                    alert('تم تحديث صفحة الهبوط بنجاح!');
-                } else {
-                    await push(ref(db, 'landings'), { ...landingData, createdAt: Date.now() });
-                    alert('تم إنشاء صفحة الهبوط بنجاح!');
-                }
-
-                resetLandingForm();
-                loadLandings();
-            } catch (e) {
-                alert('حدث خطأ أثناء معالجة الملفات.');
-            } finally {
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }
-        }
-
-        async function loadLandings() {
-            try {
-                const snap = await get(ref(db, 'landings'));
-                const container = document.getElementById('landingsList');
-                if (!snap.exists()) {
-                    container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد صفحات هبوط مضافة.</p>`;
-                    return;
-                }
-                let html = '';
-                const landings = snap.val();
-                for (let id in landings) {
-                    const l = landings[id];
-                    const encoded = encodeURIComponent(JSON.stringify({ id, ...l }));
-                    html += `
-                        <div class="item-card">
-                            <div class="item-title">${l.title}</div>
-                            <div class="item-info">سعر المنتج: ${l.price} ${l.currency || 'EGP'} ${l.oldPrice ? `| سعر الخصم: ${l.oldPrice}` : ''}</div>
-                            <div class="landing-actions">
-                                <button onclick="prepareEditLanding('${encoded}')" class="landing-action-btn btn-edit">تعديل</button>
-                                <button onclick="copyLandingLink('${id}')" class="landing-action-btn btn-copy">نسخ</button>
-                                <button onclick="previewLanding('${id}')" class="landing-action-btn btn-preview">معاينة</button>
-                                <button onclick="deleteLanding('${id}')" class="landing-action-btn btn-delete">حذف</button>
-                            </div>
-                        </div>
-                    `;
-                }
-                container.innerHTML = html;
-            } catch (e) { console.error(e); }
-        }
-
-        window.prepareEditLanding = function(encodedData) {
-            const data = JSON.parse(decodeURIComponent(encodedData));
-            document.getElementById('editingLandingId').value = data.id;
-            document.getElementById('landingTitle').value = data.title || '';
-            document.getElementById('landingPrice').value = data.price || '';
-            document.getElementById('landingDiscountPrice').value = data.oldPrice || '';
-            document.getElementById('landingCurrency').value = data.currency || 'EGP';
-            document.getElementById('landingTimer').value = data.timer || '02:45:00';
-            document.getElementById('landingDesc').value = data.desc || '';
-
-            document.getElementById('landingFormTitle').innerText = '✏️ تعديل صفحة الهبوط';
-            document.getElementById('landingSubmitBtn').innerText = 'تحديث صفحة الهبوط 🔄';
-            document.getElementById('landingCancelBtn').style.display = 'block';
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-
-        window.resetLandingForm = function() {
-            document.getElementById('editingLandingId').value = '';
-            document.getElementById('landingTitle').value = '';
-            document.getElementById('landingPrice').value = '';
-            document.getElementById('landingDiscountPrice').value = '';
-            document.getElementById('landingTimer').value = '02:45:00';
-            document.getElementById('landingImageFile').value = '';
-            document.getElementById('landingVideoFile').value = '';
-            document.getElementById('landingDesc').value = '';
-
-            document.getElementById('landingFormTitle').innerText = '🚀 إنشاء صفحة هبوط مستقلة';
-            document.getElementById('landingSubmitBtn').innerText = 'حفظ وإنشاء صفحة الهبوط ⚡';
-            document.getElementById('landingCancelBtn').style.display = 'none';
-        }
-
-        window.copyLandingLink = function(id) {
-            const link = window.location.origin + window.location.pathname.replace('index.html', '') + 'landing.html?id=' + id;
-            navigator.clipboard.writeText(link);
-            alert('تم نسخ رابط صفحة الهبوط بنجاح!');
-        }
-
-        window.previewLanding = function(id) {
-            window.open('landing.html?id=' + id, '_blank');
-        }
-
-        window.deleteLanding = async function(id) {
-            if (confirm('هل أنت متأكد من حذف صفحة الهبوط هذه؟')) {
-                await remove(ref(db, 'landings/' + id));
-                loadLandings();
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadStoreProducts();
-            loadLandings();
-        });
+        window.addEventListener('DOMContentLoaded', loadProducts);
     </script>
 </body>
 </html>

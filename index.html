@@ -117,27 +117,58 @@
         </div>
     </div>
 
-    <script>
+    <!-- ربط فايربيس (Firebase SDKs) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
+          authDomain: "store-24-4df16.firebaseapp.com",
+          databaseURL: "https://store-24-4df16-default-rtdb.firebaseio.com",
+          projectId: "store-24-4df16",
+          storageBucket: "store-24-4df16.firebasestorage.app",
+          messagingSenderId: "81493388397",
+          appId: "1:81493388397:web:920f9dbe1f080638ebe364",
+          measurementId: "G-WEM3CVD7CQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        let productsListCache = [];
         let currentCategory = 'الكل';
         const ownerWhatsAppPhone = "201156666967";
         let cart = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             setRandomWelcomeMessage();
-            loadStoreProducts();
             updateCartBadge();
 
-            // فحص الرابط تلقائياً أول ما الصفحة تفتح لو فيها ?id= لعرض المنتج مباشرة
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            if (productId) {
-                setTimeout(() => {
-                    openProductModal(Number(productId));
-                }, 200);
-            }
+            // الاستماع المباشر للتحديثات من قاعدة البيانات
+            const productsRef = ref(db, 'products');
+            onValue(productsRef, (snapshot) => {
+                const data = snapshot.val();
+                productsListCache = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        productsListCache.push({ id: key, ...data[key] });
+                    });
+                }
+                loadStoreProducts();
+
+                // فحص الرابط تلقائياً أول ما الصفحة تفتح لو فيها ?id= لعرض المنتج مباشرة
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('id');
+                if (productId) {
+                    setTimeout(() => {
+                        openProductModal(productId);
+                    }, 200);
+                }
+            });
         });
 
-        function toggleMusic() {
+        window.toggleMusic = function() {
             let audio = document.getElementById('storeAudio');
             let btn = document.getElementById('musicToggleBtn');
             
@@ -162,7 +193,7 @@
             document.getElementById('welcomeMessage').innerText = messages[Math.floor(Math.random() * messages.length)];
         }
 
-        function addToCart(id, name, price) {
+        window.addToCart = function(id, name, price) {
             let existing = cart.find(item => item.id === id);
             if (existing) {
                 existing.qty += 1;
@@ -178,7 +209,7 @@
             document.getElementById('cartCountBadge').innerText = totalItems;
         }
 
-        function openCartModal() {
+        window.openCartModal = function() {
             let modalBody = document.getElementById('modalBodyContent');
             
             if (cart.length === 0) {
@@ -203,10 +234,10 @@
                             <span style="color:var(--accent-gold);">${item.price} ج.م × ${item.qty} = ${subTotal} ج.م</span>
                         </div>
                         <div class="cart-item-controls">
-                            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                            <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
                             <span>${item.qty}</span>
-                            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
-                            <button class="remove-item-btn" onclick="removeFromCart(${item.id})">حذف</button>
+                            <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+                            <button class="remove-item-btn" onclick="removeFromCart('${item.id}')">حذف</button>
                         </div>
                     </div>
                 `;
@@ -224,7 +255,7 @@
             document.getElementById('generalModal').style.display = 'flex';
         }
 
-        function changeQty(id, change) {
+        window.changeQty = function(id, change) {
             let item = cart.find(i => i.id === id);
             if (item) {
                 item.qty += change;
@@ -236,13 +267,13 @@
             }
         }
 
-        function removeFromCart(id) {
+        window.removeFromCart = function(id) {
             cart = cart.filter(i => i.id !== id);
             updateCartBadge();
             openCartModal();
         }
 
-        function checkoutOrder() {
+        window.checkoutOrder = function() {
             if (cart.length === 0) return;
 
             let message = `🛒 *طلب جديد من المتجر:*\n\n`;
@@ -261,8 +292,7 @@
         }
 
         function loadStoreProducts() {
-            let data = localStorage.getItem('store_products');
-            let products = data ? JSON.parse(data) : [];
+            let products = productsListCache;
             let grid = document.getElementById('storeProductsGrid');
 
             let filtered = currentCategory === 'الكل' ? products : products.filter(p => p.category === currentCategory);
@@ -283,34 +313,34 @@
                     }
                 }
 
+                let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
+
                 return `
                     <div class="product-card">
-                        <div class="product-media-box" onclick="openProductModal(${p.id})">
+                        <div class="product-media-box" onclick="openProductModal('${p.id}')">
                             ${mediaHtml}
                         </div>
                         <div class="product-body">
                             <div>
-                                <div class="product-title" onclick="openProductModal(${p.id})">${p.name}</div>
+                                <div class="product-title" onclick="openProductModal('${p.id}')">${p.name}</div>
                                 <div class="product-price">${p.price} ج.م</div>
                             </div>
-                            <button class="add-to-cart-btn" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "")}', ${p.price})">🛒 أضف للسلة</button>
+                            <button class="add-to-cart-btn" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف للسلة</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function filterCategory(category, btnElement) {
+        window.filterCategory = function(category, btnElement) {
             currentCategory = category;
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             loadStoreProducts();
         }
 
-        function openProductModal(id) {
-            let data = localStorage.getItem('store_products');
-            let products = data ? JSON.parse(data) : [];
-            let p = products.find(item => item.id === id);
+        window.openProductModal = function(id) {
+            let p = productsListCache.find(item => item.id === id);
             if (!p) return;
 
             if (!p.comments) p.comments = [];
@@ -335,6 +365,8 @@
                 </div>
             `).join('') || `<p style="font-size:10px; color:var(--text-muted); text-align:center; padding:8px;">كن أول من يترك تقييماً على هذا المنتج!</p>`;
 
+            let cleanName = p.name ? p.name.replace(/'/g, "\\'") : '';
+
             let modalBody = document.getElementById('modalBodyContent');
             modalBody.innerHTML = `
                 <div class="modal-media">${mediaHtml}</div>
@@ -342,7 +374,7 @@
                 <div style="font-size:14px; font-weight:bold; color:#fff; margin-bottom:6px;">${p.price} ج.م</div>
                 <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">${p.desc || 'لا يوجد وصف تفصيلي متاح لهذا المنتج حالياً.'}</p>
                 
-                <button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "")}', ${p.price})">🛒 أضف هذا المنتج إلى السلة</button>
+                <button class="add-to-cart-btn" style="padding: 10px; font-size: 11px; margin-bottom: 12px;" onclick="addToCart('${p.id}', '${cleanName}', ${p.price})">🛒 أضف هذا المنتج إلى السلة</button>
 
                 <div class="comments-section">
                     <h4 style="font-size:12px; margin-bottom:8px; color:#fff;">💬 تقييمات وآراء العملاء</h4>
@@ -357,26 +389,25 @@
                         <option value="1">⭐ (سيء)</option>
                     </select>
                     <textarea id="commText" class="comment-input" rows="2" placeholder="اكتب تعليقك ورأيك..."></textarea>
-                    <button class="submit-comment-btn" onclick="addComment(${p.id})">إرسال التقييم 🚀</button>
+                    <button class="submit-comment-btn" onclick="addComment('${p.id}')">إرسال التقييم 🚀</button>
                 </div>
             `;
 
             document.getElementById('generalModal').style.display = 'flex';
         }
 
-        function closeGeneralModal() {
+        window.closeGeneralModal = function() {
             document.getElementById('generalModal').style.display = 'none';
-            // إذا كان العميل دخل برابط منتج ثم أغلق النافذة، نقوم بتنظيف الـ URL ليعود للمتجر الرئيسي بسلاسة
             if (window.location.search.includes('id=')) {
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
-        function closeModalOnOutside(event) {
+        window.closeModalOnOutside = function(event) {
             if (event.target.id === 'generalModal') closeGeneralModal();
         }
 
-        function addComment(productId) {
+        window.addComment = function(productId) {
             let name = document.getElementById('commName').value.trim();
             let rating = parseInt(document.getElementById('commRating').value);
             let text = document.getElementById('commText').value.trim();
@@ -386,14 +417,17 @@
                 return;
             }
 
-            let data = localStorage.getItem('store_products');
-            let products = data ? JSON.parse(data) : [];
-            let p = products.find(item => item.id === productId);
+            let p = productsListCache.find(item => item.id === productId);
             if (p) {
                 if (!p.comments) p.comments = [];
                 p.comments.unshift({ name, rating, text });
-                localStorage.setItem('store_products', JSON.stringify(products));
-                openProductModal(productId);
+                
+                // تحديث التعليقات مباشرة في قاعدة بيانات فايربيس
+                update(ref(db, 'products/' + productId), { comments: p.comments }).then(() => {
+                    document.getElementById('commName').value = '';
+                    document.getElementById('commText').value = '';
+                    openProductModal(productId);
+                }).catch(err => alert('خطأ في إرسال التقييم: ' + err.message));
             }
         }
     </script>

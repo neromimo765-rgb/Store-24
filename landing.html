@@ -31,8 +31,9 @@
         .old-price { font-size: 14px; color: var(--text-muted); text-decoration: line-through; }
         .timer-box {
             background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red);
-            color: var(--accent-red); text-align: center; padding: 8px; border-radius: 8px;
+            color: var(--accent-red); text-align: center; padding: 10px; border-radius: 8px;
             font-weight: bold; font-size: 13px; margin-bottom: 15px;
+            display: flex; justify-content: center; gap: 8px; align-items: center;
         }
         .desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; white-space: pre-wrap; }
         .form-group { margin-bottom: 12px; }
@@ -47,6 +48,7 @@
             color: #fff; border: none; padding: 14px; border-radius: 8px;
             font-weight: 900; font-size: 15px; cursor: pointer; text-align: center;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            display: flex; justify-content: center; align-items: center; gap: 8px;
         }
         #loadingState, #errorState { text-align: center; padding: 50px 20px; color: var(--text-muted); font-size: 14px; }
     </style>
@@ -71,7 +73,10 @@
                     <div>السعر: <span class="current-price" id="pPrice"></span> <span id="pCurrency"></span></div>
                     <div id="oldPriceWrapper" style="display: none;">قبل الخصم: <span class="old-price" id="pOldPrice"></span></div>
                 </div>
-                <div class="timer-box">⏱️ العرض ينتهي خلال: <span id="pTimer">02:45:00</span></div>
+                <div class="timer-box">
+                    <span>⏱️ العرض ينتهي خلال:</span>
+                    <span id="pTimer">05:00:00</span>
+                </div>
                 <div class="desc" id="pDesc"></div>
             </div>
 
@@ -89,7 +94,9 @@
                     <label>العنوان بالتفصيل:</label>
                     <textarea id="clientAddress" class="form-control" rows="2" placeholder="المحافظة، المنطقة، الشارع..."></textarea>
                 </div>
-                <button onclick="submitOrder()" class="btn-order">تأكيد طلب المنتج 🚀</button>
+                <button onclick="submitOrder()" class="btn-order">
+                    <span>تأكيد طلب المنتج عبر واتساب</span> 🚀
+                </button>
             </div>
         </div>
     </div>
@@ -115,6 +122,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const landingId = urlParams.get('id');
 
+        let productData = null;
+
         async function loadLandingData() {
             if (!landingId) {
                 showError();
@@ -124,16 +133,15 @@
             try {
                 const snapshot = await get(ref(db, 'landings/' + landingId));
                 if (snapshot.exists()) {
-                    const data = snapshot.val();
+                    productData = snapshot.val();
                     
-                    document.getElementById('pTitle').innerText = data.title || '';
-                    document.getElementById('pPrice').innerText = data.price || '';
-                    document.getElementById('pCurrency').innerText = data.currency || 'EGP';
-                    document.getElementById('pTimer').innerText = data.timer || '02:45:00';
-                    document.getElementById('pDesc').innerText = data.desc || '';
+                    document.getElementById('pTitle').innerText = productData.title || '';
+                    document.getElementById('pPrice').innerText = productData.price || '';
+                    document.getElementById('pCurrency').innerText = productData.currency || 'EGP';
+                    document.getElementById('pDesc').innerText = productData.desc || '';
 
-                    if (data.oldPrice && data.oldPrice.trim() !== '') {
-                        document.getElementById('pOldPrice').innerText = data.oldPrice + ' ' + (data.currency || 'EGP');
+                    if (productData.oldPrice && productData.oldPrice.trim() !== '') {
+                        document.getElementById('pOldPrice').innerText = productData.oldPrice + ' ' + (productData.currency || 'EGP');
                         document.getElementById('oldPriceWrapper').style.display = 'block';
                     } else {
                         document.getElementById('oldPriceWrapper').style.display = 'none';
@@ -141,8 +149,8 @@
 
                     const mediaBox = document.getElementById('mediaBox');
                     let mediaHtml = '';
-                    if (data.imageUrl) mediaHtml += `<img src="${data.imageUrl}" alt="صورة المنتج">`;
-                    if (data.videoUrl) mediaHtml += `<video src="${data.videoUrl}" controls autoplay muted></video>`;
+                    if (productData.imageUrl) mediaHtml += `<img src="${productData.imageUrl}" alt="صورة المنتج">`;
+                    if (productData.videoUrl) mediaHtml += `<video src="${productData.videoUrl}" controls autoplay muted></video>`;
                     if (mediaHtml) {
                         mediaBox.innerHTML = mediaHtml;
                         mediaBox.style.display = 'block';
@@ -150,6 +158,9 @@
 
                     document.getElementById('loadingState').style.display = 'none';
                     document.getElementById('landingContent').style.display = 'block';
+
+                    // بدء تشغيل العد التنازلي
+                    startCountdown();
                 } else {
                     showError();
                 }
@@ -163,6 +174,39 @@
             document.getElementById('errorState').style.display = 'block';
         }
 
+        // دالة العد التنازلي التفاعلي
+        function startCountdown() {
+            let endTime = localStorage.getItem('landing_end_time_' + landingId);
+            if (!endTime || new Date().getTime() > parseInt(endTime)) {
+                endTime = new Date().getTime() + (5 * 60 * 60 * 1000); // 5 ساعات
+                localStorage.setItem('landing_end_time_' + landingId, endTime);
+            }
+
+            setInterval(() => {
+                const now = new Date().getTime();
+                const distance = parseInt(endTime) - now;
+
+                if (distance < 0) {
+                    endTime = new Date().getTime() + (5 * 60 * 60 * 1000);
+                    localStorage.setItem('landing_end_time_' + landingId, endTime);
+                    return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const timerElement = document.getElementById('pTimer');
+                if (timerElement) {
+                    timerElement.innerText = 
+                        String(hours).padStart(2, '0') + ':' + 
+                        String(minutes).padStart(2, '0') + ':' + 
+                        String(seconds).padStart(2, '0');
+                }
+            }, 1000);
+        }
+
+        // دالة إرسال الطلب وحفظه وتحويل العميل للواتساب
         window.submitOrder = async function() {
             const name = document.getElementById('clientName').value.trim();
             const phone = document.getElementById('clientPhone').value.trim();
@@ -174,6 +218,7 @@
             }
 
             try {
+                // حفظ الطلب في قاعدة البيانات أولاً
                 await push(ref(db, 'orders'), {
                     landingId: landingId,
                     clientName: name,
@@ -181,12 +226,28 @@
                     clientAddress: address,
                     orderDate: Date.now()
                 });
-                alert('🎉 تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً.');
-                document.getElementById('clientName').value = '';
-                document.getElementById('clientPhone').value = '';
-                document.getElementById('clientAddress').value = '';
+
+                // تجهيز رسالة الواتساب بالتفاصيل المدخلة
+                const productTitle = productData ? productData.title : 'منتج من المتجر';
+                const productPrice = productData ? (productData.price + ' ' + (productData.currency || 'EGP')) : '';
+                
+                const whatsappMessage = encodeURIComponent(
+                    `مرحباً، أريد تأكيد طلب هذا المنتج:\n\n` +
+                    `📦 المنتج: ${productTitle}\n` +
+                    `💰 السعر: ${productPrice}\n\n` +
+                    `👤 الاسم: ${name}\n` +
+                    `📞 الهاتف: ${phone}\n` +
+                    `📍 العنوان: ${address}`
+                );
+
+                // استبدل الرقم أدناه برقم الواتساب الخاص بك (مثلاً: 2010xxxxxxxx)
+                const whatsappNumber = "201000000000"; 
+
+                // فتح الواتساب مباشرة برسالة الطلب
+                window.open(`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${whatsappMessage}`, '_blank');
+
             } catch (e) {
-                alert('حدث خطأ، حاول مرة أخرى.');
+                alert('حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى.');
             }
         }
 

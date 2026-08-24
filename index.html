@@ -42,10 +42,9 @@
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(24, 24, 36, 0.8));
             border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px; text-align: center;
             font-size: 12px; color: var(--accent-gold); font-weight: bold; margin-bottom: 16px;
-            animation: fadeIn 0.8s ease-in-out;
         }
 
-        /* قسم مشغل موسيقى البحر */
+        /* قسم مشغل موسيقى البحر (تشغيل يدوي كامل) */
         .music-section {
             background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
             padding: 12px; text-align: center; margin-bottom: 16px;
@@ -56,7 +55,7 @@
             display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; margin-bottom: 6px;
         }
         .music-control-btn:active { transform: scale(0.95); }
-        .music-hint { font-size: 10px; color: var(--text-muted); }
+        .music-hint { font-size: 10px; color: var(--text-muted); line-height: 1.4; }
 
         /* شريط الكتالوجات (الأقسام) */
         .categories-scroll {
@@ -84,7 +83,7 @@
         .product-title { font-size: 12px; font-weight: bold; margin-bottom: 6px; color: #fff; }
         .product-price { font-size: 13px; color: var(--accent-gold); font-weight: 900; }
 
-        /* نافذة تفاصيل المنتج ونافذة السلة (Modal) */
+        /* النوافذ المنبثقة (Modals) */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(11, 11, 16, 0.9); display: none;
@@ -113,11 +112,9 @@
             padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; margin-bottom: 6px;
         }
         .btn-success { background: var(--success); color: #fff; }
-
-        /* سلة المشتريات داخل الـ Modal */
         .cart-item { display: flex; justify-content: space-between; align-items: center; background: #0f0f13; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); font-size: 11px; }
 
-        /* نافذة تكبير الصورة (Lightbox) */
+        /* تكبير الصورة */
         #lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 4000;
@@ -130,8 +127,8 @@
 </head>
 <body>
 
-    <!-- عنصر الصوت (موسيقى البحر الهادئة) -->
-    <audio id="seaAudio" loop>
+    <!-- عنصر الصوت (مغلق افتراضياً ولا يعمل إلا بالضغط اليدوي) -->
+    <audio id="seaAudio" preload="none" loop>
         <source src="https://actions.google.com/sounds/v1/water/waves_ocean_surf.ogg" type="audio/ogg">
         متصفحك لا يدعم تشغيل الصوت.
     </audio>
@@ -149,13 +146,13 @@
         <!-- رسالة الترحيب المتغيرة للعملاء الجدد -->
         <div id="welcomeBanner" class="welcome-banner">أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟</div>
 
-        <!-- قسم موسيقى البحر مع الإرشادات -->
+        <!-- قسم مشغل موسيقى البحر (تشغيل / إيقاف يدوي مع إرشادات توضيحية) -->
         <div class="music-section">
             <button id="musicBtn" class="music-control-btn" onclick="toggleSeaMusic()">🌊 صوت البحر: متوقف</button>
-            <div class="music-hint">اضغط على الزر أعلاه لتشغيل أصوات الأمواج الهادئة أثناء تصفح المنتجات 🎧</div>
+            <div class="music-hint">اضغط على الزر أعلاه لتشغيل أصوات الأمواج الهادئة أثناء التصفح، واضغط عليه مرة أخرى لإيقافها في أي وقت. 🎧</div>
         </div>
 
-        <!-- شريط الأقسام (الكاتالوجات) -->
+        <!-- شريط الكتالوجات (الأقسام) -->
         <div class="categories-scroll" id="categoriesContainer">
             <div class="cat-chip active" onclick="filterCategory('الكل', this)">الكل 🌟</div>
             <div class="cat-chip" onclick="filterCategory('أدوات منزلية', this)">🚀 أدوات منزلية</div>
@@ -226,7 +223,7 @@
         ];
         document.getElementById('welcomeBanner').innerText = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
 
-        // تشغيل وإيقاف موسيقى البحر
+        // التحكم اليدوي البحت في تشغيل وإيقاف موسيقى البحر
         window.toggleSeaMusic = function() {
             const audio = document.getElementById('seaAudio');
             const btn = document.getElementById('musicBtn');
@@ -344,7 +341,6 @@
             document.getElementById('lightbox').style.display = 'none';
         }
 
-        // وظائف سلة المشتريات
         window.addToCart = function(id) {
             const p = allProducts[id];
             cart.push(p);

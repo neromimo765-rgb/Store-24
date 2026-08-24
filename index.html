@@ -152,7 +152,7 @@
         <div id="liveViewerBadge" class="live-viewer-badge">👁️ جاري تحميل عداد الزوار...</div>
 
         <div class="music-section">
-            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ تشغيل موسيقى المؤتمرات الحماسية 🚀</button>
+            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ فعل واستمتع 🚀</button>
         </div>
 
         <div class="categories-scroll" id="categoriesContainer">
@@ -190,6 +190,10 @@
         <img id="lightboxImg" src="" alt="صورة مكبرة">
     </div>
 
+    <audio id="realStoreAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf756.mp3?filename=energetic-hip-hop-10738.mp3" type="audio/mpeg">
+    </audio>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -216,71 +220,23 @@
         const exchangeRates = { EGP: 1, SAR: 0.077 };
         const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س' };
 
-        // نظام مولد موسيقى المؤتمرات الحماسية السينمائية (Tech Conference & Electronic Epic Beat)
-        let epicAudioCtx = null;
-        let epicInterval = null;
-        let isEpicPlaying = false;
-
+        // تشغيل وإيقاف الملف الصوتي الحقيقي الاحترافي عبر زر "فعل واستمتع"
         window.toggleEpicMusic = function() {
+            const audio = document.getElementById('realStoreAudio');
             const btn = document.getElementById('musicBtn');
             
-            if (!isEpicPlaying) {
-                try {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    epicAudioCtx = new AudioContext();
-
-                    // سلم نغمات سينمائي حماسي (يعطي إيحاء إطلاق مؤتمرات الذكاء الاصطناعي والتجارة الإلكترونية الكبرى)
-                    const conferenceMelody = [
-                        130.81, 196.00, 261.63, 329.63, // بيس عميق مع هاف-تون حماسي
-                        392.00, 523.25, 587.33, 659.25  // تصاعد درامي سريع
-                    ];
-                    let beatStep = 0;
-
-                    epicInterval = setInterval(() => {
-                        if (!epicAudioCtx) return;
-                        
-                        const osc = epicAudioCtx.createOscillator();
-                        const gain = epicAudioCtx.createGain();
-
-                        // استخدام موجة 'sawtooth' الحادة والقوية (تشبه ساوند تراك المؤتمرات التقنية الضخمة)
-                        osc.type = 'sawtooth';
-                        
-                        // التبديل بين ترددات البيس العميق والنغمات الحادة لخلق إيقاع حماسي متسارع
-                        const freq = conferenceMelody[beatStep % conferenceMelody.length];
-                        osc.frequency.setValueAtTime(freq, epicAudioCtx.currentTime);
-
-                        // تأثير ضغط صوتي (Punchy Beat) وسريع جداً لإعطاء شعور بالحماس
-                        gain.gain.setValueAtTime(0.15, epicAudioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, epicAudioCtx.currentTime + 0.25);
-
-                        // فلتر ترددات لزيادة نقاء وفخامة الصوت السينمائي
-                        const filter = epicAudioCtx.createBiquadFilter();
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(1200, epicAudioCtx.currentTime);
-
-                        osc.connect(filter);
-                        filter.connect(gain);
-                        gain.connect(epicAudioCtx.destination);
-
-                        osc.start();
-                        osc.stop(epicAudioCtx.currentTime + 0.3);
-
-                        beatStep++;
-                    }, 200); // إيقاع سريع ومكهرب يمنح شعوراً بالحماس المطلق
-
-                    isEpicPlaying = true;
-                    btn.innerHTML = '🔥 مؤتمر المتجر الحماسي: يعمل (اضغط للإيقاف)';
+            if (audio.paused) {
+                audio.play().then(() => {
+                    btn.innerHTML = '🔥 فعل واستمتع: تعمل بنجاح (اضغط للإيقاف)';
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
-                } catch (e) {
-                    console.error(e);
-                    alert('عذراً، متصفحك لا يدعم تشغيل الصوت المباشر.');
-                }
+                }).catch(e => {
+                    console.error("خطأ في تشغيل الصوت:", e);
+                    alert('عذراً، يرجى النقر مرة أخرى للسماح للمتجر بتشغيل الصوت.');
+                });
             } else {
-                if (epicInterval) clearInterval(epicInterval);
-                if (epicAudioCtx) epicAudioCtx.close();
-                isEpicPlaying = false;
-                btn.innerHTML = '⚡ تشغيل موسيقى المؤتمرات الحماسية 🚀';
+                audio.pause();
+                btn.innerHTML = '⚡ فعل واستمتع 🚀';
                 btn.style.borderColor = 'var(--accent-gold)';
                 btn.style.color = 'var(--accent-gold)';
             }

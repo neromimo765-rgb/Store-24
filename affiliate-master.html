@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>المستشار العالمي للاستثمار والأفلييت الاحترافي 🌍🔥</title>
+    <title>المستشار الشامل للدروبشيبينغ والتسويق الذكي 🌍🔥</title>
     <style>
         :root {
             --bg-primary: #09090e;
@@ -18,7 +18,16 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-primary); color: var(--text-main); padding: 12px; }
-        .container { max-width: 100%; width: 100%; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .container { max-width: 100%; width: 100%; margin: 0 auto; }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
         
         header { text-align: center; margin-bottom: 16px; }
         h1 { font-size: 16px; color: var(--accent-gold); font-weight: 900; margin-bottom: 4px; line-height: 1.4; }
@@ -33,18 +42,20 @@
         .form-group.full { width: 100%; }
         
         label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 6px; color: var(--text-main); }
-        input, select {
+        input, select, textarea {
             width: 100%; background: #0a0a0f; border: 1px solid var(--border-color); color: #fff;
             padding: 12px; border-radius: 10px; font-size: 14px; outline: none; appearance: none;
         }
-        input:focus, select:focus { border-color: var(--accent-gold); }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-gold); }
 
-        .btn-analyze {
-            width: 100%; background: linear-gradient(135deg, var(--accent-gold), #D97706);
+        button {
+            background: linear-gradient(135deg, var(--accent-gold), #D97706);
             color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: 900;
-            font-size: 13px; cursor: pointer; margin-top: 10px; text-align: center;
+            font-size: 13px; cursor: pointer; width: 100%; text-align: center; margin-top: 10px;
         }
-        .btn-analyze:active { opacity: 0.8; transform: scale(0.98); }
+        button:active { opacity: 0.8; transform: scale(0.98); }
+
+        .btn-reset { background: #374151; color: #fff; margin-top: 8px; }
 
         .result-box {
             margin-top: 16px; background: #0a0a0f; border: 1px solid var(--border-color);
@@ -54,123 +65,223 @@
         .result-section:last-child { border-bottom: none; }
         .result-title { font-weight: 900; color: var(--accent-gold); margin-bottom: 6px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
         
-        .loading { text-align: center; color: var(--accent-gold); font-weight: bold; padding: 20px; display: none; font-size: 11px; }
-        
         .badge-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-right: 4px; }
         .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
         .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
         .copy-box { background: #12121a; border: 1px dashed var(--accent-gold); padding: 10px; border-radius: 8px; margin-top: 6px; font-family: monospace; color: #fbbf24; white-space: pre-wrap; font-size: 10px; word-break: break-all; }
+        
+        .preview-img { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 8px; display: none; border: 1px solid var(--border-color); }
+        h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <header>
-            <h1>🌍 المستشار العالمي للأفلييت الاحترافي</h1>
-            <p class="subtitle">محرك الذكاء الاصطناعي الأقوى والأسرع للعمل المباشر عبر هاتف الأندرويد</p>
-        </header>
+        
+        <!-- قسم رأس الصفحة -->
+        <div class="card">
+            <header>
+                <h1>🌍 مساعد الدروبشيبينغ والتسويق الذكي</h1>
+                <p class="subtitle">منظومتك الخاصة المجانية لإدارة الأرباح، تتبع الأوردرات، وخطط السوشيال ميديا بالكامل</p>
+            </header>
+        </div>
 
-        <div class="form-grid">
+        <!-- القسم الأول: حاسبة الدروبشيبينغ وتحليل المنصات -->
+        <div class="card">
+            <h2>💰 1. حاسبة أرباح الدروبشيبينغ وخطة النشر</h2>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>🔗 اسم المنتج أو رابط الأفلييت / الجملة:</label>
+                    <input type="text" id="productName" placeholder="مثال: منظم مطبخ ذكي...">
+                </div>
+
+                <div class="form-group full">
+                    <label>📸 رفع صورة المنتج من التليفون (للمعاينة):</label>
+                    <input type="file" id="productImageInput" accept="image/*" onchange="previewImage(event)">
+                    <img id="imagePreview" class="preview-img" alt="معاينة المنتج">
+                </div>
+
+                <div class="form-group">
+                    <label>📦 سعر الشراء من موقع الجملة:</label>
+                    <input type="number" id="basePrice" placeholder="مثال: 150">
+                </div>
+                
+                <div class="form-group">
+                    <label>💵 سعر البيع المقترح للعميل بمتجرك:</label>
+                    <input type="number" id="sellPrice" placeholder="مثال: 300">
+                </div>
+
+                <div class="form-group full">
+                    <label>💱 العملة المستخدمة:</label>
+                    <select id="currencyType">
+                        <option value="جنيه مصري (EGP)">جنيه مصري (EGP)</option>
+                        <option value="ريال سعودي (SAR)">ريال سعودي (SAR)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="runAnalysis()">🚀 تشغيل التحليل الشامل وخطة السوشيال ميديا</button>
+            <button class="btn-reset" onclick="resetFormForNextProduct()">🔄 تحليل منتج جديد (إدخال جديد)</button>
+
+            <div id="analysisResult" class="result-box"></div>
+        </div>
+
+        <!-- القسم الثاني: مساعد "أنا واقف فين؟" -->
+        <div class="card">
+            <h2>🧭 2. مساعد "أنا واقف فين؟" (دليل المشاكل والحلول)</h2>
             <div class="form-group full">
-                <label>🔗 اسم المنتج أو رابط الأفلييت:</label>
-                <input type="text" id="productName" placeholder="مثال: ساعة ذكية / ماكينة قهوة...">
-            </div>
-
-            <div class="form-group">
-                <label>💰 عمولتك للقطعة:</label>
-                <input type="number" id="affiliateCommission" placeholder="مثال: 100">
-            </div>
-            
-            <div class="form-group">
-                <label>💵 سعر بيع المنتج:</label>
-                <input type="number" id="productPrice" placeholder="مثال: 500">
-            </div>
-
-            <div class="form-group full">
-                <label>💱 العملة المستخدمة:</label>
-                <select id="currencyType">
-                    <option value="جنيه مصري (EGP)">جنيه مصري (EGP)</option>
-                    <option value="ريال سعودي (SAR)">ريال سعودي (SAR)</option>
+                <label>اختر مشكلتك الحالية لتعرف خطوتك القادمة:</label>
+                <select id="userProblem" onchange="getHelp()">
+                    <option value="">-- اضغط لاختيار الموقف الحالي --</option>
+                    <option value="1">نزلت المنتج على المتجر بس محدش شافه خالص</option>
+                    <option value="2">جالي مشاهدات بس مفيش ولا أوردر دخل</option>
+                    <option value="3">الناس بتسأل على السعر بس مش بيكملوا شراء</option>
+                    <option value="4">معيش فلوس لإعلانات ممولة وعاوز أبيع مجاناً</option>
                 </select>
             </div>
+            <div id="helpResult" class="result-box"></div>
         </div>
 
-        <button class="btn-analyze" onclick="runGlobalAffiliateStrategy()">🚀 تشغيل التحليل الفوري</button>
-
-        <div id="loadingDiv" class="loading">
-            🔄 جاري معالجة الخوارزميات وحساب الأرباح بدقة...
+        <!-- القسم الثالث: مسجل أوردرات العملاء -->
+        <div class="card">
+            <h2>📦 3. مسجل أوردرات متجري (لحفظ بيانات الزبون مؤقتاً)</h2>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>اسم العميل الثلاثي:</label>
+                    <input type="text" id="custName" placeholder="مثال: محمد أحمد علي">
+                </div>
+                <div class="form-group">
+                    <label>رقم تليفون العميل:</label>
+                    <input type="text" id="custPhone" placeholder="مثال: 010xxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>العنوان بالتفصيل:</label>
+                    <input type="text" id="custAddress" placeholder="المحافظة، المركز، الشارع">
+                </div>
+            </div>
+            <button onclick="saveOrder()" style="background-color: #10b981; color: white;">💾 حفظ بيانات الأوردر للنسخ السريع</button>
+            
+            <div id="savedOrdersList" style="margin-top: 15px; font-size: 11px; color: var(--text-muted); line-height: 1.6;"></div>
         </div>
 
-        <div id="resultBox" class="result-box">
-            <!-- النتائج هنا -->
-        </div>
     </div>
 
     <script>
-        function runGlobalAffiliateStrategy() {
-            const name = document.getElementById('productName').value.trim();
-            const commission = parseFloat(document.getElementById('affiliateCommission').value) || 0;
-            const price = parseFloat(document.getElementById('productPrice').value) || 0;
-            const currency = document.getElementById('currencyType').value;
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('imagePreview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            if(event.target.files[0]){
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
 
-            if (!name || commission === 0 || price === 0) {
-                alert('الرجاء التأكد من إدخال اسم المنتج، العمولة، والسعر بشكل صحيح.');
+        function runAnalysis() {
+            const name = document.getElementById('productName').value.trim() || "المنتج الخاص بك";
+            const base = parseFloat(document.getElementById('basePrice').value) || 0;
+            const sell = parseFloat(document.getElementById('sellPrice').value) || 0;
+            const currency = document.getElementById('currencyType').value;
+            
+            if(!name || base === 0 || sell === 0) {
+                alert("الرجاء إدخال اسم المنتج وسعر الشراء وسعر البيع بشكل صحيح!");
                 return;
             }
 
-            const loadingDiv = document.getElementById('loadingDiv');
-            const resultBox = document.getElementById('resultBox');
+            if(sell <= base) {
+                alert("تأكد أن سعر البيع للعميل أكبر من سعر الشراء من الجملة!");
+                return;
+            }
 
-            loadingDiv.style.display = 'block';
-            resultBox.style.display = 'none';
+            const netProfit = sell - base;
+            const isGoodProfit = netProfit >= 50;
 
-            setTimeout(() => {
-                loadingDiv.style.display = 'none';
-                resultBox.style.display = 'block';
+            let resBox = document.getElementById('analysisResult');
+            resBox.style.display = 'block';
+            resBox.innerHTML = `
+                <div class="result-section">
+                    <div class="result-title">🎯 المنتج المستهدف:</div>
+                    <p style="color: var(--accent-gold); font-weight: bold; word-break: break-all;">${name}</p>
+                </div>
 
-                let maxCpa = commission * 0.45; 
-                let isHighCommission = (commission / price) >= 0.15;
-                let estimatedClicksFor10Sales = Math.round(10 / 0.025); 
-                let netRealCommission = commission * 0.88; 
-                let timeRoiScore = commission >= 75 ? 'ممتاز (جهد خفيف وعائد قوي)' : 'متوسط (يحتاج مبيعات أكثر)';
+                <div class="result-section">
+                    <div class="result-title">📊 1. الصافي الواقعي لأرباح الدروبشيبينغ</div>
+                    <p>سعر الجملة: <b>${base} ${currency}</b> | سعر البيع: <b>${sell} ${currency}</b></p>
+                    <p>صافي مكسبك الحقيقي (بعد خصم سعر الجملة): <b style="color: var(--success);">${netProfit} ${currency}</b> للأوردر الواحد</p>
+                    <p>${isGoodProfit ? '<span class="badge-tag badge-success">هامش ربح ممتاز</span>' : '<span class="badge-tag badge-danger">هامش ربح ضعيف</span>'}</p>
+                </div>
 
-                resultBox.innerHTML = `
-                    <div class="result-section">
-                        <div class="result-title">📊 1. الصافي الواقعي والأرباح</div>
-                        <p>العمولة الصافية (بعد خصم 12% مرتجعات): <b style="color: var(--success);">${netRealCommission.toFixed(1)} ${currency}</b></p>
-                        <p>الحد الأقصى للإعلان الآمن: <b style="color: var(--accent-gold);">${maxCpa.toFixed(1)} ${currency}</b></p>
-                        <p>${isHighCommission ? '<span class="badge-tag badge-success">مربح جداً</span>' : '<span class="badge-tag badge-danger">عضوي فقط (بدون إعلانات)</span>'}</p>
-                    </div>
+                <div class="result-section">
+                    <div class="result-title">🌐 2. خطة النشر المجانية 100% عبر المنصات الأربع</div>
+                    <p><b>• فيسبوك (Facebook):</b> انشر صور المنتج بأسلوب جذاب في (Marketplace) لثلاث محافظات يومياً، وانضم لجروبات (تسوق من الإنترنت، ستات بيوت) واطلب كتابة "مهتم" بالتعليقات للرد على الخاص.</p>
+                    <p><b>• تيك توك (TikTok):</b> اصنع فيديو قصير مجاني من صور المنتج باستخدام تطبيقات الموبايل مثل CapCut، وركز على إبراز المشكلة والحل.</p>
+                    <p><b>• إنستجرام (Instagram):</b> انشر نفس الفيديو على (Reels) وانشر يومياً في (Stories) استطلاعات رأي تفاعلية مع المهتمين عبر الرسائل المباشرة DM.</p>
+                    <p><b>• تليجرام (Telegram):</b> أنشئ قناتك الخاصة لعرض منتجاتك المتاحة بانتظام وزيادة قاعدة متابعيك.</p>
+                </div>
 
-                    <div class="result-section">
-                        <div class="result-title">⏳ 2. الترافيك المطلوب</div>
-                        <p>لتحقيق <b>10 مبيعات</b> تحتاج تقريباً إلى <b>${estimatedClicksFor10Sales} زائر حقيقي</b> ضاغط على الرابط.</p>
-                        <p>تقييم العائد على الوقت: <b style="color: var(--accent-gold);">${timeRoiScore}</b></p>
-                    </div>
-
-                    <div class="result-section">
-                        <div class="result-title">🛡️ 3. حماية الروابط وتجنب الحظر</div>
-                        <p>• تجنب وضع رابط الأفلييت المباشر بالتعليقات العامة لحسابك.</p>
-                        <p>• استخدم صفحة وسيطة أو نظام الرد التلقائي على كلمة (مهتم).</p>
-                    </div>
-
-                    <div class="result-section">
-                        <div class="result-title">📢 4. سكريبت تيك توك / ريلز جاهز للنسخ</div>
-                        <div class="copy-box">لو بتدور على (${name}) الأصلي وبتخاف تتنصب عليك.. اسمع الكلمتين دول للاخر!
+                <div class="result-section">
+                    <div class="result-title">📢 3. سكريبت تيك توك / ريلز جاهز للنسخ</div>
+                    <div class="copy-box">لو بتدور على (${name}) وبتخاف تتنصب عليك.. اسمع الكلمتين دول للاخر!
 المنتج ده جربته بنفسي ولقيت فيه المواصفات الحقيقية، ودبرت لكم رابط التوكيل الموثوق عليه خصم.
-رابط الطلب سيبهولكم في أول كومنت أو في البايو!</div>
-                    </div>
+اطلب المنتج من متجري والوصول والشحن لحد باب البيت!</div>
+                </div>
 
-                    <div class="result-section">
-                        <div class="result-title">🛑 5. طوارئ وخطة العمل</div>
-                        <p>• <b>الانسحاب (Kill-Switch):</b> لو دخل 150 زائر ومافيش ولا مبيعة، غير المنتج فوراً.</p>
-                        <p>• <b>التوسع (Scaling):</b> لو جت أول 3 مبيعات بسهولة، اعمل 3 فيديوهات كمان بنفس الفكرة لمضاعفة أرباحك.</p>
-                    </div>
-                `;
+                <div class="result-section">
+                    <div class="result-title">🛑 4. طوارئ وخطة العمل (Kill-Switch)</div>
+                    <p>• لو عرضت المنتج ومجاش عليه أي تفاعل بعد فترة، غيره فوراً بمنتج تاني وراقب الأداء.</p>
+                </div>
+            `;
+            resBox.scrollIntoView({ behavior: 'smooth' });
+        }
 
-                // التمرير التلقائي للنتيجة على الموبايل
-                resultBox.scrollIntoView({ behavior: 'smooth' });
-            }, 800);
+        function getHelp() {
+            let prob = document.getElementById('userProblem').value;
+            let helpBox = document.getElementById('helpResult');
+            if(!prob) {
+                helpBox.style.display = 'none';
+                return;
+            }
+            
+            helpBox.style.display = 'block';
+            let solutions = {
+                "1": "🛠️ **الحل لو محدش شاف المنتج:**\n• متجرك لسه محتاج استمرارية؛ نشر يومي على الفيسبوك (Marketplace وجروبات) وتيك توك وإنستجرام بانتظام.\n• تأكد أن صورة المنتج واضحة وجذابة جداً من أول نظرة.",
+                "2": "🛠️ **الحل لو فيه مشاهدات ومفيش أوردرات:**\n• راجع طريقة عرض السعر ووصف المنتج على متجرك.\n• اعرض المنتج كأنه (عرض خاص لفترة محدودة أو خصم خاص) لتشجيع العميل على الشراء الفوري.",
+                "3": "🛠️ **الحل لو الناس بتسأل ومش بيكملوا:**\n• رد على العميل في أسرع وقت وبأسلوب ودود جداً، ووضّح له تفاصيل الشحن والمحافظات ببساطة.",
+                "4": "🛠️ **خطتك للبيع بدون مليم (مجان تام):**\n• اعتمد 100% على الـ Organic Traffic (الفيديوهات المجانية، النشر اليدوي في الميكرو-ماركت بليس، والرد المستمر على التعليقات)."
+            };
+            helpBox.innerHTML = solutions[prob];
+            helpBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function saveOrder() {
+            let name = document.getElementById('custName').value.trim();
+            let phone = document.getElementById('custPhone').value.trim();
+            let address = document.getElementById('custAddress').value.trim();
+
+            if(!name || !phone) {
+                alert("من فضلك اكتب اسم العميل ورقم التليفون على الأقل.");
+                return;
+            }
+
+            let list = document.getElementById('savedOrdersList');
+            list.innerHTML += `✅ أوردر محفوظ: <b>${name}</b> | 📞 ${phone} | 🏠 ${address || 'بدون عنوان'}<br>`;
+            alert("تم حفظ بيانات الزبون بنجاح! تقدر تنسخها وتحطها في موقع الجملة الأساسي.");
+            
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custAddress').value = '';
+        }
+
+        function resetFormForNextProduct() {
+            document.getElementById('productName').value = '';
+            document.getElementById('basePrice').value = '';
+            document.getElementById('sellPrice').value = '';
+            document.getElementById('productImageInput').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('analysisResult').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>

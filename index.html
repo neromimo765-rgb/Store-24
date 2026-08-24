@@ -57,9 +57,10 @@
             padding: 10px; text-align: center; margin-bottom: 16px;
         }
         .music-control-btn {
-            background: none; border: 1px solid var(--accent-gold); color: var(--accent-gold);
-            padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.2));
+            border: 1px solid var(--accent-gold); color: var(--accent-gold);
+            padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 900; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
 
         .categories-scroll {
@@ -151,7 +152,7 @@
         <div id="liveViewerBadge" class="live-viewer-badge">👁️ جاري تحميل عداد الزوار...</div>
 
         <div class="music-section">
-            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">🎵 الموسيقى الحماسية للمتجر: متوقفة</button>
+            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ تشغيل موسيقى المؤتمرات الحماسية 🚀</button>
         </div>
 
         <div class="categories-scroll" id="categoriesContainer">
@@ -215,7 +216,7 @@
         const exchangeRates = { EGP: 1, SAR: 0.077 };
         const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س' };
 
-        // نظام الموسيقى الحماسية والإيقاعية الخاصة بالمتاجر (نغمات متناسقة ونظيفة)
+        // نظام مولد موسيقى المؤتمرات الحماسية السينمائية (Tech Conference & Electronic Epic Beat)
         let epicAudioCtx = null;
         let epicInterval = null;
         let isEpicPlaying = false;
@@ -228,12 +229,12 @@
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     epicAudioCtx = new AudioContext();
 
-                    // سلم موسيقي مبهج ومتسق للمتاجر (نغمات توافقية دافئة وحماسية)
-                    const storeMelody = [
-                        261.63, 329.63, 392.00, 523.25, // نغمات صاعدة
-                        392.00, 440.00, 523.25, 659.25  // إيقاع حماسي متسق
+                    // سلم نغمات سينمائي حماسي (يعطي إيحاء إطلاق مؤتمرات الذكاء الاصطناعي والتجارة الإلكترونية الكبرى)
+                    const conferenceMelody = [
+                        130.81, 196.00, 261.63, 329.63, // بيس عميق مع هاف-تون حماسي
+                        392.00, 523.25, 587.33, 659.25  // تصاعد درامي سريع
                     ];
-                    let step = 0;
+                    let beatStep = 0;
 
                     epicInterval = setInterval(() => {
                         if (!epicAudioCtx) return;
@@ -241,25 +242,34 @@
                         const osc = epicAudioCtx.createOscillator();
                         const gain = epicAudioCtx.createGain();
 
-                        // استخدام موجة لطيفة (sine أو triangle) لتكون ناعمة ومريحة للأذن وليست مزعجة
-                        osc.type = 'triangle'; 
-                        osc.frequency.setValueAtTime(storeMelody[step % storeMelody.length], epicAudioCtx.currentTime);
+                        // استخدام موجة 'sawtooth' الحادة والقوية (تشبه ساوند تراك المؤتمرات التقنية الضخمة)
+                        osc.type = 'sawtooth';
+                        
+                        // التبديل بين ترددات البيس العميق والنغمات الحادة لخلق إيقاع حماسي متسارع
+                        const freq = conferenceMelody[beatStep % conferenceMelody.length];
+                        osc.frequency.setValueAtTime(freq, epicAudioCtx.currentTime);
 
-                        // تأثير صوتي سلس يشبه النبضات الإيقاعية للموسيقى التجارية
-                        gain.gain.setValueAtTime(0.12, epicAudioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, epicAudioCtx.currentTime + 0.4);
+                        // تأثير ضغط صوتي (Punchy Beat) وسريع جداً لإعطاء شعور بالحماس
+                        gain.gain.setValueAtTime(0.15, epicAudioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, epicAudioCtx.currentTime + 0.25);
 
-                        osc.connect(gain);
+                        // فلتر ترددات لزيادة نقاء وفخامة الصوت السينمائي
+                        const filter = epicAudioCtx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(1200, epicAudioCtx.currentTime);
+
+                        osc.connect(filter);
+                        filter.connect(gain);
                         gain.connect(epicAudioCtx.destination);
 
                         osc.start();
-                        osc.stop(epicAudioCtx.currentTime + 0.45);
+                        osc.stop(epicAudioCtx.currentTime + 0.3);
 
-                        step++;
-                    }, 300); // سرعة إيقاع هادئة وحماسية في نفس الوقت
+                        beatStep++;
+                    }, 200); // إيقاع سريع ومكهرب يمنح شعوراً بالحماس المطلق
 
                     isEpicPlaying = true;
-                    btn.innerHTML = '🎵 الموسيقى الحماسية للمتجر: تعمل (اضغط للإيقاف)';
+                    btn.innerHTML = '🔥 مؤتمر المتجر الحماسي: يعمل (اضغط للإيقاف)';
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
                 } catch (e) {
@@ -270,7 +280,7 @@
                 if (epicInterval) clearInterval(epicInterval);
                 if (epicAudioCtx) epicAudioCtx.close();
                 isEpicPlaying = false;
-                btn.innerHTML = '🎵 الموسيقى الحماسية للمتجر: متوقفة (اضغط للتشغيل)';
+                btn.innerHTML = '⚡ تشغيل موسيقى المؤتمرات الحماسية 🚀';
                 btn.style.borderColor = 'var(--accent-gold)';
                 btn.style.color = 'var(--accent-gold)';
             }

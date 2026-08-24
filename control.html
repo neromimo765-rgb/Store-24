@@ -54,7 +54,7 @@
             border-radius: 10px; padding: 12px; margin-bottom: 12px;
         }
         .item-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #fff; }
-        .item-info { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .item-info { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
         .img-preview-box { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 8px; }
         .img-preview-box img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
         .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px; }
@@ -89,9 +89,19 @@
 
     <div class="container">
         <header>
-            <h1>🛒 لوحة المتجر الأساسي</h1>
+            <h1>🛒 لوحة تحكم المتجر</h1>
             <a href="landing-admin.html" class="nav-btn">صفحات الهبوط 🚀</a>
         </header>
+
+        <!-- قسم التحكم في إحصائيات المتجر العامة -->
+        <div class="card">
+            <h2>📊 إحصائيات وزيارات المتجر العامة</h2>
+            <div class="form-group">
+                <label>عدد زيارات المتجر الوهمية (اكتب العدد مثل 12 لتغييره يومياً، أو اتركه فارغاً للإلغاء والإخفاء):</label>
+                <input type="number" id="globalFakeVisits" class="form-control" placeholder="مثال: 12">
+            </div>
+            <button onclick="saveGlobalSettings()" class="btn" style="background: var(--info); color:#fff;">حفظ إعدادات زيارات المتجر ⚙️</button>
+        </div>
 
         <div class="card">
             <h2 id="formTitle">➕ إضافة منتج جديد</h2>
@@ -115,8 +125,8 @@
             </div>
 
             <div class="form-group">
-                <label>سعر الخصم (اختياري - بنفس عملة السعر الأصلي):</label>
-                <input type="number" id="prodSalePrice" class="form-control" placeholder="مثال: 600 (اتركه فارغاً إن لم يوجد خصم)">
+                <label>سعر الخصم (اختياري):</label>
+                <input type="number" id="prodSalePrice" class="form-control" placeholder="مثال: 600 (اتركه فارغاً إن لم يوجد)">
             </div>
 
             <div class="form-group">
@@ -138,17 +148,17 @@
             </div>
 
             <div class="form-group">
-                <label>عدد المشاهدات الوهمية:</label>
-                <input type="number" id="prodFakeViews" class="form-control" value="14">
+                <label>عدد مشاهدات المنتج الوهمية (اختياري - اتركه فارغاً للإخفاء):</label>
+                <input type="number" id="prodFakeViews" class="form-control" placeholder="مثال: 45">
             </div>
 
             <div class="form-group">
-                <label>عدد المشترين الوهميين:</label>
-                <input type="number" id="prodFakeBuyers" class="form-control" value="25">
+                <label>عدد مشتريات المنتج الوهمية (اختياري - اتركه فارغاً للإخفاء):</label>
+                <input type="number" id="prodFakeBuyers" class="form-control" placeholder="مثال: 12">
             </div>
 
             <div class="form-group">
-                <label>صور المنتج (من الهاتف - حتى 10 صور):</label>
+                <label>صور المنتج (حتى 10 صور):</label>
                 <input type="file" id="prodImages" class="form-control" accept="image/*" multiple>
             </div>
             <div class="form-group">
@@ -164,7 +174,7 @@
         </div>
 
         <div class="card">
-            <h2>📦 المنتجات المضافة للمتجر</h2>
+            <h2>📦 المنتجات المضافة ومتابعة المشتريات</h2>
             <div id="productsList">
                 <p style="text-align: center; color: var(--text-muted); font-size: 11px;">جاري تحميل المنتجات...</p>
             </div>
@@ -173,7 +183,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, get, push, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get, push, update, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -189,10 +199,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // أسعار التحويل العكسية لتخزين السعر بالعملة الأساسية (الجنيه المصري) مع الحفاظ على دقة التحويل في الواجهة الأمامية
-        const baseRatesToEGP = { EGP: 1, SAR: 13.0, USD: 47.6 }; 
-        // (ملاحظة: النظام يحول تلقائياً بناءً على اختيارك، سيتم تخزين السعر محولاً للعملة الأساسية أو حفظ العملة مع السعر لضمان استقرار العرض).
-
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -200,6 +206,27 @@
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = error => reject(error);
             });
+        }
+
+        window.saveGlobalSettings = async function() {
+            const fakeVisits = document.getElementById('globalFakeVisits').value.trim();
+            try {
+                await set(ref(db, 'settings/globalFakeVisits'), fakeVisits !== '' ? fakeVisits : null);
+                alert('تم حفظ وتحديث عدد زيارات المتجر بنجاح!');
+            } catch (e) {
+                alert('حدث خطأ أثناء الحفظ.');
+            }
+        }
+
+        async function loadGlobalSettings() {
+            try {
+                const snap = await get(ref(db, 'settings/globalFakeVisits'));
+                if (snap.exists()) {
+                    document.getElementById('globalFakeVisits').value = snap.val();
+                } else {
+                    document.getElementById('globalFakeVisits').value = '';
+                }
+            } catch (e) { console.error(e); }
         }
 
         window.saveProduct = async function() {
@@ -210,8 +237,8 @@
             const currency = document.getElementById('prodCurrency').value;
             const stock = document.getElementById('prodStock').value;
             const category = document.getElementById('prodCategory').value;
-            const fakeViews = document.getElementById('prodFakeViews').value.trim() || '14';
-            const fakeBuyers = document.getElementById('prodFakeBuyers').value.trim() || '25';
+            const fakeViews = document.getElementById('prodFakeViews').value.trim();
+            const fakeBuyers = document.getElementById('prodFakeBuyers').value.trim();
             const desc = document.getElementById('prodDesc').value.trim();
             const imageFiles = document.getElementById('prodImages').files;
             const videoFile = document.getElementById('prodVideo').files[0];
@@ -221,10 +248,8 @@
                 return;
             }
 
-            // توحيد العملة المدخلة إلى الجنيه المصري لتتوافق مع نظام العرض في المتجر الرئيسي
-            // إذا أدخل بالسعودي أو الأمريكي، نقوم بتحويله إلى ما يعادله بالمصري بناءً على معامل السعر
             let multiplier = 1;
-            if (currency === 'SAR') multiplier = 13.0; // معامل تقريبي عكسي للتخزين
+            if (currency === 'SAR') multiplier = 13.0;
             if (currency === 'USD') multiplier = 47.6;
 
             const priceInEGP = (rawPrice * multiplier).toFixed(2);
@@ -250,8 +275,8 @@
                     salePrice: salePriceInEGP, 
                     stock, 
                     category, 
-                    fakeViews, 
-                    fakeBuyers, 
+                    fakeViews: fakeViews !== '' ? fakeViews : null, 
+                    fakeBuyers: fakeBuyers !== '' ? fakeBuyers : null, 
                     desc 
                 };
                 if (images.length > 0) productData.images = images;
@@ -276,14 +301,17 @@
 
         async function loadProducts() {
             try {
-                const snap = await get(ref(db, 'products'));
+                const productsSnap = await get(ref(db, 'products'));
+                const salesSnap = await get(ref(db, 'productSales'));
+                const salesData = salesSnap.exists() ? salesSnap.val() : {};
+
                 const container = document.getElementById('productsList');
-                if (!snap.exists()) {
+                if (!productsSnap.exists()) {
                     container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px;">لا توجد منتجات مضافة.</p>`;
                     return;
                 }
                 let html = '';
-                const products = snap.val();
+                const products = productsSnap.val();
                 for (let id in products) {
                     const p = products[id];
                     let imgHtml = '';
@@ -295,12 +323,19 @@
 
                     const stockText = p.stock === 'out' ? '🔴 غير متوفر' : '🟢 متوفر';
                     const priceDisplay = p.salePrice ? `${p.salePrice} ج.م (خصم من ${p.price})` : `${p.price} ج.م`;
+                    
+                    const realPurchasesCount = salesData[id] || 0;
 
                     const encoded = encodeURIComponent(JSON.stringify({ id, ...p }));
                     html += `
                         <div class="item-card">
                             <div class="item-title">${p.title}</div>
-                            <div class="item-info">السعر: ${priceDisplay} | الحالة: ${stockText} | القسم: ${p.category || 'أدوات منزلية'}</div>
+                            <div class="item-info">
+                                السعر: ${priceDisplay} | الحالة: ${stockText}<br>
+                                القسم: ${p.category || 'أدوات منزلية'}<br>
+                                🛒 <b>عدد المشتريات الفعلية (الحقيقية):</b> <span style="color:var(--success); font-weight:bold;">${realPurchasesCount} عملية شراء</span><br>
+                                👀 مشاهدات وهمية: ${p.fakeViews ? p.fakeViews : 'غير مفعلة (مخفية)'} | 🛍️ مشترين وهميين: ${p.fakeBuyers ? p.fakeBuyers : 'غير مفعلة (مخفية)'}
+                            </div>
                             ${imgHtml}
                             <div class="actions-grid">
                                 <button onclick="editProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
@@ -323,12 +358,12 @@
             document.getElementById('editingId').value = data.id;
             document.getElementById('prodTitle').value = data.title || '';
             document.getElementById('prodPrice').value = data.price || '';
-            document.getElementById('prodCurrency').value = 'EGP'; // افتراضي عند التعديل يعرض بالقيمة الأساسية
+            document.getElementById('prodCurrency').value = 'EGP';
             document.getElementById('prodSalePrice').value = data.salePrice || '';
             document.getElementById('prodStock').value = data.stock || 'in';
             document.getElementById('prodCategory').value = data.category || 'أدوات منزلية';
-            document.getElementById('prodFakeViews').value = data.fakeViews || '14';
-            document.getElementById('prodFakeBuyers').value = data.fakeBuyers || '25';
+            document.getElementById('prodFakeViews').value = data.fakeViews || '';
+            document.getElementById('prodFakeBuyers').value = data.fakeBuyers || '';
             document.getElementById('prodDesc').value = data.desc || '';
 
             document.getElementById('formTitle').innerText = '✏️ تعديل المنتج';
@@ -344,8 +379,8 @@
             document.getElementById('prodCurrency').value = 'EGP';
             document.getElementById('prodSalePrice').value = '';
             document.getElementById('prodStock').value = 'in';
-            document.getElementById('prodFakeViews').value = '14';
-            document.getElementById('prodFakeBuyers').value = '25';
+            document.getElementById('prodFakeViews').value = '';
+            document.getElementById('prodFakeBuyers').value = '';
             document.getElementById('prodDesc').value = '';
             document.getElementById('prodImages').value = '';
             document.getElementById('prodVideo').value = '';
@@ -377,7 +412,10 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', loadProducts);
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGlobalSettings();
+            loadProducts();
+        });
     </script>
 </body>
 </html>

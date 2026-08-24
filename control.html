@@ -35,6 +35,9 @@
         .card h2 { font-size: 14px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+        .form-row { display: flex; gap: 8px; }
+        .form-row .form-control { flex: 2; }
+        .form-row select.form-control { flex: 1; }
         .form-control {
             width: 100%; background: #0f0f13; border: 1px solid var(--border-color);
             color: #fff; padding: 10px; border-radius: 8px; font-size: 12px; outline: none;
@@ -98,10 +101,32 @@
                 <label>اسم المنتج:</label>
                 <input type="text" id="prodTitle" class="form-control" placeholder="مثال: ساعة ذكية أصلية">
             </div>
+            
             <div class="form-group">
-                <label>السعر (بالجنيه):</label>
-                <input type="number" id="prodPrice" class="form-control" placeholder="مثال: 750">
+                <label>السعر الأصلي والعملة:</label>
+                <div class="form-row">
+                    <input type="number" id="prodPrice" class="form-control" placeholder="مثال: 750">
+                    <select id="prodCurrency" class="form-control">
+                        <option value="EGP">ج.م (مصري)</option>
+                        <option value="SAR">ر.س (سعودي)</option>
+                        <option value="USD">$ (أمريكي)</option>
+                    </select>
+                </div>
             </div>
+
+            <div class="form-group">
+                <label>سعر الخصم (اختياري - بنفس عملة السعر الأصلي):</label>
+                <input type="number" id="prodSalePrice" class="form-control" placeholder="مثال: 600 (اتركه فارغاً إن لم يوجد خصم)">
+            </div>
+
+            <div class="form-group">
+                <label>حالة التوفر:</label>
+                <select id="prodStock" class="form-control">
+                    <option value="in">🟢 متوفر</option>
+                    <option value="out">🔴 غير متوفر</option>
+                </select>
+            </div>
+
             <div class="form-group">
                 <label>القسم (الكتالوج):</label>
                 <select id="prodCategory" class="form-control">
@@ -111,6 +136,17 @@
                     <option value="أخرى">📦 أخرى</option>
                 </select>
             </div>
+
+            <div class="form-group">
+                <label>عدد المشاهدات الوهمية:</label>
+                <input type="number" id="prodFakeViews" class="form-control" value="14">
+            </div>
+
+            <div class="form-group">
+                <label>عدد المشترين الوهميين:</label>
+                <input type="number" id="prodFakeBuyers" class="form-control" value="25">
+            </div>
+
             <div class="form-group">
                 <label>صور المنتج (من الهاتف - حتى 10 صور):</label>
                 <input type="file" id="prodImages" class="form-control" accept="image/*" multiple>
@@ -153,6 +189,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // أسعار التحويل العكسية لتخزين السعر بالعملة الأساسية (الجنيه المصري) مع الحفاظ على دقة التحويل في الواجهة الأمامية
+        const baseRatesToEGP = { EGP: 1, SAR: 13.0, USD: 47.6 }; 
+        // (ملاحظة: النظام يحول تلقائياً بناءً على اختيارك، سيتم تخزين السعر محولاً للعملة الأساسية أو حفظ العملة مع السعر لضمان استقرار العرض).
+
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -165,16 +205,30 @@
         window.saveProduct = async function() {
             const editingId = document.getElementById('editingId').value;
             const title = document.getElementById('prodTitle').value.trim();
-            const price = document.getElementById('prodPrice').value.trim();
+            let rawPrice = parseFloat(document.getElementById('prodPrice').value);
+            let rawSalePrice = parseFloat(document.getElementById('prodSalePrice').value);
+            const currency = document.getElementById('prodCurrency').value;
+            const stock = document.getElementById('prodStock').value;
             const category = document.getElementById('prodCategory').value;
+            const fakeViews = document.getElementById('prodFakeViews').value.trim() || '14';
+            const fakeBuyers = document.getElementById('prodFakeBuyers').value.trim() || '25';
             const desc = document.getElementById('prodDesc').value.trim();
             const imageFiles = document.getElementById('prodImages').files;
             const videoFile = document.getElementById('prodVideo').files[0];
 
-            if (!title || !price) {
-                alert('الرجاء إدخال اسم المنتج والسعر.');
+            if (!title || isNaN(rawPrice)) {
+                alert('الرجاء إدخال اسم المنتج والسعر الأصلي بشكل صحيح.');
                 return;
             }
+
+            // توحيد العملة المدخلة إلى الجنيه المصري لتتوافق مع نظام العرض في المتجر الرئيسي
+            // إذا أدخل بالسعودي أو الأمريكي، نقوم بتحويله إلى ما يعادله بالمصري بناءً على معامل السعر
+            let multiplier = 1;
+            if (currency === 'SAR') multiplier = 13.0; // معامل تقريبي عكسي للتخزين
+            if (currency === 'USD') multiplier = 47.6;
+
+            const priceInEGP = (rawPrice * multiplier).toFixed(2);
+            const salePriceInEGP = !isNaN(rawSalePrice) ? (rawSalePrice * multiplier).toFixed(2) : '';
 
             document.getElementById('loadingOverlay').style.display = 'flex';
 
@@ -190,7 +244,16 @@
                     videoUrl = await fileToBase64(videoFile);
                 }
 
-                const productData = { title, price, category, desc };
+                const productData = { 
+                    title, 
+                    price: priceInEGP, 
+                    salePrice: salePriceInEGP, 
+                    stock, 
+                    category, 
+                    fakeViews, 
+                    fakeBuyers, 
+                    desc 
+                };
                 if (images.length > 0) productData.images = images;
                 if (videoUrl) productData.videoUrl = videoUrl;
 
@@ -230,11 +293,14 @@
                         imgHtml += '</div>';
                     }
 
+                    const stockText = p.stock === 'out' ? '🔴 غير متوفر' : '🟢 متوفر';
+                    const priceDisplay = p.salePrice ? `${p.salePrice} ج.م (خصم من ${p.price})` : `${p.price} ج.م`;
+
                     const encoded = encodeURIComponent(JSON.stringify({ id, ...p }));
                     html += `
                         <div class="item-card">
                             <div class="item-title">${p.title}</div>
-                            <div class="item-info">${p.price} ج.م | القسم: ${p.category || 'أدوات منزلية'}</div>
+                            <div class="item-info">السعر: ${priceDisplay} | الحالة: ${stockText} | القسم: ${p.category || 'أدوات منزلية'}</div>
                             ${imgHtml}
                             <div class="actions-grid">
                                 <button onclick="editProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
@@ -257,7 +323,12 @@
             document.getElementById('editingId').value = data.id;
             document.getElementById('prodTitle').value = data.title || '';
             document.getElementById('prodPrice').value = data.price || '';
+            document.getElementById('prodCurrency').value = 'EGP'; // افتراضي عند التعديل يعرض بالقيمة الأساسية
+            document.getElementById('prodSalePrice').value = data.salePrice || '';
+            document.getElementById('prodStock').value = data.stock || 'in';
             document.getElementById('prodCategory').value = data.category || 'أدوات منزلية';
+            document.getElementById('prodFakeViews').value = data.fakeViews || '14';
+            document.getElementById('prodFakeBuyers').value = data.fakeBuyers || '25';
             document.getElementById('prodDesc').value = data.desc || '';
 
             document.getElementById('formTitle').innerText = '✏️ تعديل المنتج';
@@ -270,6 +341,11 @@
             document.getElementById('editingId').value = '';
             document.getElementById('prodTitle').value = '';
             document.getElementById('prodPrice').value = '';
+            document.getElementById('prodCurrency').value = 'EGP';
+            document.getElementById('prodSalePrice').value = '';
+            document.getElementById('prodStock').value = 'in';
+            document.getElementById('prodFakeViews').value = '14';
+            document.getElementById('prodFakeBuyers').value = '25';
             document.getElementById('prodDesc').value = '';
             document.getElementById('prodImages').value = '';
             document.getElementById('prodVideo').value = '';
@@ -287,7 +363,6 @@
         }
 
         window.shareSocial = function(platform, id, title) {
-            // رابط متجكرك الأساسي المباشر بدقة تامة مع الـ ID لتكبير المنتج تلقائياً
             const storeUrl = `https://neromimo765-rgb.github.io/Store-24/index.html?id=${id}`;
             const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}\n${storeUrl}`);
             

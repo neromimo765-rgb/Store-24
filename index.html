@@ -45,6 +45,7 @@
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(24, 24, 36, 0.8));
             border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px; text-align: center;
             font-size: 11px; color: var(--accent-gold); font-weight: bold; margin-bottom: 16px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         .music-section {
@@ -148,7 +149,11 @@
             </div>
         </header>
 
-        <div id="welcomeBanner" class="welcome-banner">أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟</div>
+        <!-- شريط الترحيب وزيارات المتجر العامة -->
+        <div id="welcomeBanner" class="welcome-banner">
+            <span>أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟</span>
+            <span id="globalVisitsBadge" style="display: none; background: rgba(245, 158, 11, 0.2); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--accent-gold);">👀 <span id="visitsCountText">0</span> زيارة</span>
+        </div>
 
         <div class="music-section">
             <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ فعل واستمتع 🚀</button>
@@ -218,7 +223,6 @@
         let globalAudio = null;
         let isMusicPlaying = false;
 
-        // تشغيل الموسيقى يدوياً وضمان عملها 100%
         window.toggleEpicMusic = function() {
             const btn = document.getElementById('musicBtn');
             
@@ -246,6 +250,24 @@
             }
         }
 
+        // جلب عدد زيارات المتجر العامة المحددة من لوحة التحكم وإظهارها في شريط الترحيب
+        async function loadGlobalVisits() {
+            try {
+                const snap = await get(ref(db, 'settings/globalFakeVisits'));
+                const badge = document.getElementById('globalVisitsBadge');
+                const textElem = document.getElementById('visitsCountText');
+                
+                if (snap.exists() && snap.val() !== '') {
+                    textElem.innerText = snap.val();
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (e) {
+                console.error("خطأ في جلب زيارات المتجر العامة:", e);
+            }
+        }
+
         async function trackRealVisitor() {
             const visitorKey = 'store_visited_real';
             try {
@@ -261,6 +283,7 @@
             }
         }
         trackRealVisitor();
+        loadGlobalVisits();
 
         window.changeCurrency = function(curr) {
             currentCurrency = curr;
@@ -329,7 +352,7 @@
                     priceHtml = `<div class="product-price">${formatPrice(p.price)}</div>`;
                 }
 
-                // عرض مشاهدات ومشتريات المنتج تحت كل كارت إذا تم إدخالها من لوحة التحكم (بدون كلمة وهمي)
+                // عرض المشاهدات والمشترين الخاصة بالمنتج تحت كل كارت
                 let statsHtml = '';
                 if (p.fakeViews || p.fakeBuyers) {
                     statsHtml = `<div class="product-stats">`;

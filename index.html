@@ -149,14 +149,13 @@
             </div>
         </header>
 
-        <!-- شريط الترحيب وزيارات المتجر العامة -->
         <div id="welcomeBanner" class="welcome-banner">
             <span>أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟</span>
             <span id="globalVisitsBadge" style="display: none; background: rgba(245, 158, 11, 0.2); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--accent-gold);">👀 <span id="visitsCountText">0</span> زيارة</span>
         </div>
 
         <div class="music-section">
-            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ فعل واستمتع 🚀</button>
+            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ فعل الموسيقى واستمتع 🚀</button>
         </div>
 
         <div class="categories-scroll" id="categoriesContainer">
@@ -223,12 +222,14 @@
         let globalAudio = null;
         let isMusicPlaying = false;
 
+        // تشغيل وإدارة الموسيقى بسلاسة وتخطي قيود المتصفحات
         window.toggleEpicMusic = function() {
             const btn = document.getElementById('musicBtn');
             
             if (!globalAudio) {
                 globalAudio = new Audio('https://www.bensound.com/bensound-music/bensound-creativeminds.mp3');
                 globalAudio.loop = true;
+                globalAudio.volume = 0.4;
             }
 
             if (!isMusicPlaying) {
@@ -238,19 +239,44 @@
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
                 }).catch(e => {
-                    console.error("المتصفح منع التشغيل التلقائي:", e);
-                    alert('يرجى النقر مرة أخرى للسماح للمتجر بتشغيل الصوت.');
+                    console.error("متصفحك يمنع التشغيل التلقائي:", e);
+                    alert('⚠️ يجبرنا المتصفح على النقر مرة أخرى للسماح بالتشغيل. اضغط OK ثم اضغط الزر مجدداً.');
                 });
             } else {
                 globalAudio.pause();
                 isMusicPlaying = false;
-                btn.innerHTML = '⚡ فعل واستمتع 🚀';
+                btn.innerHTML = '⚡ فعل الموسيقى واستمتع 🚀';
                 btn.style.borderColor = 'var(--accent-gold)';
                 btn.style.color = 'var(--accent-gold)';
             }
         }
 
-        // جلب عدد زيارات المتجر العامة المحددة من لوحة التحكم وإظهارها في شريط الترحيب
+        // دالة لتوليد حركة عشوائية ذكية بناءً على معرف المنتج وزيارة الزبون (عشان الأرقام مبتبقاش جامدة)
+        function getDynamicStats(productId, baseViews, baseBuyers) {
+            let v = parseInt(baseViews) || 0;
+            let b = parseInt(baseBuyers) || 0;
+
+            if (v === 0 && b === 0) return '';
+
+            // استخدام رقم عشوائي ثابت نسبياً لكل زائر في الجلسة بناءً على ID المنتج
+            let storageKey = `stat_boost_${productId}`;
+            let boost = localStorage.getItem(storageKey);
+            
+            if (!boost) {
+                // إضافة عشوائية بسيطة لأول زيارة للعميل للمنتج (مثلا زيادة بين 1 إلى 4 مشاهدات)
+                boost = Math.floor(Math.random() * 4) + 1;
+                localStorage.setItem(storageKey, boost);
+            }
+            
+            let finalViews = v + parseInt(boost);
+            let finalBuyers = b;
+
+            return `<div class="product-stats">
+                ${finalViews > 0 ? `<span>👀 ${finalViews} مشاهدة</span>` : ''}
+                ${finalBuyers > 0 ? `<span>🛍️ ${finalBuyers} مشترِ</span>` : ''}
+            </div>`;
+        }
+
         async function loadGlobalVisits() {
             try {
                 const snap = await get(ref(db, 'settings/globalFakeVisits'));
@@ -258,7 +284,15 @@
                 const textElem = document.getElementById('visitsCountText');
                 
                 if (snap.exists() && snap.val() !== '') {
-                    textElem.innerText = snap.val();
+                    // حركة بسيطة لزيارات المتجر العامة لمنع الجمود التام
+                    let baseVal = parseInt(snap.val()) || 50;
+                    let visitKey = 'store_global_dynamic_boost';
+                    let boost = sessionStorage.getItem(visitKey);
+                    if(!boost) {
+                        boost = Math.floor(Math.random() * 3);
+                        sessionStorage.setItem(visitKey, boost);
+                    }
+                    textElem.innerText = baseVal + parseInt(boost);
                     badge.style.display = 'inline-block';
                 } else {
                     badge.style.display = 'none';
@@ -352,14 +386,8 @@
                     priceHtml = `<div class="product-price">${formatPrice(p.price)}</div>`;
                 }
 
-                // عرض المشاهدات والمشترين الخاصة بالمنتج تحت كل كارت
-                let statsHtml = '';
-                if (p.fakeViews || p.fakeBuyers) {
-                    statsHtml = `<div class="product-stats">`;
-                    if (p.fakeViews) statsHtml += `<span>👀 ${p.fakeViews} مشاهدة</span>`;
-                    if (p.fakeBuyers) statsHtml += `<span>🛍️ ${p.fakeBuyers} مشترِ</span>`;
-                    statsHtml += `</div>`;
-                }
+                // تضمين نظام الحركة الحية للأرقام لكل منتج
+                let statsHtml = getDynamicStats(id, p.fakeViews, p.fakeBuyers);
 
                 const isAvailable = p.stock !== 'out';
                 const stockBadge = isAvailable 
@@ -369,7 +397,7 @@
                 html += `
                     <div class="product-card" onclick="openProductModal('${id}')">
                         ${discountBadgeHtml}
-                        <img src="${mainImg}" class="product-img" alt="${p.title}">
+                        <img src="${mainImg}" class="product-img" alt="${p.title}" loading="lazy">
                         <div class="product-info">
                             <div>
                                 <div class="product-title">${p.title}</div>
@@ -392,7 +420,7 @@
             let images = p.images || ['https://via.placeholder.com/300'];
             let thumbsHtml = '';
             images.forEach((img, index) => {
-                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)" alt="صورة مصغرة">`;
+                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)" alt="صورة مصغرة" loading="lazy">`;
             });
 
             let finalActivePrice = (p.salePrice && parseFloat(p.salePrice) > 0) ? p.salePrice : p.price;

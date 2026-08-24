@@ -140,7 +140,6 @@
                 <select id="currencySelector" class="currency-select" onchange="changeCurrency(this.value)">
                     <option value="EGP">ج.م (مصري)</option>
                     <option value="SAR">ر.س (سعودي)</option>
-                    <option value="USD">$ (أمريكي)</option>
                 </select>
                 <button class="cart-btn" onclick="openCartModal()">
                     🛒 السلة <span id="cartCount" class="cart-badge">0</span>
@@ -152,7 +151,7 @@
         <div id="liveViewerBadge" class="live-viewer-badge">👁️ جاري تحميل عداد الزوار...</div>
 
         <div class="music-section">
-            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ الموسيقى الحماسية: متوقفة</button>
+            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">🎵 الموسيقى الحماسية للمتجر: متوقفة</button>
         </div>
 
         <div class="categories-scroll" id="categoriesContainer">
@@ -213,10 +212,10 @@
         let currentCategory = 'الكل';
         let currentCurrency = 'EGP';
 
-        const exchangeRates = { EGP: 1, SAR: 0.077, USD: 0.021 };
-        const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س', USD: '$' };
+        const exchangeRates = { EGP: 1, SAR: 0.077 };
+        const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س' };
 
-        // نظام مولد الموسيقى الحماسية والإيقاعية (Web Audio API)
+        // نظام الموسيقى الحماسية والإيقاعية الخاصة بالمتاجر (نغمات متناسقة ونظيفة)
         let epicAudioCtx = null;
         let epicInterval = null;
         let isEpicPlaying = false;
@@ -229,8 +228,11 @@
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     epicAudioCtx = new AudioContext();
 
-                    // سلم موسيقي حماسي (نغمات متصاعدة)
-                    const notes = [220.00, 261.63, 329.63, 392.00, 440.00, 523.25, 659.25];
+                    // سلم موسيقي مبهج ومتسق للمتاجر (نغمات توافقية دافئة وحماسية)
+                    const storeMelody = [
+                        261.63, 329.63, 392.00, 523.25, // نغمات صاعدة
+                        392.00, 440.00, 523.25, 659.25  // إيقاع حماسي متسق
+                    ];
                     let step = 0;
 
                     epicInterval = setInterval(() => {
@@ -239,25 +241,25 @@
                         const osc = epicAudioCtx.createOscillator();
                         const gain = epicAudioCtx.createGain();
 
-                        // اختيار نغمة إيقاعية حماسية
-                        osc.type = 'sawtooth'; // صوت حاد وقوي
-                        osc.frequency.setValueAtTime(notes[step % notes.length], epicAudioCtx.currentTime);
+                        // استخدام موجة لطيفة (sine أو triangle) لتكون ناعمة ومريحة للأذن وليست مزعجة
+                        osc.type = 'triangle'; 
+                        osc.frequency.setValueAtTime(storeMelody[step % storeMelody.length], epicAudioCtx.currentTime);
 
-                        // تأثير تضخيم وتلاشي سريع (نبضة حماسية)
-                        gain.gain.setValueAtTime(0.08, epicAudioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, epicAudioCtx.currentTime + 0.3);
+                        // تأثير صوتي سلس يشبه النبضات الإيقاعية للموسيقى التجارية
+                        gain.gain.setValueAtTime(0.12, epicAudioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, epicAudioCtx.currentTime + 0.4);
 
                         osc.connect(gain);
                         gain.connect(epicAudioCtx.destination);
 
                         osc.start();
-                        osc.stop(epicAudioCtx.currentTime + 0.35);
+                        osc.stop(epicAudioCtx.currentTime + 0.45);
 
                         step++;
-                    }, 250); // سرعة الإيقاع الحماسي
+                    }, 300); // سرعة إيقاع هادئة وحماسية في نفس الوقت
 
                     isEpicPlaying = true;
-                    btn.innerHTML = '⚡ الموسيقى الحماسية: تعمل (اضغط للإيقاف)';
+                    btn.innerHTML = '🎵 الموسيقى الحماسية للمتجر: تعمل (اضغط للإيقاف)';
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
                 } catch (e) {
@@ -268,7 +270,7 @@
                 if (epicInterval) clearInterval(epicInterval);
                 if (epicAudioCtx) epicAudioCtx.close();
                 isEpicPlaying = false;
-                btn.innerHTML = '⚡ الموسيقى الحماسية: متوقفة (اضغط للتشغيل)';
+                btn.innerHTML = '🎵 الموسيقى الحماسية للمتجر: متوقفة (اضغط للتشغيل)';
                 btn.style.borderColor = 'var(--accent-gold)';
                 btn.style.color = 'var(--accent-gold)';
             }
@@ -503,7 +505,7 @@
             const buyerKey = 'store_buyer_real';
             try {
                 if (!localStorage.getItem(buyerKey)) {
-                    localStorage.setItem(visitorKey, 'true'); // kept compatible
+                    localStorage.setItem(buyerKey, 'true');
                     const bRef = ref(db, 'analytics/realBuyers');
                     const snap = await get(bRef);
                     const current = snap.exists() ? snap.val() : 0;
@@ -531,7 +533,6 @@
             });
             recordRealPurchase(productIds);
             
-            // رقم الواتساب الخاص بك المحدث
             window.open(`https://api.whatsapp.com/send?phone=201156666967&text=${encodeURIComponent(text)}`, '_blank');
         }
 
@@ -539,7 +540,6 @@
             recordRealPurchase([id]);
             const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n*${title}*\nالسعر: ${formatPrice(price)}`);
             
-            // رقم الواتساب الخاص بك المحدث
             window.open(`https://api.whatsapp.com/send?phone=201156666967&text=${message}`, '_blank');
         }
 

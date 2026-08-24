@@ -44,12 +44,7 @@
         .welcome-banner {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(24, 24, 36, 0.8));
             border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px; text-align: center;
-            font-size: 11px; color: var(--accent-gold); font-weight: bold; margin-bottom: 10px;
-        }
-
-        .live-viewer-badge {
-            background: rgba(16, 185, 129, 0.15); border: 1px solid var(--success); color: var(--success);
-            padding: 6px; border-radius: 8px; font-size: 10px; text-align: center; font-weight: bold; margin-bottom: 16px;
+            font-size: 11px; color: var(--accent-gold); font-weight: bold; margin-bottom: 16px;
         }
 
         .music-section {
@@ -149,7 +144,6 @@
         </header>
 
         <div id="welcomeBanner" class="welcome-banner">أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟</div>
-        <div id="liveViewerBadge" class="live-viewer-badge">👁️ جاري تحميل عداد الزوار...</div>
 
         <div class="music-section">
             <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ فعل واستمتع 🚀</button>
@@ -246,7 +240,8 @@
             }
         }
 
-        async function trackRealVisitorAndLoadStats() {
+        // تسجيل الزيارات الحقيقية في قاعدة البيانات في الخلفية بصمت دون إظهار أي عدادات للزوار بالواجهة
+        async function trackRealVisitor() {
             const visitorKey = 'store_visited_real';
             try {
                 const vRef = ref(db, 'analytics/realVisitors');
@@ -256,15 +251,11 @@
                     const current = snap.exists() ? snap.val() : 0;
                     await set(vRef, current + 1);
                 }
-                const snap = await get(vRef);
-                const totalVisitors = snap.exists() ? snap.val() : 1;
-                document.getElementById('liveViewerBadge').innerHTML = `👁️ زار المتجر حقاً: (${totalVisitors} عميل)`;
             } catch (e) {
                 console.error("خطأ في تتبع الزوار:", e);
-                document.getElementById('liveViewerBadge').innerHTML = `👁️ متجرنا متفاعل الآن`;
             }
         }
-        trackRealVisitorAndLoadStats();
+        trackRealVisitor();
 
         window.changeCurrency = function(curr) {
             currentCurrency = curr;
@@ -360,12 +351,6 @@
             const p = allProducts[id];
             if (!p) return;
 
-            let realSalesCount = 0;
-            try {
-                const salesSnap = await get(ref(db, `productSales/${id}`));
-                if (salesSnap.exists()) realSalesCount = salesSnap.val();
-            } catch (e) { console.error(e); }
-
             let images = p.images || ['https://via.placeholder.com/300'];
             let thumbsHtml = '';
             images.forEach((img, index) => {
@@ -389,7 +374,7 @@
             const isAvailable = p.stock !== 'out';
             const actionBtn = isAvailable 
                 ? `<button class="btn-action" onclick="addToCart('${id}')">إضافة إلى السلة 🛒</button>
-                   <button class="btn-action btn-success" onclick="orderDirect('${id}', '${p.title}', '${finalActivePrice}')">شراء مباشر عبر واتساب ⚡</button>`
+                   <button class="btn-action btn-success" onclick="orderDirect('${id}', '${p.title}', '${finalActivePrice}')">طلب المنتج عبر واتساب ⚡</button>`
                 : `<button class="btn-action" style="background:#555; color:#aaa; cursor:not-allowed;" disabled>المنتج غير متوفر حالياً 🔴</button>`;
 
             let modalBody = `
@@ -397,8 +382,6 @@
                 <div class="modal-thumbs">${thumbsHtml}</div>
                 <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px; color:#fff;">${p.title}</div>
                 ${modalPriceHtml}
-                <div style="font-size: 10px; color: var(--success); margin-bottom: 4px;">🔥 المشاهدات: (${p.fakeViews || 14}) | 🛍️ المشترين: (${p.fakeBuyers || 25})</div>
-                <div style="font-size: 10px; color: var(--accent-gold); margin-bottom: 8px;">✅ العملاء الحقيقيون الذين اشتروا هذا المنتج: <b>${realSalesCount}</b> عميلاً</div>
                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; white-space: pre-wrap;">${p.desc || 'لا يوجد وصف متاح.'}</div>
                 ${actionBtn}
             `;

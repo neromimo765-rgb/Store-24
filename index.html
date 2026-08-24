@@ -152,7 +152,7 @@
         <div id="liveViewerBadge" class="live-viewer-badge">👁️ جاري تحميل عداد الزوار...</div>
 
         <div class="music-section">
-            <button id="musicBtn" class="music-control-btn" onclick="toggleSeaMusic()">🌊 صوت البحر: متوقف</button>
+            <button id="musicBtn" class="music-control-btn" onclick="toggleEpicMusic()">⚡ الموسيقى الحماسية: متوقفة</button>
         </div>
 
         <div class="categories-scroll" id="categoriesContainer">
@@ -216,50 +216,48 @@
         const exchangeRates = { EGP: 1, SAR: 0.077, USD: 0.021 };
         const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س', USD: '$' };
 
-        // نظام مولد صوت البحر الخفيف والآمن (Web Audio API) بدون أي ملفات خارجية أو تهنيج
-        let audioCtx = null;
-        let noiseNode = null;
-        let filterNode = null;
-        let gainNode = null;
-        let isSeaPlaying = false;
+        // نظام مولد الموسيقى الحماسية والإيقاعية (Web Audio API)
+        let epicAudioCtx = null;
+        let epicInterval = null;
+        let isEpicPlaying = false;
 
-        window.toggleSeaMusic = function() {
+        window.toggleEpicMusic = function() {
             const btn = document.getElementById('musicBtn');
             
-            if (!isSeaPlaying) {
+            if (!isEpicPlaying) {
                 try {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AudioContext();
+                    epicAudioCtx = new AudioContext();
 
-                    // إنشاء ضوضاء بيضاء خفيفة جداً
-                    const bufferSize = 2 * audioCtx.sampleRate;
-                    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                    const output = noiseBuffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        output[i] = Math.random() * 2 - 1;
-                    }
+                    // سلم موسيقي حماسي (نغمات متصاعدة)
+                    const notes = [220.00, 261.63, 329.63, 392.00, 440.00, 523.25, 659.25];
+                    let step = 0;
 
-                    noiseNode = audioCtx.createBufferSource();
-                    noiseNode.buffer = noiseBuffer;
-                    noiseNode.loop = true;
+                    epicInterval = setInterval(() => {
+                        if (!epicAudioCtx) return;
+                        
+                        const osc = epicAudioCtx.createOscillator();
+                        const gain = epicAudioCtx.createGain();
 
-                    // فلتر لتنعيم الصوت وجعله شبيه بخرير وسحب أمواج البحر
-                    filterNode = audioCtx.createBiquadFilter();
-                    filterNode.type = 'lowpass';
-                    filterNode.frequency.setValueAtTime(300, audioCtx.currentTime);
+                        // اختيار نغمة إيقاعية حماسية
+                        osc.type = 'sawtooth'; // صوت حاد وقوي
+                        osc.frequency.setValueAtTime(notes[step % notes.length], epicAudioCtx.currentTime);
 
-                    // خفض مستوى الصوت ليكون خفيفاً ومريحاً
-                    gainNode = audioCtx.createGain();
-                    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                        // تأثير تضخيم وتلاشي سريع (نبضة حماسية)
+                        gain.gain.setValueAtTime(0.08, epicAudioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, epicAudioCtx.currentTime + 0.3);
 
-                    noiseNode.connect(filterNode);
-                    filterNode.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
+                        osc.connect(gain);
+                        gain.connect(epicAudioCtx.destination);
 
-                    noiseNode.start(0);
-                    isSeaPlaying = true;
+                        osc.start();
+                        osc.stop(epicAudioCtx.currentTime + 0.35);
 
-                    btn.innerHTML = '🌊 صوت البحر: يعمل (اضغط للإيقاف)';
+                        step++;
+                    }, 250); // سرعة الإيقاع الحماسي
+
+                    isEpicPlaying = true;
+                    btn.innerHTML = '⚡ الموسيقى الحماسية: تعمل (اضغط للإيقاف)';
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
                 } catch (e) {
@@ -267,15 +265,10 @@
                     alert('عذراً، متصفحك لا يدعم تشغيل الصوت المباشر.');
                 }
             } else {
-                if (noiseNode) {
-                    noiseNode.stop();
-                    noiseNode.disconnect();
-                }
-                if (audioCtx) {
-                    audioCtx.close();
-                }
-                isSeaPlaying = false;
-                btn.innerHTML = '🌊 صوت البحر: متوقف (اضغط للتشغيل)';
+                if (epicInterval) clearInterval(epicInterval);
+                if (epicAudioCtx) epicAudioCtx.close();
+                isEpicPlaying = false;
+                btn.innerHTML = '⚡ الموسيقى الحماسية: متوقفة (اضغط للتشغيل)';
                 btn.style.borderColor = 'var(--accent-gold)';
                 btn.style.color = 'var(--accent-gold)';
             }
@@ -510,7 +503,7 @@
             const buyerKey = 'store_buyer_real';
             try {
                 if (!localStorage.getItem(buyerKey)) {
-                    localStorage.setItem(buyerKey, 'true');
+                    localStorage.setItem(visitorKey, 'true'); // kept compatible
                     const bRef = ref(db, 'analytics/realBuyers');
                     const snap = await get(bRef);
                     const current = snap.exists() ? snap.val() : 0;
@@ -537,13 +530,17 @@
                 productIds.push(item.id);
             });
             recordRealPurchase(productIds);
-            window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${encodeURIComponent(text)}`, '_blank');
+            
+            // رقم الواتساب الخاص بك المحدث
+            window.open(`https://api.whatsapp.com/send?phone=201156666967&text=${encodeURIComponent(text)}`, '_blank');
         }
 
         window.orderDirect = function(id, title, price) {
             recordRealPurchase([id]);
             const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n*${title}*\nالسعر: ${formatPrice(price)}`);
-            window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${message}`, '_blank');
+            
+            // رقم الواتساب الخاص بك المحدث
+            window.open(`https://api.whatsapp.com/send?phone=201156666967&text=${message}`, '_blank');
         }
 
         window.addEventListener('DOMContentLoaded', loadStoreProducts);

@@ -25,9 +25,13 @@
         }
         header h1 { font-size: 16px; color: var(--accent-gold); font-weight: 800; }
 
-        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .header-actions { display: flex; gap: 6px; align-items: center; }
 
-        /* زر السلة */
+        .currency-select {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--accent-gold);
+            padding: 5px 8px; border-radius: 15px; font-size: 10px; font-weight: bold; cursor: pointer;
+        }
+
         .cart-btn {
             background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
             padding: 6px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;
@@ -37,122 +41,120 @@
             background: var(--accent-red); color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 9px; font-weight: bold;
         }
 
-        /* شريط الترحيب المتحرك */
         .welcome-banner {
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(24, 24, 36, 0.8));
             border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px; text-align: center;
-            font-size: 12px; color: var(--accent-gold); font-weight: bold; margin-bottom: 16px;
+            font-size: 11px; color: var(--accent-gold); font-weight: bold; margin-bottom: 10px;
         }
 
-        /* قسم مشغل موسيقى البحر (تشغيل يدوي كامل) */
+        .live-viewer-badge {
+            background: rgba(16, 185, 129, 0.15); border: 1px solid var(--success); color: var(--success);
+            padding: 6px; border-radius: 8px; font-size: 10px; text-align: center; font-weight: bold; margin-bottom: 16px;
+        }
+
         .music-section {
             background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
-            padding: 12px; text-align: center; margin-bottom: 16px;
+            padding: 10px; text-align: center; margin-bottom: 16px;
         }
         .music-control-btn {
-            background: var(--bg-card); border: 1px solid var(--accent-gold); color: var(--accent-gold);
-            padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; margin-bottom: 6px;
+            background: none; border: 1px solid var(--accent-gold); color: var(--accent-gold);
+            padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px;
         }
-        .music-control-btn:active { transform: scale(0.95); }
-        .music-hint { font-size: 10px; color: var(--text-muted); line-height: 1.4; }
 
-        /* شريط الكتالوجات (الأقسام) */
         .categories-scroll {
-            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px;
+            display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px;
             scrollbar-width: none;
         }
         .categories-scroll::-webkit-scrollbar { display: none; }
         .cat-chip {
             background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted);
-            padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;
-            white-space: nowrap; transition: 0.2s;
+            padding: 5px 12px; border-radius: 15px; font-size: 10px; font-weight: bold; cursor: pointer;
+            white-space: nowrap;
         }
         .cat-chip.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
-        /* شبكة عرض المنتجات */
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .product-card {
             background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer;
-            transition: transform 0.2s;
+            border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; position: relative;
         }
-        .product-card:active { transform: scale(0.98); }
-        .product-img { width: 100%; height: 140px; object-fit: cover; background: #000; }
-        .product-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-        .product-title { font-size: 12px; font-weight: bold; margin-bottom: 6px; color: #fff; }
-        .product-price { font-size: 13px; color: var(--accent-gold); font-weight: 900; }
+        .product-img { width: 100%; height: 130px; object-fit: cover; background: #000; }
+        .product-info { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .product-title { font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #fff; }
+        
+        .price-box { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .product-price { font-size: 12px; color: var(--accent-gold); font-weight: 900; }
+        .old-price { font-size: 10px; color: var(--text-muted); text-decoration: line-through; }
+        .discount-badge { position: absolute; top: 6px; right: 6px; background: var(--accent-red); color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 6px; font-weight: bold; z-index: 2; }
 
-        /* النوافذ المنبثقة (Modals) */
+        .stock-status {
+            font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; text-align: center;
+        }
+        .stock-in { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .stock-out { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 11, 16, 0.9); display: none;
+            background: rgba(11, 11, 16, 0.95); display: none;
             justify-content: center; align-items: center; z-index: 3000; padding: 16px;
         }
         .modal-content {
             background: var(--bg-card); border: 1px solid var(--border-color);
-            width: 100%; max-width: 420px; border-radius: 16px; padding: 16px;
+            width: 100%; max-width: 400px; border-radius: 14px; padding: 14px;
             max-height: 90vh; overflow-y: auto; position: relative;
         }
         .close-modal {
-            position: absolute; top: 12px; left: 12px; background: var(--accent-red);
-            color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%;
-            font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            position: absolute; top: 10px; left: 10px; background: var(--accent-red);
+            color: #fff; border: none; width: 26px; height: 26px; border-radius: 50%;
+            font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 11px;
         }
-        .modal-main-img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; cursor: pointer; }
-        .modal-thumbs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 12px; }
-        .modal-thumbs img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; opacity: 0.6; }
+        .modal-main-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+        .modal-thumbs { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 10px; }
+        .modal-thumbs img { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border-color); cursor: pointer; opacity: 0.6; }
         .modal-thumbs img.active { opacity: 1; border-color: var(--accent-gold); }
-        .modal-title { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: #fff; }
-        .modal-price { font-size: 15px; color: var(--accent-gold); font-weight: 900; margin-bottom: 10px; }
-        .modal-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; white-space: pre-wrap; }
         
         .btn-action {
             width: 100%; background: var(--accent-gold); color: #000; border: none;
-            padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; margin-bottom: 6px;
+            padding: 9px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; margin-top: 6px;
         }
         .btn-success { background: var(--success); color: #fff; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; background: #0f0f13; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color); font-size: 11px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; background: #0f0f13; padding: 6px; border-radius: 6px; margin-bottom: 6px; font-size: 11px; }
 
-        /* تكبير الصورة */
         #lightbox {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 4000;
         }
         #lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; border-radius: 8px; }
-        #lightbox-close { position: absolute; top: 20px; left: 20px; color: #fff; font-size: 28px; cursor: pointer; background: none; border: none; z-index: 4001; }
+        #lightbox-close { position: absolute; top: 15px; left: 15px; color: #fff; font-size: 24px; cursor: pointer; background: none; border: none; z-index: 4001; }
 
-        .loading-text { text-align: center; color: var(--text-muted); font-size: 12px; grid-column: span 2; padding: 30px; }
+        .loading-text { text-align: center; color: var(--text-muted); font-size: 11px; grid-column: span 2; padding: 20px; }
     </style>
 </head>
 <body>
-
-    <!-- عنصر الصوت (مغلق افتراضياً ولا يعمل إلا بالضغط اليدوي) -->
-    <audio id="seaAudio" preload="none" loop>
-        <source src="https://actions.google.com/sounds/v1/water/waves_ocean_surf.ogg" type="audio/ogg">
-        متصفحك لا يدعم تشغيل الصوت.
-    </audio>
 
     <div class="container">
         <header>
             <h1>🛍️ متجرنا الأساسي</h1>
             <div class="header-actions">
+                <select id="currencySelector" class="currency-select" onchange="changeCurrency(this.value)">
+                    <option value="EGP">ج.م (مصري)</option>
+                    <option value="SAR">ر.س (سعودي)</option>
+                    <option value="USD">$ (أمريكي)</option>
+                </select>
                 <button class="cart-btn" onclick="openCartModal()">
                     🛒 السلة <span id="cartCount" class="cart-badge">0</span>
                 </button>
             </div>
         </header>
 
-        <!-- رسالة الترحيب المتغيرة للعملاء الجدد -->
         <div id="welcomeBanner" class="welcome-banner">أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟</div>
+        <div id="liveViewerBadge" class="live-viewer-badge">👁️ جاري تحميل عداد الزوار...</div>
 
-        <!-- قسم مشغل موسيقى البحر (تشغيل / إيقاف يدوي مع إرشادات توضيحية) -->
         <div class="music-section">
             <button id="musicBtn" class="music-control-btn" onclick="toggleSeaMusic()">🌊 صوت البحر: متوقف</button>
-            <div class="music-hint">اضغط على الزر أعلاه لتشغيل أصوات الأمواج الهادئة أثناء التصفح، واضغط عليه مرة أخرى لإيقافها في أي وقت. 🎧</div>
         </div>
 
-        <!-- شريط الكتالوجات (الأقسام) -->
         <div class="categories-scroll" id="categoriesContainer">
             <div class="cat-chip active" onclick="filterCategory('الكل', this)">الكل 🌟</div>
             <div class="cat-chip" onclick="filterCategory('أدوات منزلية', this)">🚀 أدوات منزلية</div>
@@ -161,13 +163,11 @@
             <div class="cat-chip" onclick="filterCategory('أخرى', this)">📦 أخرى</div>
         </div>
 
-        <!-- شبكة عرض المنتجات -->
         <div id="productsGrid" class="products-grid">
             <p class="loading-text">جاري تحميل المنتجات...</p>
         </div>
     </div>
 
-    <!-- نافذة تفاصيل المنتج -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeProductModal()">✕</button>
@@ -175,18 +175,16 @@
         </div>
     </div>
 
-    <!-- نافذة سلة المشتريات -->
     <div id="cartModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeCartModal()">✕</button>
-            <h3 style="font-size: 15px; color: var(--accent-gold); margin-bottom: 12px; font-weight: bold;">🛒 سلة المشتريات الخاصة بك</h3>
+            <h3 style="font-size: 14px; color: var(--accent-gold); margin-bottom: 10px; font-weight: bold;">🛒 سلة المشتريات</h3>
             <div id="cartItemsList"></div>
-            <div id="cartTotalContainer" style="margin-top: 12px; font-size: 13px; font-weight: bold; text-align: left; color: var(--accent-gold);"></div>
-            <button class="btn-action btn-success" onclick="checkoutCart()" style="margin-top: 12px;">إتمام الطلب عبر واتساب 📱</button>
+            <div id="cartTotalContainer" style="margin-top: 10px; font-size: 12px; font-weight: bold; text-align: left; color: var(--accent-gold);"></div>
+            <button class="btn-action btn-success" onclick="checkoutCart()" style="margin-top: 10px;">إتمام الطلب عبر واتساب 📱</button>
         </div>
     </div>
 
-    <!-- نافذة تكبير الصورة (Lightbox) -->
     <div id="lightbox">
         <button id="lightbox-close" onclick="closeLightbox()">✕</button>
         <img id="lightboxImg" src="" alt="صورة مكبرة">
@@ -194,7 +192,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyASmcV2bPzFjiwRAGxDr2kCbthG6b0h2lg",
@@ -213,32 +211,105 @@
         let allProducts = {};
         let cart = [];
         let currentCategory = 'الكل';
+        let currentCurrency = 'EGP';
 
-        // عبارات ترحيبية تتغير عشوائياً لكل زائر جديد
-        const welcomeMessages = [
-            "أهلاً بك في متجرنا! نتمنى لك تجربة تسوق ممتعة 🌟",
-            "مرحباً بك يا صديقي، اكتشف أقوى عروض اليوم وأحدث المنتجات 🔥",
-            "نورنا وجودك! تصفح أقسامنا واختر ما يناسبك بكل سهولة 🛒",
-            "أهلاً وسهلاً بك، يسعدنا خدمتك وتوفير أفضل المنتجات لك ✨"
-        ];
-        document.getElementById('welcomeBanner').innerText = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+        const exchangeRates = { EGP: 1, SAR: 0.077, USD: 0.021 };
+        const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س', USD: '$' };
 
-        // التحكم اليدوي البحت في تشغيل وإيقاف موسيقى البحر
+        // نظام مولد صوت البحر الخفيف والآمن (Web Audio API) بدون أي ملفات خارجية أو تهنيج
+        let audioCtx = null;
+        let noiseNode = null;
+        let filterNode = null;
+        let gainNode = null;
+        let isSeaPlaying = false;
+
         window.toggleSeaMusic = function() {
-            const audio = document.getElementById('seaAudio');
             const btn = document.getElementById('musicBtn');
-            if (audio.paused) {
-                audio.play().then(() => {
+            
+            if (!isSeaPlaying) {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+
+                    // إنشاء ضوضاء بيضاء خفيفة جداً
+                    const bufferSize = 2 * audioCtx.sampleRate;
+                    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const output = noiseBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        output[i] = Math.random() * 2 - 1;
+                    }
+
+                    noiseNode = audioCtx.createBufferSource();
+                    noiseNode.buffer = noiseBuffer;
+                    noiseNode.loop = true;
+
+                    // فلتر لتنعيم الصوت وجعله شبيه بخرير وسحب أمواج البحر
+                    filterNode = audioCtx.createBiquadFilter();
+                    filterNode.type = 'lowpass';
+                    filterNode.frequency.setValueAtTime(300, audioCtx.currentTime);
+
+                    // خفض مستوى الصوت ليكون خفيفاً ومريحاً
+                    gainNode = audioCtx.createGain();
+                    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+                    noiseNode.connect(filterNode);
+                    filterNode.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+
+                    noiseNode.start(0);
+                    isSeaPlaying = true;
+
                     btn.innerHTML = '🌊 صوت البحر: يعمل (اضغط للإيقاف)';
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
-                }).catch(e => console.log(e));
+                } catch (e) {
+                    console.error(e);
+                    alert('عذراً، متصفحك لا يدعم تشغيل الصوت المباشر.');
+                }
             } else {
-                audio.pause();
+                if (noiseNode) {
+                    noiseNode.stop();
+                    noiseNode.disconnect();
+                }
+                if (audioCtx) {
+                    audioCtx.close();
+                }
+                isSeaPlaying = false;
                 btn.innerHTML = '🌊 صوت البحر: متوقف (اضغط للتشغيل)';
                 btn.style.borderColor = 'var(--accent-gold)';
                 btn.style.color = 'var(--accent-gold)';
             }
+        }
+
+        async function trackRealVisitorAndLoadStats() {
+            const visitorKey = 'store_visited_real';
+            try {
+                const vRef = ref(db, 'analytics/realVisitors');
+                if (!localStorage.getItem(visitorKey)) {
+                    localStorage.setItem(visitorKey, 'true');
+                    const snap = await get(vRef);
+                    const current = snap.exists() ? snap.val() : 0;
+                    await set(vRef, current + 1);
+                }
+                const snap = await get(vRef);
+                const totalVisitors = snap.exists() ? snap.val() : 1;
+                document.getElementById('liveViewerBadge').innerHTML = `👁️ زار المتجر حقاً: (${totalVisitors} عميل)`;
+            } catch (e) {
+                console.error("خطأ في تتبع الزوار:", e);
+                document.getElementById('liveViewerBadge').innerHTML = `👁️ متجرنا متفاعل الآن`;
+            }
+        }
+        trackRealVisitorAndLoadStats();
+
+        window.changeCurrency = function(curr) {
+            currentCurrency = curr;
+            renderProducts();
+        }
+
+        function formatPrice(val) {
+            const rate = exchangeRates[currentCurrency];
+            const converted = (parseFloat(val) * rate).toFixed(2);
+            return `${converted} ${currencySymbols[currentCurrency]}`;
         }
 
         async function loadStoreProducts() {
@@ -252,9 +323,9 @@
                 renderProducts();
 
                 const urlParams = new URLSearchParams(window.location.search);
-                const productIdFromUrl = urlParams.get('id');
-                if (productIdFromUrl && allProducts[productIdFromUrl]) {
-                    openProductModal(productIdFromUrl);
+                const productId = urlParams.get('id');
+                if (productId && allProducts[productId]) {
+                    openProductModal(productId);
                 }
             } catch (e) {
                 console.error(e);
@@ -277,18 +348,41 @@
             for (let id in allProducts) {
                 const p = allProducts[id];
                 const pCat = p.category || 'أدوات منزلية';
-                
                 if (currentCategory !== 'الكل' && pCat !== currentCategory) continue;
 
                 found = true;
                 const mainImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/150';
                 
+                let priceHtml = '';
+                let discountBadgeHtml = '';
+
+                if (p.salePrice && parseFloat(p.salePrice) > 0) {
+                    discountBadgeHtml = `<div class="discount-badge">خصم</div>`;
+                    priceHtml = `
+                        <div class="price-box">
+                            <span class="product-price">${formatPrice(p.salePrice)}</span>
+                            <span class="old-price">${formatPrice(p.price)}</span>
+                        </div>
+                    `;
+                } else {
+                    priceHtml = `<div class="product-price">${formatPrice(p.price)}</div>`;
+                }
+
+                const isAvailable = p.stock !== 'out';
+                const stockBadge = isAvailable 
+                    ? `<span class="stock-status stock-in">🟢 متوفر</span>` 
+                    : `<span class="stock-status stock-out">🔴 غير متوفر</span>`;
+
                 html += `
                     <div class="product-card" onclick="openProductModal('${id}')">
+                        ${discountBadgeHtml}
                         <img src="${mainImg}" class="product-img" alt="${p.title}">
                         <div class="product-info">
-                            <div class="product-title">${p.title}</div>
-                            <div class="product-price">${p.price} ج.م</div>
+                            <div>
+                                <div class="product-title">${p.title}</div>
+                                ${priceHtml}
+                            </div>
+                            <div>${stockBadge}</div>
                         </div>
                     </div>
                 `;
@@ -297,9 +391,15 @@
             grid.innerHTML = found ? html : `<p class="loading-text">لا توجد منتجات في هذا القسم حالياً.</p>`;
         }
 
-        window.openProductModal = function(id) {
+        window.openProductModal = async function(id) {
             const p = allProducts[id];
             if (!p) return;
+
+            let realSalesCount = 0;
+            try {
+                const salesSnap = await get(ref(db, `productSales/${id}`));
+                if (salesSnap.exists()) realSalesCount = salesSnap.val();
+            } catch (e) { console.error(e); }
 
             let images = p.images || ['https://via.placeholder.com/300'];
             let thumbsHtml = '';
@@ -307,14 +407,35 @@
                 thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)" alt="صورة مصغرة">`;
             });
 
+            let finalActivePrice = (p.salePrice && parseFloat(p.salePrice) > 0) ? p.salePrice : p.price;
+            let modalPriceHtml = '';
+            
+            if (p.salePrice && parseFloat(p.salePrice) > 0) {
+                modalPriceHtml = `
+                    <div class="price-box" style="margin-bottom: 6px;">
+                        <span style="font-size: 15px; color: var(--accent-gold); font-weight: 900;">${formatPrice(p.salePrice)}</span>
+                        <span class="old-price" style="font-size: 12px;">${formatPrice(p.price)}</span>
+                    </div>
+                `;
+            } else {
+                modalPriceHtml = `<div style="font-size: 15px; color: var(--accent-gold); font-weight: 900; margin-bottom: 6px;">${formatPrice(p.price)}</div>`;
+            }
+
+            const isAvailable = p.stock !== 'out';
+            const actionBtn = isAvailable 
+                ? `<button class="btn-action" onclick="addToCart('${id}')">إضافة إلى السلة 🛒</button>
+                   <button class="btn-action btn-success" onclick="orderDirect('${id}', '${p.title}', '${finalActivePrice}')">شراء مباشر عبر واتساب ⚡</button>`
+                : `<button class="btn-action" style="background:#555; color:#aaa; cursor:not-allowed;" disabled>المنتج غير متوفر حالياً 🔴</button>`;
+
             let modalBody = `
                 <img src="${images[0]}" id="modalMainImg" class="modal-main-img" onclick="openLightbox(this.src)" alt="${p.title}">
                 <div class="modal-thumbs">${thumbsHtml}</div>
-                <div class="modal-title">${p.title}</div>
-                <div class="modal-price">${p.price} ج.م</div>
-                <div class="modal-desc">${p.desc || 'لا يوجد وصف متاح.'}</div>
-                <button class="btn-action" onclick="addToCart('${id}')">إضافة إلى السلة 🛒</button>
-                <button class="btn-action btn-success" onclick="orderDirect('${p.title}', '${p.price}')">شراء مباشر عبر واتساب ⚡</button>
+                <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px; color:#fff;">${p.title}</div>
+                ${modalPriceHtml}
+                <div style="font-size: 10px; color: var(--success); margin-bottom: 4px;">🔥 المشاهدات: (${p.fakeViews || 14}) | 🛍️ المشترين: (${p.fakeBuyers || 25})</div>
+                <div style="font-size: 10px; color: var(--accent-gold); margin-bottom: 8px;">✅ العملاء الحقيقيون الذين اشتروا هذا المنتج: <b>${realSalesCount}</b> عميلاً</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; white-space: pre-wrap;">${p.desc || 'لا يوجد وصف متاح.'}</div>
+                ${actionBtn}
             `;
 
             document.getElementById('modalBody').innerHTML = modalBody;
@@ -323,7 +444,6 @@
 
         window.closeProductModal = function() {
             document.getElementById('productModal').style.display = 'none';
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
         window.changeMainImage = function(src, thumbElement) {
@@ -343,7 +463,8 @@
 
         window.addToCart = function(id) {
             const p = allProducts[id];
-            cart.push(p);
+            let activePrice = (p.salePrice && parseFloat(p.salePrice) > 0) ? p.salePrice : p.price;
+            cart.push({ id, title: p.title, price: activePrice });
             document.getElementById('cartCount').innerText = cart.length;
             alert('تمت إضافة المنتج إلى السلة بنجاح!');
             closeProductModal();
@@ -352,7 +473,7 @@
         window.openCartModal = function() {
             const container = document.getElementById('cartItemsList');
             if (cart.length === 0) {
-                container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 20px;">السلة فارغة حالياً.</p>`;
+                container.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 15px;">السلة فارغة حالياً.</p>`;
                 document.getElementById('cartTotalContainer').innerText = '';
                 document.getElementById('cartModal').style.display = 'flex';
                 return;
@@ -364,14 +485,14 @@
                 total += parseFloat(item.price || 0);
                 html += `
                     <div class="cart-item">
-                        <span><b>${item.title}</b><br>${item.price} ج.م</span>
-                        <button onclick="removeFromCart(${index})" style="background:var(--accent-red); color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">حذف</button>
+                        <span><b>${item.title}</b><br>${formatPrice(item.price)}</span>
+                        <button onclick="removeFromCart(${index})" style="background:var(--accent-red); color:#fff; border:none; padding:3px 6px; border-radius:4px; cursor:pointer;">حذف</button>
                     </div>
                 `;
             });
 
             container.innerHTML = html;
-            document.getElementById('cartTotalContainer').innerText = `الإجمالي الكلي: ${total} ج.م`;
+            document.getElementById('cartTotalContainer').innerText = `الإجمالي الكلي: ${formatPrice(total)}`;
             document.getElementById('cartModal').style.display = 'flex';
         }
 
@@ -385,23 +506,43 @@
             openCartModal();
         }
 
-        window.checkoutCart = function() {
-            if (cart.length === 0) {
-                alert('السلة فارغة!');
-                return;
+        async function recordRealPurchase(productIdsList) {
+            const buyerKey = 'store_buyer_real';
+            try {
+                if (!localStorage.getItem(buyerKey)) {
+                    localStorage.setItem(buyerKey, 'true');
+                    const bRef = ref(db, 'analytics/realBuyers');
+                    const snap = await get(bRef);
+                    const current = snap.exists() ? snap.val() : 0;
+                    await set(bRef, current + 1);
+                }
+
+                for (let id of productIdsList) {
+                    const pSalesRef = ref(db, `productSales/${id}`);
+                    const snap = await get(pSalesRef);
+                    const currentSales = snap.exists() ? snap.val() : 0;
+                    await set(pSalesRef, currentSales + 1);
+                }
+            } catch (e) {
+                console.error("خطأ في تسجيل عملية الشراء:", e);
             }
-            let text = 'مرحباً، أريد طلب المنتجات التالية من السلة:\n';
-            let total = 0;
+        }
+
+        window.checkoutCart = function() {
+            if (cart.length === 0) return;
+            let text = 'مرحباً، أريد طلب المنتجات التالية:\n';
+            let productIds = [];
             cart.forEach((item, i) => {
-                text += `${i+1}. ${item.title} - ${item.price} ج.م\n`;
-                total += parseFloat(item.price || 0);
+                text += `${i+1}. ${item.title} - ${formatPrice(item.price)}\n`;
+                productIds.push(item.id);
             });
-            text += `\n*الإجمالي الكلي: ${total} ج.م*`;
+            recordRealPurchase(productIds);
             window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        window.orderDirect = function(title, price) {
-            const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n*${title}*\nالسعر: ${price} ج.م`);
+        window.orderDirect = function(id, title, price) {
+            recordRealPurchase([id]);
+            const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n*${title}*\nالسعر: ${formatPrice(price)}`);
             window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${message}`, '_blank');
         }
 

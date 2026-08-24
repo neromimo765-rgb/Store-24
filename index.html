@@ -207,7 +207,7 @@
             let images = p.images || ['https://via.placeholder.com/300'];
             let thumbsHtml = '';
             images.forEach((img, index) => {
-                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">`;
+                thumbsHtml += `<img src="${img}" class="${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)" alt="صورة مصغرة">`;
             });
 
             let modalBody = `
@@ -246,7 +246,7 @@
 
         window.orderProduct = function(title, price) {
             const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n*${title}*\nالسعر: ${price} ج.م`);
-            window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${message}`);
+            window.open(`https://api.whatsapp.com/send?phone=201000000000&text=${message}`, '_blank');
         }
 
         window.addEventListener('DOMContentLoaded', loadStoreProducts);

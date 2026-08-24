@@ -103,11 +103,12 @@
                 <input type="number" id="prodPrice" class="form-control" placeholder="مثال: 750">
             </div>
             <div class="form-group">
-                <label>القسم:</label>
+                <label>القسم (الكتالوج):</label>
                 <select id="prodCategory" class="form-control">
                     <option value="أدوات منزلية">🚀 أدوات منزلية</option>
                     <option value="إلكترونيات">📱 إلكترونيات</option>
                     <option value="إكسسوارات">⌚ إكسسوارات</option>
+                    <option value="أخرى">📦 أخرى</option>
                 </select>
             </div>
             <div class="form-group">
@@ -233,7 +234,7 @@
                     html += `
                         <div class="item-card">
                             <div class="item-title">${p.title}</div>
-                            <div class="item-info">${p.price} ج.م | ${p.category || 'عام'}</div>
+                            <div class="item-info">${p.price} ج.م | القسم: ${p.category || 'أدوات منزلية'}</div>
                             ${imgHtml}
                             <div class="actions-grid">
                                 <button onclick="editProduct('${encoded}')" class="action-btn btn-edit">تعديل</button>
@@ -286,7 +287,7 @@
         }
 
         window.shareSocial = function(platform, id, title) {
-            // رابط متجرك الأساسي صراحة بدون أي ارتباط بصفحة الكنترول
+            // رابط متجكرك الأساسي المباشر بدقة تامة مع الـ ID لتكبير المنتج تلقائياً
             const storeUrl = `https://neromimo765-rgb.github.io/Store-24/index.html?id=${id}`;
             const text = encodeURIComponent(`شاهد هذا المنتج الرائع: ${title}\n${storeUrl}`);
             

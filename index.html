@@ -216,7 +216,6 @@
         const exchangeRates = { EGP: 1, SAR: 0.077 };
         const currencySymbols = { EGP: 'ج.م', SAR: 'ر.س' };
 
-        // إنشاء وتشغيل الصوت بطريقة آمنة ومتوافقة مع الحماية التلقائية للجوال
         let globalAudio = null;
         let isMusicPlaying = false;
 
@@ -231,11 +230,11 @@
             if (!isMusicPlaying) {
                 globalAudio.play().then(() => {
                     isMusicPlaying = true;
-                    btn.innerHTML = '🔥 فعل واستمتع: تعمل بنجاح (اضغط للإيقاف)';
+                    btn.innerHTML = '🔥 الموسيقى الحماسية: تعمل (اضغط للإيقاف)';
                     btn.style.borderColor = 'var(--success)';
                     btn.style.color = 'var(--success)';
                 }).catch(e => {
-                    console.error("متصفح جوجل منع التشغيل التلقائي:", e);
+                    console.error("المتصفح منع التشغيل التلقائي:", e);
                     alert('يرجى النقر مرة أخرى للسماح للمتجر بتشغيل الصوت.');
                 });
             } else {
@@ -275,14 +274,14 @@
         function formatPrice(val) {
             const rate = exchangeRates[currentCurrency];
             const converted = (parseFloat(val) * rate).toFixed(2);
-            return `${converted}${currencySymbols[currentCurrency]}`;
+            return `${converted} ${currencySymbols[currentCurrency]}`;
         }
 
         async function loadStoreProducts() {
             try {
                 const snap = await get(ref(db, 'products'));
                 if (!snap.exists()) {
-                    document.getElementById('productsGrid').innerHTML = `<p class="loading-text">لا توجد منتجات مضافة حالياً.</p>`;
+                    document.getElementById('productsGrid').innerHTML = `<p class="loading-text">لا توجد منتجات مضافة حالياً في قاعدة البيانات.</p>`;
                     return;
                 }
                 allProducts = snap.val();
@@ -295,7 +294,7 @@
                 }
             } catch (e) {
                 console.error(e);
-                document.getElementById('productsGrid').innerHTML = `<p class="loading-text">حدث خطأ أثناء تحميل المنتجات.</p>`;
+                document.getElementById('productsGrid').innerHTML = `<p class="loading-text">حدث خطأ أثناء تحميل المنتجات. تأكد من قواعد الاتصال بـ Firebase.</p>`;
             }
         }
 
@@ -345,7 +344,8 @@
                         <img src="${mainImg}" class="product-img" alt="${p.title}">
                         <div class="product-info">
                             <div>
-                                <div class="product-title">${p.title}</div>${priceHtml}
+                                <div class="product-title">${p.title}</div>
+                                ${priceHtml}
                             </div>
                             <div>${stockBadge}</div>
                         </div>
@@ -395,8 +395,9 @@
             let modalBody = `
                 <img src="${images[0]}" id="modalMainImg" class="modal-main-img" onclick="openLightbox(this.src)" alt="${p.title}">
                 <div class="modal-thumbs">${thumbsHtml}</div>
-                <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px; color:#fff;">${p.title}</div>${modalPriceHtml}
-                <div style="font-size: 10px; color: var(--success); margin-bottom: 4px;">🔥 المشاهدات: (${p.fakeViews \vert{}\vert{} 14}) \vert{} 🛍️ المشترين: (${p.fakeBuyers || 25})</div>
+                <div style="font-size: 13px; font-weight: bold; margin-bottom: 4px; color:#fff;">${p.title}</div>
+                ${modalPriceHtml}
+                <div style="font-size: 10px; color: var(--success); margin-bottom: 4px;">🔥 المشاهدات: (${p.fakeViews || 14}) | 🛍️ المشترين: (${p.fakeBuyers || 25})</div>
                 <div style="font-size: 10px; color: var(--accent-gold); margin-bottom: 8px;">✅ العملاء الحقيقيون الذين اشتروا هذا المنتج: <b>${realSalesCount}</b> عميلاً</div>
                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; white-space: pre-wrap;">${p.desc || 'لا يوجد وصف متاح.'}</div>
                 ${actionBtn}
@@ -507,4 +508,12 @@
 
         window.orderDirect = function(id, title, price) {
             recordRealPurchase([id]);
-            const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n
+            const message = encodeURIComponent(`مرحباً، أريد طلب هذا المنتج:\n*${title}*\nالسعر: ${formatPrice(price)}`);
+            
+            window.open(`https://api.whatsapp.com/send?phone=201156666967&text=${message}`, '_blank');
+        }
+
+        window.addEventListener('DOMContentLoaded', loadStoreProducts);
+    </script>
+</body>
+</html>

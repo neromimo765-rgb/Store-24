@@ -84,7 +84,7 @@
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
-        <span>جاري معالجة ونشر المنتجات...</span>
+        <span>جاري المعالجة...</span>
     </div>
 
     <div class="container">
@@ -93,12 +93,12 @@
             <a href="landing-admin.html" class="nav-btn">صفحات الهبوط 🚀</a>
         </header>
 
-        <!-- قسم التحكم في إحصائيات المتجر العامة -->
+        <!-- قسم إحصائيات وزيارات المتجر العامة -->
         <div class="card">
             <h2>📊 إحصائيات وزيارات المتجر العامة</h2>
             <div class="form-group">
-                <label>عدد زيارات المتجر الوهمية (اكتب العدد مثل 12 لتغييره يومياً، أو اتركه فارغاً للإلغاء والإخفاء):</label>
-                <input type="number" id="globalFakeVisits" class="form-control" placeholder="مثال: 12">
+                <label>عدد زيارات المتجر (اكتب العدد مثل 50 لتغييره يومياً، أو اتركه فارغاً للإلغاء والإخفاء):</label>
+                <input type="number" id="globalFakeVisits" class="form-control" placeholder="مثال: 50">
             </div>
             <button onclick="saveGlobalSettings()" class="btn" style="background: var(--info); color:#fff;">حفظ إعدادات زيارات المتجر ⚙️</button>
         </div>
@@ -148,12 +148,12 @@
             </div>
 
             <div class="form-group">
-                <label>عدد مشاهدات المنتج الوهمية (اختياري - اتركه فارغاً للإخفاء):</label>
+                <label>عدد المشاهدات للمنتج (اختياري - اتركه فارغاً للإخفاء):</label>
                 <input type="number" id="prodFakeViews" class="form-control" placeholder="مثال: 45">
             </div>
 
             <div class="form-group">
-                <label>عدد مشتريات المنتج الوهمية (اختياري - اتركه فارغاً للإخفاء):</label>
+                <label>عدد المشترين للمنتج (اختياري - اتركه فارغاً للإخفاء):</label>
                 <input type="number" id="prodFakeBuyers" class="form-control" placeholder="مثال: 12">
             </div>
 
@@ -334,7 +334,7 @@
                                 السعر: ${priceDisplay} | الحالة: ${stockText}<br>
                                 القسم: ${p.category || 'أدوات منزلية'}<br>
                                 🛒 <b>عدد المشتريات الفعلية (الحقيقية):</b> <span style="color:var(--success); font-weight:bold;">${realPurchasesCount} عملية شراء</span><br>
-                                👀 مشاهدات وهمية: ${p.fakeViews ? p.fakeViews : 'غير مفعلة (مخفية)'} | 🛍️ مشترين وهميين: ${p.fakeBuyers ? p.fakeBuyers : 'غير مفعلة (مخفية)'}
+                                👀 مشاهدات: ${p.fakeViews ? p.fakeViews : 'غير مفعلة (مخفية)'} | 🛍️ مشترين: ${p.fakeBuyers ? p.fakeBuyers : 'غير مفعلة (مخفية)'}
                             </div>
                             ${imgHtml}
                             <div class="actions-grid">
